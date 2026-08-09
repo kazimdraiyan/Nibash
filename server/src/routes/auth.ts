@@ -32,8 +32,9 @@ router.post("/register", async (req,res)=>{
         }
         res.json({ message: "registered succesfully" });
     } catch (err) {
-        res.status(500).json({error: "something went wrong"});  // 500-> internal server error
-    }
+    console.log(err);
+    res.status(500).json({ error: "something went wrong" });
+}
 });
 router.post("/login",async (req,res)=>{
     try {
@@ -56,7 +57,8 @@ router.post("/login",async (req,res)=>{
         );
         res.json({token});
     } catch (err) {
-         res.status(500).json({error: "something went wrong"});
-    }
+    console.log(err);
+    res.status(500).json({ error: "something went wrong" });
+}
 });
 export default router;
