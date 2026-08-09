@@ -22,9 +22,9 @@ app.get("/health", async (_req, res) => {  // health check
   }
 });
 
-app.get("/api/protected", authMiddleware, async (req, res) => {    // middleware 
-    res.json({ message: "you are authenticated", user: (req as any).user });
-});
+// app.get("/api/protected", authMiddleware, async (req, res) => {    // testing purpose
+//     res.json({ message: "you are authenticated", user: (req as any).user });
+// });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
