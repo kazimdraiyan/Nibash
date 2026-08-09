@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { pool } from "./db/pool.js"; // keep .js if using NodeNext, drop it if using commonjs/node
 import authRoutes from "./routes/auth.js";
 import authMiddleware from "./middleware/auth.js";
+import listingsRoutes from "./routes/listings.js";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use("/api/listings",listingsRoutes);
 
 app.get("/health", async (_req, res) => {  // health check
   try {

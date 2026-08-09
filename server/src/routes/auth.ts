@@ -6,13 +6,30 @@ const router = Router();
 
 router.post("/register", async (req,res)=>{
     try {
-        const {name,email,password,phone,nid} = req.body;
-        if(!name || !email || !password|| !phone || !nid)  {
+        const {name,email,password,phone,nid,role} = req.body;
+        if(!name || !email || !password|| !phone || !nid || !role)  {
         res.status(400).json({error: "please fill out every information"});// 400-> bad request, client side fault
         return;
     } 
+
         const hashedPassword = await bcrypt.hash(password, 10); 
-        const insert = await pool.query("INSERT into users (name,email,password_hash,phone,nid) values($1,$2,$3,$4,$5)",[name,email,hashedPassword,phone,nid]);
+        const insert = await pool.query("INSERT into users (name,email,password_hash,phone,nid) values($1,$2,$3,$4,$5) RETURNING id",[name,email,hashedPassword,phone,nid]);
+        const userId = insert.rows[0].id;
+        if(role == 'owner'){
+            const ownerInsert = await pool.query("INSERT into owners(user_id) values($1)",[userId]);
+        }
+        else if(role == 'tenant'){
+            const {monthly_income,emergency_contact}=req.body;
+            const tenantInsert = await pool.query("INSERT into tenants(user_id,monthly_income,emergency_contact) values($1,$2,$3)",[userId,monthly_income,emergency_contact]);
+        }
+        else if(role == 'verifier'){
+            const verifierInsert = await pool.query("INSERT into verifiers(user_id) values($1)",[userId]);
+        }
+        else{
+            const ownerInsert = await pool.query("INSERT into owners(user_id) values($1)",[userId]);
+            const {monthly_income,emergency_contact}=req.body;
+            const tenantInsert = await pool.query("INSERT into tenants(user_id,monthly_income,emergency_contact) values($1,$2,$3)",[userId,monthly_income,emergency_contact]);
+        }
         res.json({ message: "registered succesfully" });
     } catch (err) {
         res.status(500).json({error: "something went wrong"});  // 500-> internal server error
