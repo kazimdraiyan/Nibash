@@ -14,6 +14,13 @@ router.get("/", async (req,res)=>{           // visitors can see all the approve
 });
 router.post("/",authMiddleware, async (req,res) => {   // owner posts listings
     try {
+        const owner_id= (req as any).user.id;
+        const isOwner = await pool.query("select * from owners where user_id =$1",[owner_id]);
+        if(isOwner.rows.length==0){
+            res.status(403).json({error :"you are not an owner"});
+            return;
+        }
+
         const {title,description,latitude,longitude,bedroom_count, bathroom_count, on_which_floor, area_id} = req.body;
         if(bedroom_count<=0 || bathroom_count<=0 || on_which_floor<0){  // cant be negative or zero
             res.status(400).json({ error: "bedroom_count, bathroom_count and on_which_floor must be non-negative" });
@@ -35,7 +42,7 @@ router.post("/",authMiddleware, async (req,res) => {   // owner posts listings
             return;
         }
 
-        const owner_id= (req as any).user.id;
+        
         const status = "waiting";
         const insert = await pool.query("insert into listings (title,description,latitude,longitude,bedroom_count, bathroom_count, on_which_floor, area_id,owner_id,status) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",[trimmedTitle, trimmedDescription, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, owner_id, status]);
         res.json({message: "Listing inserted"});        

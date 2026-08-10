@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const router = Router();
 
 router.post("/register", async (req,res)=>{
-    try {
+    
         const {name,email,password,phone,nid,role} = req.body;
         if(!name || !email || !password|| !phone || !nid || !role)  {
         res.status(400).json({error: "please fill out every information"});// 400-> bad request, client side fault
@@ -24,36 +24,55 @@ router.post("/register", async (req,res)=>{
             res.status(400).json({error: "Invalid phone number"});
             return;
         }
-       const existingUser = await pool.query("SELECT * FROM users WHERE email=$1 or nid=$2 or phone=$3",[email,nid,phone]);
-        if(existingUser.rows.length > 0){
-            res.status(400).json({error: "An account with this email, NID, or phone number already exists"});
-            return;     // two users cannot have the same email, NID or phone number
+        const validRoles = ["owner", "tenant","verifier","both"];
+        if (!validRoles.includes(role)) {
+            res.status(400).json({ error: "Invalid role" });
+            return;
         }
-        
-
-        const hashedPassword = await bcrypt.hash(password, 10); 
-        const insert = await pool.query("INSERT into users (name,email,password_hash,phone,nid) values($1,$2,$3,$4,$5) RETURNING id",[name,email,hashedPassword,phone,nid]);
-        const userId = insert.rows[0].id;
-        if(role == 'owner'){
-            const ownerInsert = await pool.query("INSERT into owners(user_id) values($1)",[userId]);
+        const ifTenant = role === "tenant" || role === "both";
+        const {monthly_income,emergency_contact} = req.body;
+        if(ifTenant){
+            if(monthly_income=== undefined ||monthly_income === null || !emergency_contact){
+                res.status(400).json({error: "please fill out every information for tenant"});
+                return;
+            }
+            if(monthly_income <= 0) {
+                res.status(400).json({ error: "monthly_income must be a positive number" });
+                return;
+            }
         }
-        else if(role == 'tenant'){
-            const {monthly_income,emergency_contact}=req.body;
-            const tenantInsert = await pool.query("INSERT into tenants(user_id,monthly_income,emergency_contact) values($1,$2,$3)",[userId,monthly_income,emergency_contact]);
+        const client = await pool.connect();   // single connection to the database, we will use this client to run queries
+        try{
+            await client.query("BEGIN");  // starting a transaction
+            const existingUser = await client.query("SELECT * FROM users WHERE email=$1 or nid=$2 or phone=$3",[email,nid,phone]);
+            if(existingUser.rows.length>0){
+                await client.query("ROLLBACK");  // rolling back the transaction if email already exists
+                res.status(400).json({error: "email or NID or phone already exists"});
+                return;
+            }
+            const hashedPassword = await bcrypt.hash(password, 10);  // hashing the password before storing it in the database
+            const insertUser = await client.query("INSERT INTO users (name,email,password_hash,phone,nid,role) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id",[name,email,hashedPassword,phone,nid,role]);
+            const userId = insertUser.rows[0].id;
+            
+            if(role === "owner" || role === "both"){
+             await client.query("INSERT INTO owners (user_id) VALUES ($1)",[userId]);
+            }
+            if(ifTenant){
+             await client.query("INSERT INTO tenants (user_id,monthly_income,emergency_contact) VALUES ($1,$2,$3)",[userId,monthly_income,emergency_contact]);
+            }
+            if(role === "verifier"){
+                await client.query("INSERT INTO verifiers (user_id) VALUES ($1)",[userId]);
+            }
+            await client.query("COMMIT");  // committing the transaction
+            res.json({message: "user registered successfully"});
         }
-        else if(role == 'verifier'){
-            const verifierInsert = await pool.query("INSERT into verifiers(user_id) values($1)",[userId]);
+        catch (err) {
+            await client.query("ROLLBACK");  // rolling back the transaction if any error occurs
+            console.log(err);
+            res.status(500).json({ error: "something went wrong" });
+        } finally {
+            client.release();  // releasing the client back to the pool
         }
-        else{   // both owner and tenant
-            const ownerInsert = await pool.query("INSERT into owners(user_id) values($1)",[userId]);
-            const {monthly_income,emergency_contact}=req.body;
-            const tenantInsert = await pool.query("INSERT into tenants(user_id,monthly_income,emergency_contact) values($1,$2,$3)",[userId,monthly_income,emergency_contact]);
-        }
-        res.json({ message: "registered succesfully" });
-    } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "something went wrong" });
-}
 });
 router.post("/login",async (req,res)=>{
     try {
@@ -77,7 +96,7 @@ router.post("/login",async (req,res)=>{
         res.json({token});
     } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "something went wrong" });
-}
+            res.status(500).json({ error: "something went wrong" });
+        } 
 });
 export default router;

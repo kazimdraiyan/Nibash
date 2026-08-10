@@ -12,7 +12,7 @@ router.post("/", authMiddleware, async (req, res) => {    // tenant applies for 
             return;
         }
         const { listingId } = req.body;
-        const isValidlisting = await pool.query("select * from listings where id=$1", [listingId]);
+        const isValidlisting = await pool.query("select * from listings where id=$1 and status='approved'", [listingId]);
         if (isValidlisting.rows.length == 0) {
             res.status(400).json({ error: " listing doesnt exist" });
             return;
@@ -107,6 +107,7 @@ router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // 
             return;
         }
         const approval = await pool.query("update applies set status =$1 where tenant_id =$2 and listing_id=$3", [status, tenantId, listingId]);
+        
         res.json({ message: "application considered by the owner" });
 
 
