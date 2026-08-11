@@ -5,7 +5,11 @@ import authMiddleware from "../middleware/auth.js";
 
 router.post("/", authMiddleware, async (req, res) => {    // tenant applies for a listing
     try {
-        const tenantId = (req as any).user.id;
+        if(!req.user){
+            res.status(401).json({ error: "unauthorized" });
+            return;
+        }
+        const tenantId = req.user.id;
         const isTenant = await pool.query("select * from tenants where user_id=$1", [tenantId]);
         if (isTenant.rows.length == 0) {
             res.status(403).json({ error: "youre not a tenant" });
@@ -30,7 +34,11 @@ router.post("/", authMiddleware, async (req, res) => {    // tenant applies for 
 
 router.get("/", authMiddleware, async (req, res) => {                // an ownwer gets all the applications
     try {
-        const owner_id = (req as any).user.id;
+        if (!req.user) {
+            res.status(401).json({ error: "unauthorized" });
+            return;
+        }
+        const owner_id = req.user.id;
         const isOwner = await pool.query("select * from owners where user_id = $1", [owner_id]);
         if (isOwner.rows.length == 0) {
             res.status(403).json({ error: "you are not an owner" });
@@ -54,7 +62,11 @@ router.get("/", authMiddleware, async (req, res) => {                // an ownwe
 
 router.get("/:listingId", authMiddleware, async (req, res) => {                // an ownwer gets a specific application
     try {
-        const owner_id = (req as any).user.id;
+        if (!req.user) {
+            res.status(401).json({ error: "unauthorized" });
+            return;
+        }
+        const owner_id = req.user.id;
         const { listingId } = req.params;
         const isOwner = await pool.query("select * from owners where user_id = $1", [owner_id]);
         if (isOwner.rows.length == 0) {
@@ -86,7 +98,11 @@ router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // 
             res.status(400).json({ error: "status must be approved or rejected" });
             return;
         }
-        const owner_id = (req as any).user.id;
+        if (!req.user) {
+            res.status(401).json({ error: "unauthorized" });
+            return;
+        }
+        const owner_id = req.user.id;
         const isOwner = await pool.query("select * from owners where user_id = $1", [owner_id]);
         if (isOwner.rows.length == 0) {
             res.status(403).json({ error: "you are not an owner" });

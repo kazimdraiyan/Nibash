@@ -51,7 +51,7 @@ router.post("/register", async (req,res)=>{
                 return;
             }
             const hashedPassword = await bcrypt.hash(password, 10);  // hashing the password before storing it in the database
-            const insertUser = await client.query("INSERT INTO users (name,email,password_hash,phone,nid,role) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id",[name,email,hashedPassword,phone,nid,role]);
+            const insertUser = await client.query("INSERT INTO users (name,email,password_hash,phone,nid) VALUES ($1,$2,$3,$4,$5) RETURNING id",[name,email,hashedPassword,phone,nid]);
             const userId = insertUser.rows[0].id;
             
             if(role === "owner" || role === "both"){
