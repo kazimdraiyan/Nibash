@@ -1,27 +1,34 @@
-import { application, Router } from "express";
+import { Router } from "express";
 import { pool } from "../db/pool.js";
 const router = Router();
 import authMiddleware from "../middleware/auth.js";
 
 router.post("/", authMiddleware, async (req, res) => {    // tenant applies for a listing
     try {
-        if(!req.user){
+        if (!req.user) {
             res.status(401).json({ error: "unauthorized" });
             return;
         }
         const tenantId = req.user.id;
         const isTenant = await pool.query("select * from tenants where user_id=$1", [tenantId]);
-        if (isTenant.rows.length == 0) {
+        if (isTenant.rows.length === 0) {
             res.status(403).json({ error: "youre not a tenant" });
             return;
         }
         const { listingId } = req.body;
         const isValidlisting = await pool.query("select * from listings where id=$1 and status='approved'", [listingId]);
-        if (isValidlisting.rows.length == 0) {
+        if (isValidlisting.rows.length === 0) {
             res.status(400).json({ error: " listing doesnt exist" });
             return;
         }
-
+        const existing = await pool.query(
+            "SELECT 1 FROM applies WHERE tenant_id=$1 AND listing_id=$2",
+            [tenantId, listingId]
+        );
+        if (existing.rows.length > 0) {
+            res.status(409).json({ error: "already applied to this listing" });
+            return;
+        }
         const posting = await pool.query("insert into applies(tenant_id,listing_id) values($1,$2)", [tenantId, listingId]);
         res.json({ message: "applied successfully " });
     }
@@ -40,12 +47,12 @@ router.get("/", authMiddleware, async (req, res) => {                // an ownwe
         }
         const owner_id = req.user.id;
         const isOwner = await pool.query("select * from owners where user_id = $1", [owner_id]);
-        if (isOwner.rows.length == 0) {
+        if (isOwner.rows.length === 0) {
             res.status(403).json({ error: "you are not an owner" });
             return;
         }
         const anylisting = await pool.query("select * from listings where owner_id =$1", [owner_id]);
-        if (anylisting.rows.length == 0) {
+        if (anylisting.rows.length === 0) {
             res.status(404).json({ error: "you dont have any listings" });
             return;
         }
@@ -69,12 +76,12 @@ router.get("/:listingId", authMiddleware, async (req, res) => {                /
         const owner_id = req.user.id;
         const { listingId } = req.params;
         const isOwner = await pool.query("select * from owners where user_id = $1", [owner_id]);
-        if (isOwner.rows.length == 0) {
+        if (isOwner.rows.length === 0) {
             res.status(403).json({ error: "you are not an owner" });
             return;
         }
         const listing = await pool.query("SELECT * FROM listings WHERE id = $1", [listingId]);
-        if (listing.rows.length == 0) {
+        if (listing.rows.length === 0) {
             res.status(404).json({ error: "listing not found" });
             return;
         }
@@ -104,12 +111,12 @@ router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // 
         }
         const owner_id = req.user.id;
         const isOwner = await pool.query("select * from owners where user_id = $1", [owner_id]);
-        if (isOwner.rows.length == 0) {
+        if (isOwner.rows.length === 0) {
             res.status(403).json({ error: "you are not an owner" });
             return;
         }
         const listing = await pool.query("SELECT * FROM listings WHERE id = $1", [listingId]);
-        if (listing.rows.length == 0) {
+        if (listing.rows.length === 0) {
             res.status(404).json({ error: "listing not found" });
             return;
         }
@@ -118,12 +125,12 @@ router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // 
             return;
         }
         const applications = await pool.query("select * from applies a join listings l on a.listing_id=l.id where l.owner_id=$1 and l.id=$2 and a.tenant_id=$3", [owner_id, listingId, tenantId]);
-        if (applications.rows.length == 0) {
+        if (applications.rows.length === 0) {
             res.status(404).json({ error: "application not found" });
             return;
         }
         const approval = await pool.query("update applies set status =$1 where tenant_id =$2 and listing_id=$3", [status, tenantId, listingId]);
-        
+
         res.json({ message: "application considered by the owner" });
 
 

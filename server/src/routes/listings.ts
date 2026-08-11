@@ -20,7 +20,7 @@ router.post("/",authMiddleware, async (req,res) => {   // owner posts listings
         }
         const owner_id= req.user.id;
         const isOwner = await pool.query("select * from owners where user_id =$1",[owner_id]);
-        if(isOwner.rows.length==0){
+        if(isOwner.rows.length===0){
             res.status(403).json({error :"you are not an owner"});
             return;
         }
@@ -29,6 +29,10 @@ router.post("/",authMiddleware, async (req,res) => {   // owner posts listings
         if(bedroom_count<=0 || bathroom_count<=0 || on_which_floor<0){  // cant be negative or zero
             res.status(400).json({ error: "bedroom_count, bathroom_count and on_which_floor must be non-negative" });
             return;
+        }
+        if (!title || !description) {
+        res.status(400).json({ error: "title and description are required" });
+        return;
         }
         const trimmedTitle = title.trim();  // checking if title and description are empty after trimming whitespace
         if (trimmedTitle.length === 0) {
@@ -41,7 +45,7 @@ router.post("/",authMiddleware, async (req,res) => {   // owner posts listings
             return;
         }
         const area = await pool.query("select * from areas where id=$1",[area_id]);
-        if(area.rows.length==0){     // chcking if the area_id exists in the areas table
+        if(area.rows.length===0){     // chcking if the area_id exists in the areas table
             res.status(400).json({ error: "area_id does not exist" });
             return;
         }
@@ -76,7 +80,7 @@ router.put("/:id",authMiddleware, async (req,res)=>{      // owner updates a lis
     try {
         const {id}=req.params;
         const listing = await pool.query("SELECT * from listings where id= $1",[id]);
-        if(listing.rows.length==0){
+        if(listing.rows.length===0){
             res.status(404).json({error: "listing not found"});  
             return;
         }
@@ -84,7 +88,7 @@ router.put("/:id",authMiddleware, async (req,res)=>{      // owner updates a lis
             res.status(401).json({ error: "unauthorized" });
             return;
         }
-        if(listing.rows[0].owner_id==req.user.id){  //checking if the user is the owner of the listing
+        if(listing.rows[0].owner_id===req.user.id){  //checking if the user is the owner of the listing
           // here frontend will send updated values and current values if not updated.
           //  So we can just update all the values with the new values.
           const { title, description, bedroom_count, bathroom_count, on_which_floor, area_id } = req.body;
@@ -108,7 +112,7 @@ router.delete("/:id",authMiddleware, async (req,res)=>{      // owner deletes a 
     try {
         const {id}=req.params;
         const listing = await pool.query("SELECT * from listings where id= $1",[id]);
-        if(listing.rows.length==0){
+        if(listing.rows.length===0){
             res.status(404).json({error: "listing not found"});  
             return;
         }
@@ -116,7 +120,7 @@ router.delete("/:id",authMiddleware, async (req,res)=>{      // owner deletes a 
             res.status(401).json({ error: "unauthorized" });
             return;
         }
-        if(listing.rows[0].owner_id==req.user.id){
+        if(listing.rows[0].owner_id===req.user.id){
           
           const result= await pool.query("UPDATE listings set status='unavailable' where id=$1",[id]);
           res.json({message: "deleted successfully"});

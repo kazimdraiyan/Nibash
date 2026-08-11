@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { pool } from "./db/pool.js"; // keep .js if using NodeNext, drop it if using commonjs/node
 import authRoutes from "./routes/auth.js";
-import authMiddleware from "./middleware/auth.js";
 import listingsRoutes from "./routes/listings.js";
 import applicationRoutes from "./routes/applications.js";
 

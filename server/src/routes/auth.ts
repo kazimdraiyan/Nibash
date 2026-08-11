@@ -78,14 +78,14 @@ router.post("/login",async (req,res)=>{
     try {
         const{email,password}=req.body;
         const find = await pool.query("SELECT id,email,password_hash from users where email =$1",[email]);
-        if(find.rows.length == 0){  // a sql query always returns something truthy
-            res.status(401).json({error: "account doesnt exist"}); // not authenticated error
+        if(find.rows.length === 0){  // a sql query always returns something truthy
+            res.status(401).json({error: "wrong credentials"}); // not authenticated error
             return;
             
         }
         const correctPassword = await bcrypt.compare(password,find.rows[0].password_hash);
         if(!correctPassword){
-           res.status(401).json({error: "wrong password"}); 
+           res.status(401).json({error: "wrong credentials"}); 
            return;
         }
         const token = jwt.sign(
