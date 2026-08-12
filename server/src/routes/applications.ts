@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { pool } from "../db/pool.js";
+import { applySchema, updateApplicationSchema } from "../schemas/application.schema.js";
 const router = Router();
 import authMiddleware from "../middleware/auth.js";
 
@@ -15,7 +16,13 @@ router.post("/", authMiddleware, async (req, res) => {    // tenant applies for 
             res.status(403).json({ error: "youre not a tenant" });
             return;
         }
-        const { listingId } = req.body;
+        const result = applySchema.safeParse(req.body);
+        if (!result.success) {
+            res.status(400).json({ error: result.error.issues[0].message });
+            return;
+        }
+        const data = result.data; // use data instead of req.body from here on
+        const { listingId } = data;
         const isValidlisting = await pool.query("select * from listings where id=$1 and status='approved'", [listingId]);
         if (isValidlisting.rows.length === 0) {
             res.status(400).json({ error: " listing doesnt exist" });
@@ -29,7 +36,7 @@ router.post("/", authMiddleware, async (req, res) => {    // tenant applies for 
             res.status(409).json({ error: "already applied to this listing" });
             return;
         }
-        const posting = await pool.query("insert into applies(tenant_id,listing_id) values($1,$2)", [tenantId, listingId]);
+         await pool.query("insert into applies(tenant_id,listing_id) values($1,$2)", [tenantId, listingId]);
         res.json({ message: "applied successfully " });
     }
 
@@ -100,11 +107,14 @@ router.get("/:listingId", authMiddleware, async (req, res) => {                /
 router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // owner approves or rejects applications
     try {
         const { listingId, tenantId } = req.params;
-        const { status } = req.body;
-        if (status !== 'approved' && status !== 'rejected') {
-            res.status(400).json({ error: "status must be approved or rejected" });
+        const result = updateApplicationSchema.safeParse(req.body);
+        if (!result.success) {
+            res.status(400).json({ error: result.error.issues[0].message });
             return;
         }
+        const data = result.data; // use data instead of req.body from here on
+        const { status } = data;
+       
         if (!req.user) {
             res.status(401).json({ error: "unauthorized" });
             return;
@@ -129,7 +139,7 @@ router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // 
             res.status(404).json({ error: "application not found" });
             return;
         }
-        const approval = await pool.query("update applies set status =$1 where tenant_id =$2 and listing_id=$3", [status, tenantId, listingId]);
+         await pool.query("update applies set status =$1 where tenant_id =$2 and listing_id=$3", [status, tenantId, listingId]);
 
         res.json({ message: "application considered by the owner" });
 

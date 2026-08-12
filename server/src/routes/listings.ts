@@ -2,7 +2,8 @@ import { Router } from "express";
 import { pool } from "../db/pool.js";
 const router = Router();
 import authMiddleware from "../middleware/auth.js";
-
+import { createListingSchema } from "../schemas/listing.schema.js";
+import { updateListingSchema } from "../schemas/listing.schema.js";
 router.get("/", async (req, res) => {           // visitors can see all the approved listing
     try {
         const findAllListings = await pool.query("select * from listings where status='approved'");
@@ -24,50 +25,29 @@ router.post("/", authMiddleware, async (req, res) => {   // owner posts listings
             res.status(403).json({ error: "you are not an owner" });
             return;
         }
+        const result = createListingSchema.safeParse(req.body);
+        if (!result.success) {
+            res.status(400).json({ error: result.error.issues[0].message });
+            return;
+        }
+        const data = result.data; // use data instead of req.body from here on
 
-        const { title, description, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = req.body;
+        const { title, description, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = data;
 
-        if (bedroom_count <= 0 || bathroom_count <= 0 || on_which_floor < 0) {  // cant be negative or zero
-            res.status(400).json({ error: "bedroom_count, bathroom_count and on_which_floor must be non-negative" });
-            return;
-        }
-        if (!title || !description) {
-            res.status(400).json({ error: "title and description are required" });
-            return;
-        }
-        const trimmedTitle = title.trim();  // checking if title and description are empty after trimming whitespace
-        if (trimmedTitle.length === 0) {
-            res.status(400).json({ error: "title cannot be empty" });
-            return;
-        }
-        const trimmedDescription = description.trim();
-        if (trimmedDescription.length === 0) {
-            res.status(400).json({ error: "description cannot be empty" });
-            return;
-        }
+
+
         const area = await pool.query("select * from areas where id=$1", [area_id]);
         if (area.rows.length === 0) {     // chcking if the area_id exists in the areas table
             res.status(400).json({ error: "area_id does not exist" });
             return;
         }
-        if (rent <= 0 || electricity_bill < 0 || water_bill < 0 || service_charge < 0 || security_deposit < 0) {  // rent cant be negative or zero, bills and security deposit cant be negative
-            res.status(400).json({ error: "rent must be positive and bills and security deposit must be non-negative" });
-            return;
-        }
-        if (monthly_due_date < 1 || monthly_due_date > 28) {  // monthly due date must be between 1 and 28
-            res.status(400).json({ error: "monthly_due_date must be between 1 and 28" });
-            return;
-        }
-        if (pet_allowed !== true && pet_allowed !== false) {  // pet_allowed must be boolean
-            res.status(400).json({ error: "pet_allowed must be boolean" });
-            return;
-        }
+
 
         const status = "waiting";  // when owner posts a listing, it will be waiting for admin approval
         const client = await pool.connect();
         try {
             await client.query("BEGIN");
-            const insert = await client.query("insert into listings (title,description,latitude,longitude,bedroom_count, bathroom_count, on_which_floor, area_id,owner_id,status) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id", [trimmedTitle, trimmedDescription, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, owner_id, status]);
+            const insert = await client.query("insert into listings (title,description,latitude,longitude,bedroom_count, bathroom_count, on_which_floor, area_id,owner_id,status) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id", [title, description, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, owner_id, status]);
             const listingId = insert.rows[0].id;
             const insertTerms = await client.query("insert into terms (rent,electricity_bill,water_bill,service_charge,monthly_due_date,pet_allowed,security_deposit) values ($1,$2,$3,$4,$5,$6,$7) returning id", [rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit]);
             const termsId = insertTerms.rows[0].id;
@@ -119,9 +99,15 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
             res.status(401).json({ error: "unauthorized" });
             return;
         }
-        if (listing.rows[0].owner_id === req.user.id) {  //checking if the user is the owner of the listing
 
-            const { title, description, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = req.body;
+        if (listing.rows[0].owner_id === req.user.id) {  //checking if the user is the owner of the listing
+            const result = updateListingSchema.safeParse(req.body);
+            if (!result.success) {
+                res.status(400).json({ error: result.error.issues[0].message });
+                return;
+            }
+            const data = result.data; // use data instead of req.body from here on
+            const { title, description, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = data;
             if (area_id !== undefined) {
                 const isarea = await pool.query("select * from areas where id=$1", [area_id]);
                 if (isarea.rows.length === 0) {
@@ -129,38 +115,7 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
                     return;
                 }
             }
-            if (bedroom_count !== undefined && bedroom_count <= 0 || bathroom_count !== undefined && bathroom_count <= 0 || on_which_floor !== undefined && on_which_floor < 0) {  // cant be negative or zero
-                res.status(400).json({ error: "values cannot be negative or zero" });
-                return;
-            }
-            if (rent !== undefined && rent <= 0) {
-                res.status(400).json({ error: "rent must be positive" });
-                return;
-            }
-            if (electricity_bill !== undefined && electricity_bill < 0) {
-                res.status(400).json({ error: "electricity_bill cannot be negative" });
-                return;
-            }
-            if (water_bill !== undefined && water_bill < 0) {
-                res.status(400).json({ error: "water_bill cannot be negative" });
-                return;
-            }
-            if (service_charge !== undefined && service_charge < 0) {
-                res.status(400).json({ error: "service_charge cannot be negative" });
-                return;
-            }
-            if (security_deposit !== undefined && security_deposit < 0) {
-                res.status(400).json({ error: "security_deposit cannot be negative" });
-                return;
-            }
-            if (monthly_due_date !== undefined && (monthly_due_date < 1 || monthly_due_date > 28)) {
-                res.status(400).json({ error: "monthly_due_date must be between 1 and 28" });
-                return;
-            }
-            if (pet_allowed !== undefined && pet_allowed !== true && pet_allowed !== false) {
-                res.status(400).json({ error: "pet_allowed must be a boolean" });
-                return;
-            }
+            
             const client = await pool.connect();
             try {
                 await client.query("BEGIN");
@@ -226,8 +181,5 @@ router.delete("/:id", authMiddleware, async (req, res) => {      // owner delete
     }
 
 });
-
-
-
 
 export default router;
