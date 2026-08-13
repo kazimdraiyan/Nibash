@@ -104,7 +104,7 @@ router.get("/:listingId", authMiddleware, async (req, res) => {                /
     }
 });
 
-router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // owner approves or rejects applications
+router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // owner  rejects applications
     try {
         const { listingId, tenantId } = req.params;
         const result = updateApplicationSchema.safeParse(req.body);
@@ -141,7 +141,7 @@ router.put("/:listingId/:tenantId", authMiddleware, async (req, res) => {    // 
         }
          await pool.query("update applies set status =$1 where tenant_id =$2 and listing_id=$3", [status, tenantId, listingId]);
 
-        res.json({ message: "application considered by the owner" });
+        res.json({ message: "application rejected by the owner" });
 
 
 
