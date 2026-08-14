@@ -7,6 +7,8 @@ import listingsRoutes from "./routes/listings.js";
 import applicationRoutes from "./routes/applications.js";
 import contractRoutes from "./routes/contracts.js";
 import paymentRoutes from "./routes/payments.js";
+import reviewRoutes from "./routes/reviews.js";
+
 dotenv.config();
 
 const app = express();
@@ -17,6 +19,7 @@ app.use("/api/listings",listingsRoutes);
 app.use("/api/applications",applicationRoutes);
 app.use("/api/contracts", contractRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.get("/health", async (_req, res) => {  // health check
   try {
