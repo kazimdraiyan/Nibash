@@ -4,6 +4,7 @@ const router = Router();
 import authMiddleware from "../middleware/auth.js";
 import { createListingSchema } from "../schemas/listing.schema.js";
 import { updateListingSchema } from "../schemas/listing.schema.js";
+import { ensureOwner } from "../services/user.service.js";
 router.get("/", async (req, res) => {           // visitors can see all the approved listing
     try {
         const findAllListings = await pool.query("select * from listings where status='approved'");
@@ -20,18 +21,14 @@ router.post("/", authMiddleware, async (req, res) => {   // owner posts listings
             return;
         }
         const owner_id = req.user.id;
-        const isOwner = await pool.query("select * from owners where user_id =$1", [owner_id]);
-        if (isOwner.rows.length === 0) {
-            res.status(403).json({ error: "you are not an owner" });
-            return;
-        }
+        
         const result = createListingSchema.safeParse(req.body);
         if (!result.success) {
             res.status(400).json({ error: result.error.issues[0].message });
             return;
         }
         const data = result.data; // use data instead of req.body from here on
-
+        await ensureOwner(owner_id);  // check if the user is an owner, if not make him an owner
         const { title, description, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = data;
 
 

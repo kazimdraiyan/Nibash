@@ -3,6 +3,7 @@ import { pool } from "../db/pool.js";
 import { applySchema, updateApplicationSchema } from "../schemas/application.schema.js";
 const router = Router();
 import authMiddleware from "../middleware/auth.js";
+import { ensureTenant } from "../services/user.service.js";
 
 router.post("/", authMiddleware, async (req, res) => {    // tenant applies for a listing
     try {
@@ -11,18 +12,15 @@ router.post("/", authMiddleware, async (req, res) => {    // tenant applies for 
             return;
         }
         const tenantId = req.user.id;
-        const isTenant = await pool.query("select * from tenants where user_id=$1", [tenantId]);
-        if (isTenant.rows.length === 0) {
-            res.status(403).json({ error: "youre not a tenant" });
-            return;
-        }
+        
         const result = applySchema.safeParse(req.body);
         if (!result.success) {
             res.status(400).json({ error: result.error.issues[0].message });
             return;
         }
         const data = result.data; // use data instead of req.body from here on
-        const { listingId } = data;
+        const { listingId, monthly_income, emergency_contact } = data;
+        await ensureTenant(tenantId, monthly_income, emergency_contact);
         const isValidlisting = await pool.query("select * from listings where id=$1 and status='approved'", [listingId]);
         if (isValidlisting.rows.length === 0) {
             res.status(400).json({ error: " listing doesnt exist" });
@@ -41,6 +39,10 @@ router.post("/", authMiddleware, async (req, res) => {    // tenant applies for 
     }
 
     catch (err) {
+        if (err instanceof Error && err.message === "tenant_profile_required") {
+        res.status(403).json({ error: "tenant_profile_required" });
+        return;
+    }
         console.log(err);
         res.status(500).json({ error: "something went wrong" });
     }
