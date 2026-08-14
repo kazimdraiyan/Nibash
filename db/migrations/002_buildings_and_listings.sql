@@ -12,7 +12,7 @@ create table listings(
     description text not null,
     latitude numeric not null,
     longitude numeric not null,
-    status varchar(20) not null default 'waiting' check (status in ('approved', 'waiting', 'rejected','occupied')),
+    status varchar(20) not null default 'waiting' check (status in ('approved', 'waiting', 'rejected','occupied','unavailable')),
     bedroom_count int not null,
     bathroom_count int not null,
     on_which_floor int not null,
