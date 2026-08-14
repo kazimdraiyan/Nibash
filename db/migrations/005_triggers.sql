@@ -59,3 +59,22 @@ $$ language plpgsql;
 create trigger update_listing_status_completed_trigger
 after update on contracts
 for each row execute function update_listing_status_completed();
+
+--- without payment tenant cant review
+create or replace function check_review_eligibility()
+returns trigger as $$
+begin
+    if not exists (
+        select 1 from payments 
+        where contract_id = NEW.contract_id 
+        and status = 'confirmed'
+    ) then
+        raise exception 'No confirmed payment exists for this contract';
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger check_review_eligibility_trigger
+before insert on reviews
+for each row execute function check_review_eligibility();

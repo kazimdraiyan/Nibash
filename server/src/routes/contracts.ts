@@ -45,8 +45,8 @@ router.post("/", authMiddleware, async (req, res) => {
             await client.query("BEGIN");
             const insertTerms = await client.query("insert into terms (rent,electricity_bill,water_bill,service_charge,monthly_due_date,pet_allowed,security_deposit) values ($1,$2,$3,$4,$5,$6,$7) returning id", [data.rent, data.electricity_bill, data.water_bill, data.service_charge, data.monthly_due_date, data.pet_allowed, data.security_deposit]);
             const termsId = insertTerms.rows[0].id;
-            const insertAgreements = await client.query("insert into agreements (terms_id) values ($1) returning id", [termsId]);
-            const agreementId = insertAgreements.rows[0].id;
+            const insertAgreements = await client.query("insert into agreements (terms_id) values ($1) returning terms_id", [termsId]);
+            const agreementId = insertAgreements.rows[0].terms_id;
             const insertContract = await client.query("insert into contracts (listing_id,tenant_id,agreement_id,start_date,end_date,status) values ($1,$2,$3,$4,$5,'proposed') returning id", [listing_id, tenant_id, agreementId, start_date, end_date]);
             const contractId = insertContract.rows[0].id;
             await client.query("update applies set status='approved' where tenant_id=$1 and listing_id=$2", [tenant_id, listing_id]);
@@ -93,7 +93,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
             t.rent, t.electricity_bill, t.water_bill, t.service_charge, 
             t.monthly_due_date, t.pet_allowed, t.security_deposit
      FROM contracts c 
-     JOIN agreements a ON a.id = c.agreement_id 
+     JOIN agreements a ON a.terms_id = c.agreement_id 
      JOIN terms t ON t.id = a.terms_id 
      WHERE c.id = $1`,
                 [id]
