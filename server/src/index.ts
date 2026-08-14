@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import "./cron/jobs.js";
 import { pool } from "./db/pool.js"; // keep .js if using NodeNext, drop it if using commonjs/node
 import authRoutes from "./routes/auth.js";
 import listingsRoutes from "./routes/listings.js";
