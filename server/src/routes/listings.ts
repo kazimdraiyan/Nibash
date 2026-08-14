@@ -1,9 +1,11 @@
 import { Router } from "express";
 import { pool } from "../db/pool.js";
-const router = Router();
 import authMiddleware from "../middleware/auth.js";
 import { createListingSchema } from "../schemas/listing.schema.js";
 import { updateListingSchema } from "../schemas/listing.schema.js";
+
+const router = Router();
+
 router.get("/", async (req, res) => {           // visitors can see all the approved listing
     try {
         const findAllListings = await pool.query("select * from listings where status='approved'");
@@ -13,35 +15,35 @@ router.get("/", async (req, res) => {           // visitors can see all the appr
         res.status(500).json({ error: "something went wrong" });
     }
 });
+
 router.post("/", authMiddleware, async (req, res) => {   // owner posts listings
     try {
         if (!req.user) {
             res.status(401).json({ error: "unauthorized" });
             return;
         }
+
         const owner_id = req.user.id;
         const isOwner = await pool.query("select * from owners where user_id =$1", [owner_id]);
         if (isOwner.rows.length === 0) {
             res.status(403).json({ error: "you are not an owner" });
             return;
         }
+
         const result = createListingSchema.safeParse(req.body);
         if (!result.success) {
             res.status(400).json({ error: result.error.issues[0].message });
             return;
         }
+
         const data = result.data; // use data instead of req.body from here on
-
         const { title, description, latitude, longitude, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = data;
-
-
 
         const area = await pool.query("select * from areas where id=$1", [area_id]);
         if (area.rows.length === 0) {     // chcking if the area_id exists in the areas table
             res.status(400).json({ error: "area_id does not exist" });
             return;
         }
-
 
         const status = "waiting";  // when owner posts a listing, it will be waiting for admin approval
         const client = await pool.connect();
@@ -54,8 +56,6 @@ router.post("/", authMiddleware, async (req, res) => {   // owner posts listings
             await client.query("insert into initial_terms (listing_id,terms_id) values ($1,$2)", [listingId, termsId]);
             await client.query("COMMIT");
             res.status(201).json({ message: "listing created successfully" });
-
-
         }
         catch (err) {
             await client.query("ROLLBACK");
@@ -69,7 +69,6 @@ router.post("/", authMiddleware, async (req, res) => {   // owner posts listings
         console.log(err);
         res.status(500).json({ error: "something went wrong" });
     }
-
 });
 
 router.get("/:id", async (req, res) => {  // get a specific listing
@@ -80,6 +79,7 @@ router.get("/:id", async (req, res) => {  // get a specific listing
             res.status(404).json({ error: "listing not found" });
             return;
         }
+
         res.json({ listings: findListings.rows[0] });
     } catch (err) {
         console.log(err);
@@ -95,6 +95,7 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
             res.status(404).json({ error: "listing not found" });
             return;
         }
+
         if (!req.user) {
             res.status(401).json({ error: "unauthorized" });
             return;
@@ -106,6 +107,7 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
                 res.status(400).json({ error: result.error.issues[0].message });
                 return;
             }
+
             const data = result.data; // use data instead of req.body from here on
             const { title, description, bedroom_count, bathroom_count, on_which_floor, area_id, rent, electricity_bill, water_bill, service_charge, monthly_due_date, pet_allowed, security_deposit } = data;
             if (area_id !== undefined) {
@@ -115,7 +117,7 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
                     return;
                 }
             }
-            
+
             const client = await pool.connect();
             try {
                 await client.query("BEGIN");
@@ -130,7 +132,6 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
 
                 await client.query("COMMIT");
                 res.json({ message: "listing updated successfully" });
-
             } catch (err) {
                 await client.query("ROLLBACK");
                 console.error(err);
@@ -144,14 +145,11 @@ router.patch("/:id", authMiddleware, async (req, res) => {      // owner updates
             res.status(403).json({ error: "not authorized" });
             return;
         }
-
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "something went wrong" });
     }
-
 });
-
 
 router.delete("/:id", authMiddleware, async (req, res) => {      // owner deletes a listing
     try {
@@ -161,12 +159,13 @@ router.delete("/:id", authMiddleware, async (req, res) => {      // owner delete
             res.status(404).json({ error: "listing not found" });
             return;
         }
+
         if (!req.user) {
             res.status(401).json({ error: "unauthorized" });
             return;
         }
-        if (listing.rows[0].owner_id === req.user.id) {
 
+        if (listing.rows[0].owner_id === req.user.id) {
             const result = await pool.query("UPDATE listings set status='unavailable' where id=$1", [id]);
             res.json({ message: "deleted successfully" });
         }
@@ -174,12 +173,10 @@ router.delete("/:id", authMiddleware, async (req, res) => {      // owner delete
             res.status(403).json({ error: "not authorized" });
             return;
         }
-
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "something went wrong" });
     }
-
 });
 
 export default router;
