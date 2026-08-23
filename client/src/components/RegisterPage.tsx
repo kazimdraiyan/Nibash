@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface RegisterPageProps {
-  onNavigate: (view: "login") => void;
   onRegisterSuccess?: (data: { email: string }) => void; // TODO: Is token needed along with email?
 }
 
-export function RegisterPage({ onNavigate, onRegisterSuccess }: RegisterPageProps) {
+export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -67,6 +69,7 @@ export function RegisterPage({ onNavigate, onRegisterSuccess }: RegisterPageProp
       }
 
       onRegisterSuccess?.({ email });
+      navigate("/login"); // Redirect to login page after successful registration
     } catch (err: any) {
       // TODO: Handle specific error cases
       setError(err.message || "An error occurred.");
@@ -304,7 +307,7 @@ export function RegisterPage({ onNavigate, onRegisterSuccess }: RegisterPageProp
                 Already registered with Nibash?{" "}
                 <button
                   type="button"
-                  onClick={() => onNavigate("login")}
+                  onClick={() => navigate("/login")}
                   className="text-primary font-semibold underline underline-offset-4 hover:opacity-80 transition-opacity ml-1 cursor-pointer"
                 >
                   Login

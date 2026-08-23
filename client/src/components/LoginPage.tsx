@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface LoginPageProps {
-  onNavigate: (view: "register") => void;
   onLoginSuccess?: (data: { email: string; token: string }) => void;
 }
 
-export function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
+export function LoginPage({ onLoginSuccess }: LoginPageProps) {
+  const navigate = useNavigate();
+
   // State hooks
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,6 +39,7 @@ export function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
       }
 
       onLoginSuccess?.({ email, token: data.token });
+      navigate("/"); // Redirect to home page after successful login
     } catch (err: any) {
       // TODO: Handle specific error cases
       setError(err.message || "An error occurred.");
@@ -188,7 +191,7 @@ export function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
                 Don't have an account yet?{" "}
                 <button
                   type="button"
-                  onClick={() => onNavigate("register")}
+                  onClick={() => navigate("/register")}
                   className="text-primary font-semibold underline underline-offset-4 hover:opacity-80 transition-opacity ml-1 cursor-pointer"
                 >
                   Create an account
