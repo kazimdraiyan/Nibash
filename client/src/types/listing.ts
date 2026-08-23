@@ -1,7 +1,7 @@
 export interface Listing {
     id: string;
     imageUrl: string;
-    imageAlt: string;
+    imageAlt?: string;
     beds: number;
     baths: number;
     sqft: number;
