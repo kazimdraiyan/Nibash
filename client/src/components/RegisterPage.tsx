@@ -66,7 +66,7 @@ export function RegisterPage() {
         throw new Error(data.error || "An error occurred.");
       }
 
-      login(data.token, { email }); // save auth state client side
+      await login(data.token); // save auth state client side
       navigate("/"); // Redirect to home page after successful registration
     } catch (err: any) {
       // TODO: Handle specific error cases

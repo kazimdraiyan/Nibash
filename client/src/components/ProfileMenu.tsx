@@ -36,9 +36,9 @@ export function ProfileMenu() {
       {open && (
         <div className="absolute right-0 mt-2 w-64 bg-surface-container-lowest border-hairline rounded-lg shadow-lg overflow-hidden z-50">
           <div className="p-4">
-            {/* <p className="font-body-md text-body-md text-primary font-semibold">
+            <p className="font-body-md text-body-md text-primary font-semibold">
               {user.name}
-            </p> */}
+            </p>
             <p className="font-body-md text-sm text-on-surface-variant">
               {user.email}
             </p>

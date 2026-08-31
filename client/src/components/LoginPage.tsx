@@ -30,13 +30,12 @@ export function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), password }),
       });
-
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || "An error occurred.");
       }
 
-      login(data.token, { email }); // save auth state client side
+      await login(data.token); // save auth state client side
       navigate("/"); // Redirect to home page after successful login
     } catch (err: any) {
       // TODO: Handle specific error cases

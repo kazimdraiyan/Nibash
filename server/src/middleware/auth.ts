@@ -18,7 +18,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       id: number;
       email: string;
     }; // decoding the token
-    req.user = isValid; // attaching the decoded value with  the rquest
+    req.user = isValid; // attaching the decoded value with  the request
     // only possible because we opened express Request interface and added a new optional property to it
     next(); // passing the decoded value to the whatever route handler comes after this middleware
   } catch (err) {

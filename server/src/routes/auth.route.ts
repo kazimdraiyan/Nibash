@@ -7,6 +7,7 @@ const router = Router();
 
 router.post("/register", asyncHandler(authController.register));
 router.post("/login", asyncHandler(authController.login));
+router.get("/me", authMiddleware, asyncHandler(authController.me));
 router.post(
   "/become-owner",
   authMiddleware,

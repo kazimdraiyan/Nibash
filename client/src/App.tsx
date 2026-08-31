@@ -6,6 +6,7 @@ import { LoginPage } from "./components/LoginPage";
 import { RegisterPage } from "./components/RegisterPage";
 import { mockListings } from "./data/mockListings.js";
 import { Routes, Route } from "react-router-dom";
+import { useAuth } from "./context/AuthContext.js";
 
 function HomePage() {
   return (
@@ -17,7 +18,12 @@ function HomePage() {
 }
 
 export default function App() {
-  // TODO: Implement current user states
+  const { loading } = useAuth();
+
+  // TODO: replace with skeleton loader
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="antialiased min-h-screen flex flex-col font-body-md text-body-md bg-background text-on-background">

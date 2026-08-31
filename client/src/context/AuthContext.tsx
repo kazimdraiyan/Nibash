@@ -1,20 +1,27 @@
 // global auth state holder
+// TODO: save only the token in localStorage and fetch user data from server on page load
 
 import {
   createContext,
   useContext,
   useState,
+  useEffect,
   type ReactNode,
 } from "react";
 
 interface User {
   email: string;
+  id: number;
+  name: string;
+  nid: string;
+  phone: string;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => void;
+  loading: boolean;
+  login: (token: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -24,27 +31,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem("token"),
   );
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const login = (newToken: string, newUser: User) => {
+  async function fetchUserInfo(authToken: string): Promise<User | null> {
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/me", {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.user;
+    } catch {
+      return null;
+    }
+  }
+
+  // On app load, if a token exists, load user info
+  // TODO: learn more about useEffect
+  useEffect(() => {
+    async function restoreSession() {
+      if (token) {
+        const fetchedUser = await fetchUserInfo(token);
+        if (fetchedUser) {
+          setUser(fetchedUser);
+        } else {
+          // if invalid token, clear it from local storage
+          localStorage.removeItem("token");
+          setToken(null);
+        }
+      }
+      setLoading(false);
+    }
+    restoreSession();
+  }, []);
+
+  const login = async (newToken: string) => {
     localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(newUser));
     setToken(newToken);
-    setUser(newUser);
+    const fetchedUser = await fetchUserInfo(newToken);
+    setUser(fetchedUser);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,6 +3,15 @@ import jwt from "jsonwebtoken";
 import { pool } from "../db/pool.js";
 import { AppError } from "../errors/AppError.js";
 
+export async function getUserById(userId: number): Promise<{ id: number; name: string; email: string; nid: string; phone: string }> {
+  const find = await pool.query(
+    "SELECT id,name,email,nid,phone FROM users WHERE id=$1",
+    [userId],
+  );
+  if (find.rows.length === 0) throw new AppError(404, "user not found");
+  return find.rows[0];
+}
+
 export async function registerUser(
   name: string,
   email: string,

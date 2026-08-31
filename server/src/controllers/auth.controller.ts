@@ -31,6 +31,15 @@ export async function login(req: Request, res: Response) {
   res.json({ token });
 }
 
+export async function me(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const user = await authService.getUserById(req.user.id);
+  res.json({ user }); // { id, name, email, nid, phone }
+}
+
 export async function becomeOwner(req: Request, res: Response) {
   if (!req.user) {
     res.status(401).json({ error: "unauthorized" });
