@@ -15,21 +15,19 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
+app.use("/api/listings", listingRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/contracts", contractRoutes);
+app.use("/api/payments", paymentRoutes);
 
-app.use('/api/auth', authRoutes);
-app.use('/api/listings', listingRoutes);
-app.use('/api/applications', applicationRoutes);
-app.use('/api/contracts', contractRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/reviews', reviewRoutes);
-
-app.get('/health', async (_req, res) => {
+app.get("/health", async (_req, res) => {  // health check
     try {
-        const result = await pool.query('SELECT NOW()');
-        res.json({ status: 'ok', db_time: result.rows[0].now });
+        const result = await pool.query("SELECT NOW()");
+        res.json({ status: "ok", db_time: result.rows[0].now });
     } catch (err) {
-        const message = err instanceof Error ? err.message : 'unknown error';
-        res.status(500).json({ status: 'db error', error: message });
+        const message = err instanceof Error ? err.message : "unknown error";
+        res.status(500).json({ status: "db error", error: message });
     }
 });
 

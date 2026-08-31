@@ -1,4 +1,4 @@
--- a tenant or owner cant be a verifier
+-- A tenant or owner cannot be a verifier
 create or replace function is_a_user()
 returns trigger as $$
 begin
@@ -9,12 +9,13 @@ begin
     return new;
 end;
 $$ language plpgsql;
+
 create trigger check_user
 before insert on verifiers
 for each row execute function is_a_user();
 
 
--- a verifier cant be owner or tenant
+-- A verifier can't be owner or tenant
 create or replace function is_a_verifier()
 returns trigger as $$
 begin
@@ -24,6 +25,7 @@ begin
     return new;
 end;
 $$ language plpgsql;
+
 create trigger check_verifier_owner
 before insert on owners
 for each row execute function is_a_verifier();
@@ -31,6 +33,7 @@ for each row execute function is_a_verifier();
 create trigger check_verifier_tenant
 before insert on tenants
 for each row execute function is_a_verifier();
+
 
 -- listing becomes occupied when a contract is signed
 create or replace function update_listing_status()
@@ -42,9 +45,11 @@ begin
     return new;
 end;
 $$ language plpgsql;
+
 create trigger update_listing_status_trigger
 after update on contracts
 for each row execute function update_listing_status();
+
 
 -- listing becomes available when a contract is completed
 create or replace function update_listing_status_completed()
@@ -56,6 +61,7 @@ begin
     return new;
 end;
 $$ language plpgsql;
+
 create trigger update_listing_status_completed_trigger
 after update on contracts
 for each row execute function update_listing_status_completed();

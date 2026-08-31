@@ -1,0 +1,39 @@
+Database Schema of Nibash
+
+Users(id: int (PK), name: string, email: string, nid: string, phone: string, password_hash: string, created_at: timestamp)
+
+Owners(user_id: int (PK, FK))
+
+Tenants(user_id: int (PK, FK), monthly_income: numeric, emergency_contact: string)
+
+Verifiers(user_id: int (PK, FK))
+
+Areas(id: int (PK), name: string, city: string, latitude: numeric, longitude: numeric, radius: numeric, created_at: timestamp)
+
+Listings(id: int (PK), title: string, description: string, latitude: numeric, longitude: numeric, status: string, bedroom_count: int, bathroom_count: int, on_which_floor: int, area_id: int (FK), owner_id: int (FK), view_count: int)
+
+Amenities(id: int (PK), name: string, description: string, icon_path: string)
+
+Listing_Amenities(listing_id: int (PK, FK), amenity_id: int (PK, FK))
+
+Documents(id: int (PK), verifier_id: int (FK), listing_id: int (FK), document_type: string, is_verified: boolean, verification_type: string, uploaded_at: timestamp)
+
+Terms(id: int (PK), rent: numeric, electricity_bill: numeric, water_bill: numeric, service_charge: numeric, monthly_due_date: int, pet_allowed: boolean, security_deposit: numeric)
+
+Initial_Terms(terms_id: int (PK, FK), listing_id: int (FK))
+
+Agreements(terms_id: int (PK, FK))
+
+Applications(tenant_id: int (PK, FK), listing_id: int (PK, FK), applied_at: timestamp, status: string)
+
+Contracts(id: int (PK), tenant_id: int (FK), listing_id: int (FK), agreement_id: int (FK), status: string, start_date: date, end_date: date, paid_security_deposit: boolean)
+
+Payments(id: int (PK), contract_id: int (FK), amount: numeric, payment_method: string, status: string, bKash_transaction_id: string, SSLCommerz_transaction_id: string, paid_at: timestamp)
+
+Reviews(id: int (PK), contract_id: int (FK), rating: int, description: string, created_at: timestamp)
+
+Media(id: int (PK), media_type: string, media_path: string, uploaded_at: timestamp)
+
+Review_Media(review_id: int (PK, FK), media_id: int (PK, FK))
+
+Document_Media(document_id: int (PK, FK), media_id: int (PK, FK))
