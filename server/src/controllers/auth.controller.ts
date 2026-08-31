@@ -14,7 +14,10 @@ export async function register(req: Request, res: Response) {
   }
   const { name, email, password, phone, nid } = result.data;
   await authService.registerUser(name, email, password, phone, nid);
-  res.json({ message: "user registered successfully" });
+
+  // auto login after registration
+  const token = await authService.loginUser(email, password);
+  res.json({ token });
 }
 
 export async function login(req: Request, res: Response) {

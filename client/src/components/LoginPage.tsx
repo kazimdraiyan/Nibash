@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.tsx";
 
-interface LoginPageProps {
-  onLoginSuccess?: (data: { email: string; token: string }) => void;
-}
-
-export function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export function LoginPage() {
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   // State hooks
@@ -38,7 +36,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
         throw new Error(data.error || "An error occurred.");
       }
 
-      onLoginSuccess?.({ email, token: data.token });
+      login(data.token, { email }); // save auth state client side
       navigate("/"); // Redirect to home page after successful login
     } catch (err: any) {
       // TODO: Handle specific error cases

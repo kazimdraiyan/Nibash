@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.tsx";
 
-interface RegisterPageProps {
-  onRegisterSuccess?: (data: { email: string }) => void; // TODO: Is token needed along with email?
-}
-
-export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
+export function RegisterPage() {
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -68,8 +66,8 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
         throw new Error(data.error || "An error occurred.");
       }
 
-      onRegisterSuccess?.({ email });
-      navigate("/login"); // Redirect to login page after successful registration
+      login(data.token, { email }); // save auth state client side
+      navigate("/"); // Redirect to home page after successful registration
     } catch (err: any) {
       // TODO: Handle specific error cases
       setError(err.message || "An error occurred.");
