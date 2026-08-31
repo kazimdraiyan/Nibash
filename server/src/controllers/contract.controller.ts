@@ -30,7 +30,7 @@ export async function getById(req: Request, res: Response) {
     return;
   }
   const contract = await contractService.getContractById(
-    req.params.id,
+    req.params.id as string,
     req.user.id,
   );
   res.json({ contract });
@@ -46,6 +46,6 @@ export async function sign(req: Request, res: Response) {
     res.status(400).json({ error: result.error.issues[0].message });
     return;
   }
-  await contractService.signContract(req.params.id, req.user.id);
+  await contractService.signContract(req.params.id as string, req.user.id);
   res.json({ message: "contract signed successfully" });
 }

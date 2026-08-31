@@ -18,7 +18,7 @@ export async function create(req: Request, res: Response) {
 
 export async function getForListing(req: Request, res: Response) {
   const reviews = await reviewService.getReviewsForListing(
-    req.params.listing_id,
+    req.params.listing_id as string,
   );
   res.json({ reviews });
 }
