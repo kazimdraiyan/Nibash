@@ -12,7 +12,7 @@ export async function getAll(req: Request, res: Response) {
 }
 
 export async function getById(req: Request, res: Response) {
-  const listing = await listingService.getListingById(req.params.id);
+  const listing = await listingService.getListingById(req.params.id as string);
   res.json({ listing });
 }
 
@@ -44,7 +44,7 @@ export async function update(req: Request, res: Response) {
     res.status(400).json({ error: result.error.issues[0].message });
     return;
   }
-  await listingService.updateListing(req.params.id, req.user.id, result.data);
+  await listingService.updateListing(req.params.id as string, req.user.id, result.data);
   res.json({ message: "listing updated successfully" });
 }
 
@@ -53,6 +53,6 @@ export async function remove(req: Request, res: Response) {
     res.status(401).json({ error: "unauthorized" });
     return;
   }
-  await listingService.deleteListing(req.params.id, req.user.id);
+  await listingService.deleteListing(req.params.id as string, req.user.id);
   res.json({ message: "deleted successfully" });
 }

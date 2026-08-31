@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-  name: z.string().min(1, "name cannot be empty"),
+  name: z
+    .string()
+    .min(1, "name cannot be empty")
+    .regex(/^[a-zA-Z\s]+$/, "name can only contain letters and spaces"),
   email: z.string().email("invalid email address"),
   password: z.string().min(6, "password must be at least 6 characters long"),
   phone: z

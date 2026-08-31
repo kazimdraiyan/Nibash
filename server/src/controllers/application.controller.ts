@@ -38,7 +38,7 @@ export async function getForListing(req: Request, res: Response) {
   }
   const applications = await applicationService.getApplicationsForListing(
     req.user.id,
-    req.params.listingId,
+    req.params.listingId as string,
   );
   res.json({ applications });
 }
@@ -55,8 +55,8 @@ export async function reject(req: Request, res: Response) {
   }
   await applicationService.rejectApplication(
     req.user.id,
-    req.params.listingId,
-    req.params.tenantId,
+    req.params.listingId as string,
+    req.params.tenantId as string,
   );
   res.json({ message: "application rejected" });
 }

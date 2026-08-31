@@ -26,7 +26,7 @@ export async function getForContract(req: Request, res: Response) {
   }
   const payments = await paymentService.getPaymentsForContract(
     req.user.id,
-    req.params.contract_id,
+    req.params.contract_id as string,
   );
   res.json({ payments });
 }
@@ -43,7 +43,7 @@ export async function resolve(req: Request, res: Response) {
   }
   await paymentService.resolvePayment(
     req.user.id,
-    req.params.payment_id,
+    req.params.payment_id as string,
     result.data.status,
   );
   res.json({ message: "payment updated successfully" });
