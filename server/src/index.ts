@@ -14,15 +14,19 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // middleware that parses incoming JSON request bodies into req.body. Without
+// this req.body is undefined
+
+// route mounting
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/contracts", contractRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
+// health chcek
 app.get("/health", async (_req, res) => {
-  // health check
   try {
     const result = await pool.query("SELECT NOW()");
     res.json({ status: "ok", db_time: result.rows[0].now });
@@ -32,6 +36,7 @@ app.get("/health", async (_req, res) => {
   }
 });
 
+// starts the actual http server, listening on port .env declares(5000 for fallback)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
