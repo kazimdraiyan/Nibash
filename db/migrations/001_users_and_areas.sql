@@ -3,7 +3,6 @@
 -- drop table if exists tenants;
 -- drop table if exists verifiers;
 -- drop table if exists areas;
-
 create table users(
     id serial primary key,
     name varchar(255) not null,

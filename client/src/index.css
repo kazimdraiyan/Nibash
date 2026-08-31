@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-body { background-color: #f9f9f9; color: #1b1b1b; }
-.border-hairline { border-width: 1px; border-color: #cfc4c5; }
-.hover-darken:hover { background-color: #f3f3f3; border-color: #7e7576; }
+body {
+  background-color: #f9f9f9;
+  color: #1b1b1b;
+}
+.border-hairline {
+  border-width: 1px;
+  border-color: #cfc4c5;
+}
+.hover-darken:hover {
+  background-color: #f3f3f3;
+  border-color: #7e7576;
+}

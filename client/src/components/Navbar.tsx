@@ -6,7 +6,6 @@ export function Navbar() {
   return (
     <header className="bg-surface dark:bg-surface w-full h-20 border-b border-outline-variant dark:border-outline flat no shadows sticky top-0 z-50">
       <div className="flex justify-between items-center px-container-padding max-w-[1440px] mx-auto w-full h-full">
-        
         {/* Brand Logo */}
         <Link
           to="/"
@@ -39,7 +38,6 @@ export function Navbar() {
             Get Started
           </Link>
         </div>
-
       </div>
     </header>
   );

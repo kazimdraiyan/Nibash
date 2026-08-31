@@ -51,7 +51,6 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   return (
     <div className="min-h-[calc(100vh-80px-240px)] max-w-[1440px] mx-auto px-container-padding py-12 md:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
-
         {/* Left Column: Branding */}
         <div className="lg:col-span-5 hidden lg:flex flex-col justify-between p-8 bg-surface-container-low border-hairline rounded-xl relative overflow-hidden">
           <div className="relative z-10">
@@ -60,7 +59,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
               {/* // TODO: Replace with actual branding message */}
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro sequi aut tempore laboriosam, delectus nemo expedita ducimus eaque impedit nulla.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+              sequi aut tempore laboriosam, delectus nemo expedita ducimus eaque
+              impedit nulla.
             </p>
           </div>
 
@@ -68,12 +69,20 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           <div className="relative z-10 pt-6 mt-12 grid grid-cols-2 gap-4">
             <div>
               {/* // TODO: Find the number by querying */}
-              <span className="block font-display-lg text-2xl text-primary font-light">1k+</span>
-              <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Verified listings</span>
+              <span className="block font-display-lg text-2xl text-primary font-light">
+                1k+
+              </span>
+              <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+                Verified listings
+              </span>
             </div>
             <div>
-              <span className="block font-display-lg text-2xl text-primary font-light">25+</span>
-              <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Areas covered</span>
+              <span className="block font-display-lg text-2xl text-primary font-light">
+                25+
+              </span>
+              <span className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+                Areas covered
+              </span>
             </div>
           </div>
         </div>
@@ -81,7 +90,6 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
         {/* Right Column: Login Form */}
         <div className="lg:col-span-7 flex flex-col justify-center">
           <div className="bg-surface-container-lowest border-hairline rounded-xl p-8 md:p-10 max-w-xl mx-auto w-full">
-
             {/* Header */}
             <div className="mb-8">
               <div className="flex items-center justify-between">
@@ -94,17 +102,21 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             {/* Error Alerts */}
             {error && (
               <div className="mb-6 p-4 bg-error-container/40 border border-error/30 rounded-lg flex items-center gap-3 text-on-error-container">
-                <span className="material-symbols-outlined text-error text-xl shrink-0 mt-0.5">error</span>
+                <span className="material-symbols-outlined text-error text-xl shrink-0 mt-0.5">
+                  error
+                </span>
                 <div className="font-body-md text-sm">{error}</div>
               </div>
             )}
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
               {/* Email */}
               <div className="flex flex-col gap-1.5">
-                <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="login-email">
+                <label
+                  className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                  htmlFor="login-email"
+                >
                   Email Address
                 </label>
                 <div className="relative">
@@ -126,7 +138,10 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               {/* Password */}
               <div className="flex flex-col gap-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="login-password">
+                  <label
+                    className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                    htmlFor="login-password"
+                  >
                     Password
                   </label>
                   <button
@@ -168,7 +183,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 type="submit"
                 disabled={loading}
                 className="w-full bg-primary text-on-primary rounded-lg py-3.5 px-6 border border-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-container-low hover:text-primary hover:border hover:border-primary transition-all duration-200 flex items-center justify-center gap-2 mt-2 disabled:opacity-50 disabled:hover:bg-primary disabled:hover:text-on-primary disabled:hover:border-primary cursor-pointer"
-                >
+              >
                 <div className="h-6 flex items-center gap-2">
                   {loading ? (
                     <>
@@ -178,7 +193,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   ) : (
                     <>
                       <span>Login</span>
-                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                      <span className="material-symbols-outlined text-sm">
+                        arrow_forward
+                      </span>
                     </>
                   )}
                 </div>
@@ -198,7 +215,6 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 </button>
               </p>
             </div>
-
           </div>
         </div>
       </div>

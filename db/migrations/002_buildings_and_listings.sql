@@ -74,7 +74,10 @@ create table terms(
     electricity_bill numeric not null,
     water_bill numeric not null,
     service_charge numeric not null,
-    monthly_due_date int not null check (monthly_due_date between 1 and 28),
+    monthly_due_date int not null check (
+        monthly_due_date between 1
+        and 28
+    ),
     pet_allowed boolean not null,
     security_deposit numeric not null
 );

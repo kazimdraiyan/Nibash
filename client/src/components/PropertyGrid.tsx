@@ -8,7 +8,10 @@ export function PropertyGrid({ listings }: { listings: Listing[] }) {
         <h2 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-tight items-center">
           Latest in your area
         </h2>
-        <a className="hidden md:inline-flex font-label-sm text-label-sm uppercase text-primary border-b border-primary hover:border-b-2 transition-all pb-1" href="#">
+        <a
+          className="hidden md:inline-flex font-label-sm text-label-sm uppercase text-primary border-b border-primary hover:border-b-2 transition-all pb-1"
+          href="#"
+        >
           View All Listings
         </a>
       </div>
@@ -18,5 +21,5 @@ export function PropertyGrid({ listings }: { listings: Listing[] }) {
         ))}
       </div>
     </section>
-  )
+  );
 }

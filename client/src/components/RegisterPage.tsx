@@ -81,7 +81,6 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
   return (
     <div className="min-h-[calc(100vh-80px-240px)] max-w-[1440px] mx-auto px-container-padding py-12 md:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
-
         {/* Left Column: Branding */}
         <div className="lg:col-span-4 hidden lg:flex flex-col justify-between p-8 bg-surface-container-low border-hairline rounded-xl sticky top-28">
           <div>
@@ -90,30 +89,50 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant mb-6">
               {/* // TODO: Replace with actual branding message */}
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Reprehenderit deserunt corporis asperiores aspernatur, consectetur exercitationem?
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+              Reprehenderit deserunt corporis asperiores aspernatur, consectetur
+              exercitationem?
             </p>
           </div>
 
           <div className="flex flex-col gap-4 pt-6">
             <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-primary text-xl mt-0.5">verified_user</span>
+              <span className="material-symbols-outlined text-primary text-xl mt-0.5">
+                verified_user
+              </span>
               <div>
-                <span className="block font-headline-md text-base text-primary font-medium">NID Authentication</span>
-                <span className="font-body-md text-xs text-on-surface-variant">Prevent impersonation and double-listings .</span>
+                <span className="block font-headline-md text-base text-primary font-medium">
+                  NID Authentication
+                </span>
+                <span className="font-body-md text-xs text-on-surface-variant">
+                  Prevent impersonation and double-listings .
+                </span>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-primary text-xl mt-0.5">description</span>
+              <span className="material-symbols-outlined text-primary text-xl mt-0.5">
+                description
+              </span>
               <div>
-                <span className="block font-headline-md text-base text-primary font-medium">Digital Agreements</span>
-                <span className="font-body-md text-xs text-on-surface-variant">Legally structured online lease contracts.</span>
+                <span className="block font-headline-md text-base text-primary font-medium">
+                  Digital Agreements
+                </span>
+                <span className="font-body-md text-xs text-on-surface-variant">
+                  Legally structured online lease contracts.
+                </span>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-primary text-xl mt-0.5">account_balance_wallet</span>
+              <span className="material-symbols-outlined text-primary text-xl mt-0.5">
+                account_balance_wallet
+              </span>
               <div>
-                <span className="block font-headline-md text-base text-primary font-medium">Payment History</span>
-                <span className="font-body-md text-xs text-on-surface-variant">Track rent, deposits, and automated receipts.</span>
+                <span className="block font-headline-md text-base text-primary font-medium">
+                  Payment History
+                </span>
+                <span className="font-body-md text-xs text-on-surface-variant">
+                  Track rent, deposits, and automated receipts.
+                </span>
               </div>
             </div>
           </div>
@@ -122,7 +141,6 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
         {/* Right Column: Register Form */}
         <div className="lg:col-span-8 flex flex-col justify-center">
           <div className="bg-surface-container-lowest border-hairline rounded-xl p-8 md:p-10 w-full">
-
             {/* Header */}
             <div className="mb-8">
               <h1 className="font-headline-md text-headline-md font-bold text-primary mt-2">
@@ -133,20 +151,24 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
             {/* Error Alerts */}
             {error && (
               <div className="mb-6 p-4 bg-error-container/40 border border-error/30 rounded-lg flex items-start gap-3 text-on-error-container">
-                <span className="material-symbols-outlined text-error text-xl shrink-0 mt-0.5">error</span>
+                <span className="material-symbols-outlined text-error text-xl shrink-0 mt-0.5">
+                  error
+                </span>
                 <div className="font-body-md text-sm">{error}</div>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                 {/* // TODO: Make the input field types proper */}
                 {/* // TODO: Add required marker */}
 
                 {/* Full Name */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="reg-name">
+                  <label
+                    className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                    htmlFor="reg-name"
+                  >
                     Full Name
                   </label>
                   <div className="relative">
@@ -167,7 +189,10 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
 
                 {/* Email Address */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="reg-email">
+                  <label
+                    className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                    htmlFor="reg-email"
+                  >
                     Email Address
                   </label>
                   <div className="relative">
@@ -188,7 +213,10 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
 
                 {/* Phone Number */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="reg-phone">
+                  <label
+                    className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                    htmlFor="reg-phone"
+                  >
                     Phone Number
                   </label>
                   <div className="relative">
@@ -210,7 +238,10 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
 
                 {/* National ID */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="reg-nid">
+                  <label
+                    className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                    htmlFor="reg-nid"
+                  >
                     National ID
                   </label>
                   <div className="relative">
@@ -232,7 +263,10 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
 
                 {/* Password */}
                 <div className="flex flex-col gap-1.5 md:col-span-2">
-                  <label className="font-label-sm text-label-sm uppercase tracking-widest text-primary" htmlFor="reg-password">
+                  <label
+                    className="font-label-sm text-label-sm uppercase tracking-widest text-primary"
+                    htmlFor="reg-password"
+                  >
                     Password
                   </label>
                   <div className="relative">
@@ -261,7 +295,6 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
                     </button>
                   </div>
                 </div>
-
               </div>
 
               {/* Agreement Checkbox */}
@@ -273,11 +306,18 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
                   onChange={(e) => setAgreeTerms(e.target.checked)}
                   className="w-4 h-4 rounded border-hairline text-primary focus:ring-0 focus:outline-none accent-primary cursor-pointer mt-0.5"
                 />
-                <label htmlFor="reg-terms" className="font-body-md text-xs text-on-surface-variant cursor-pointer select-none leading-relaxed">
-                  I certify that the information provided is accurate and agree to the{" "}
-                  {/* // TODO: Add ToS and Privacy Policy links */}
-                  <span className="text-primary underline">Nibash Terms of Service</span> and{" "}
-                  <span className="text-primary underline">Privacy Policy</span>.
+                <label
+                  htmlFor="reg-terms"
+                  className="font-body-md text-xs text-on-surface-variant cursor-pointer select-none leading-relaxed"
+                >
+                  I certify that the information provided is accurate and agree
+                  to the {/* // TODO: Add ToS and Privacy Policy links */}
+                  <span className="text-primary underline">
+                    Nibash Terms of Service
+                  </span>{" "}
+                  and{" "}
+                  <span className="text-primary underline">Privacy Policy</span>
+                  .
                 </label>
               </div>
 
@@ -295,7 +335,9 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
                 ) : (
                   <>
                     <span>Create Account</span>
-                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    <span className="material-symbols-outlined text-sm">
+                      arrow_forward
+                    </span>
                   </>
                 )}
               </button>
@@ -314,7 +356,6 @@ export function RegisterPage({ onRegisterSuccess }: RegisterPageProps) {
                 </button>
               </p>
             </div>
-
           </div>
         </div>
       </div>

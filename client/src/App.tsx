@@ -13,7 +13,7 @@ function HomePage() {
       <Hero />
       <PropertyGrid listings={mockListings} />
     </>
-  )
+  );
 }
 
 export default function App() {
@@ -21,7 +21,6 @@ export default function App() {
 
   return (
     <div className="antialiased min-h-screen flex flex-col font-body-md text-body-md bg-background text-on-background">
-
       <Navbar />
 
       <main className="flex-grow">
