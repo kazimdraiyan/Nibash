@@ -127,7 +127,7 @@ export function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full bg-surface-container-lowest border-hairline rounded-lg py-3.5 pl-11 pr-4 font-body-md text-body-md focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/60"
+                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg py-3.5 pl-11 pr-4 text-sm font-medium focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -160,15 +160,15 @@ export function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full bg-surface-container-lowest border-hairline rounded-lg py-3.5 pl-11 pr-11 font-body-md text-body-md focus:outline-none focus:border-primary transition-colors placeholder:text-on-surface-variant/60"
+                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg py-3.5 pl-11 pr-12 text-sm font-medium focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors placeholder:text-slate-400"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors p-1 cursor-pointer"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-black transition-colors p-1 cursor-pointer"
                     title={showPassword ? "Hide password" : "Show password"}
                   >
-                    <span className="absolute right-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-xl">
+                    <span className="material-symbols-outlined text-xl">
                       {showPassword ? "visibility_off" : "visibility"}
                     </span>
                   </button>

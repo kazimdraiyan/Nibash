@@ -51,13 +51,58 @@ export default {
                 "surface-dim": "#dadada",
                 "primary-fixed": "#e2e2e2",
                 "tertiary": "#000000",
-                "on-primary-fixed": "#1b1b1b"
+                "on-primary-fixed": "#1b1b1b",
+                // Luxury Silver, Charcoal & Subtle Gold Palette
+                "silver": {
+                    "50": "#f8fafc",
+                    "100": "#f1f5f9",
+                    "200": "#e2e8f0",
+                    "300": "#cbd5e1",
+                    "400": "#94a3b8",
+                    "500": "#64748b",
+                    "600": "#475569",
+                    "700": "#334155",
+                    "800": "#1e293b",
+                    "900": "#0f172a",
+                    "950": "#020617"
+                },
+                "platinum": {
+                    "light": "#f4f6f8",
+                    "DEFAULT": "#e2e5ea",
+                    "dark": "#9aa2af"
+                },
+                "charcoal": {
+                    "50": "#f6f6f7",
+                    "100": "#e5e6e8",
+                    "200": "#cbced2",
+                    "300": "#a7abb3",
+                    "400": "#787e8a",
+                    "500": "#5a606c",
+                    "600": "#3d424b",
+                    "700": "#262a32",
+                    "800": "#171a20",
+                    "850": "#111317",
+                    "900": "#0c0e11",
+                    "950": "#07080a"
+                },
+                "gold": {
+                    "200": "#f7ebd1",
+                    "300": "#ebd6a5",
+                    "400": "#d8bd7b",
+                    "500": "#c5a65c",
+                    "600": "#a8883e"
+                },
+                "offwhite": "#f8f9fa",
+                "warmwhite": "#f3f4f6",
+                "mutedgray": "#94a3b8"
             },
             "borderRadius": {
                 "DEFAULT": "0.125rem",
-                "lg": "0.25rem",
-                "xl": "0.5rem",
-                "full": "0.75rem"
+                "lg": "0.375rem",
+                "xl": "0.75rem",
+                "2xl": "1rem",
+                "3xl": "1.5rem",
+                "full": "9999px"
             },
             "spacing": {
                 "container-padding": "32px",
@@ -67,12 +112,14 @@ export default {
                 "margin-mobile": "16px"
             },
             "fontFamily": {
-                "label-sm": ["Inter"],
-                "display-lg-mobile": ["Hanken Grotesk"],
-                "body-lg": ["Inter"],
-                "headline-md": ["Hanken Grotesk"],
-                "display-lg": ["Hanken Grotesk"],
-                "body-md": ["Inter"]
+                "label-sm": ["Inter", "sans-serif"],
+                "display-lg-mobile": ["Hanken Grotesk", "sans-serif"],
+                "body-lg": ["Inter", "sans-serif"],
+                "headline-md": ["Hanken Grotesk", "sans-serif"],
+                "display-lg": ["Hanken Grotesk", "sans-serif"],
+                "body-md": ["Inter", "sans-serif"],
+                "serif": ["'Cormorant Garamond'", "Georgia", "serif"],
+                "display": ["'Hanken Grotesk'", "sans-serif"]
             },
             "fontSize": {
                 "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
