@@ -15,6 +15,9 @@ import { ListingFormPage } from "./pages/ListingFormPage";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { ContractFormPage } from "./pages/ContractFormPage";
 import { ContractDetailPage } from "./pages/ContractDetailPage";
+import { ScrollToTop } from "./components/ScrollToTop";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ActualListings } from "./components/ActualListings";
 import { mockListings } from "./data/mockListings";
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
@@ -24,6 +27,7 @@ function HomePage() {
     <>
       <Hero />
       <PropertyGrid listings={mockListings} />
+      <ActualListings />
       <div id="how-it-works">
         <HowItWorks />
       </div>
@@ -54,6 +58,7 @@ export default function App() {
 
   return (
     <div className="antialiased min-h-screen flex flex-col bg-[#090a0c] text-[#f8f9fa]">
+      <ScrollToTop />
       <Navbar />
 
       <main className="flex-grow">
@@ -61,14 +66,56 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/onboarding" element={<RoleOnboardingPage />} />
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <RoleOnboardingPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/listings" element={<ListingsPage />} />
-          <Route path="/listings/new" element={<ListingFormPage />} />
+          <Route
+            path="/listings/new"
+            element={
+              <ProtectedRoute>
+                <ListingFormPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/listings/:id" element={<ListingDetailPage />} />
-          <Route path="/listings/:id/edit" element={<ListingFormPage />} />
-          <Route path="/owner/applications" element={<ApplicationsPage />} />
-          <Route path="/contracts/new" element={<ContractFormPage />} />
-          <Route path="/contracts/:id" element={<ContractDetailPage />} />
+          <Route
+            path="/listings/:id/edit"
+            element={
+              <ProtectedRoute>
+                <ListingFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contracts/new"
+            element={
+              <ProtectedRoute>
+                <ContractFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contracts/:id"
+            element={
+              <ProtectedRoute>
+                <ContractDetailPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
 

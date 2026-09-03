@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export function Footer() {
+  const { token } = useAuth();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -98,8 +100,12 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <Link to="/register" className="hover:text-white transition-colors">
-                List a Property
+              <Link
+                to={token ? "/listings/new" : "/login"}
+                state={!token ? { from: { pathname: "/listings/new" } } : undefined}
+                className="hover:text-white transition-colors"
+              >
+                Post a Listing
               </Link>
             </li>
             <li>

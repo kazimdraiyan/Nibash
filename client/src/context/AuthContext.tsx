@@ -1,6 +1,3 @@
-// global auth state holder
-// TODO: save only the token in localStorage and fetch user data from server on page load
-
 import {
   createContext,
   useContext,
@@ -9,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 
-interface User {
+export interface User {
   email: string;
   id: number;
   name: string;
@@ -20,8 +17,9 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  isAuthenticated: boolean;
   loading: boolean;
-  login: (token: string) => Promise<void>;
+  login: (token: string, initialUserData?: User) => Promise<void>;
   logout: () => void;
 }
 
@@ -29,10 +27,20 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("token"),
+    localStorage.getItem("token")
   );
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const saved = localStorage.getItem("user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState<boolean>(() => {
+    // If there is a token, we must verify it against /api/auth/me
+    return Boolean(localStorage.getItem("token"));
+  });
 
   async function fetchUserInfo(authToken: string): Promise<User | null> {
     try {
@@ -47,40 +55,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // On app load, if a token exists, load user info
-  // TODO: learn more about useEffect
+  // Restore & verify session on app mount
   useEffect(() => {
+    let isMounted = true;
+
     async function restoreSession() {
-      if (token) {
-        const fetchedUser = await fetchUserInfo(token);
-        if (fetchedUser) {
-          setUser(fetchedUser);
-        } else {
-          // if invalid token, clear it from local storage
-          localStorage.removeItem("token");
+      const currentToken = localStorage.getItem("token");
+      if (currentToken) {
+        const fetchedUser = await fetchUserInfo(currentToken);
+        if (isMounted) {
+          if (fetchedUser) {
+            setUser(fetchedUser);
+            localStorage.setItem("user", JSON.stringify(fetchedUser));
+          } else {
+            // Invalid or expired token
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setToken(null);
+            setUser(null);
+          }
+        }
+      } else {
+        if (isMounted) {
+          setUser(null);
           setToken(null);
         }
       }
-      setLoading(false);
+
+      if (isMounted) {
+        setLoading(false);
+      }
     }
+
     restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const login = async (newToken: string) => {
+  const login = async (newToken: string, initialUserData?: User) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
+    if (initialUserData) {
+      setUser(initialUserData);
+      localStorage.setItem("user", JSON.stringify(initialUserData));
+    }
     const fetchedUser = await fetchUserInfo(newToken);
-    setUser(fetchedUser);
+    if (fetchedUser) {
+      setUser(fetchedUser);
+      localStorage.setItem("user", JSON.stringify(fetchedUser));
+    }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: Boolean(token),
+        loading,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

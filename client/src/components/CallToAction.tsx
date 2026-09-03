@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export function CallToAction() {
+  const { token } = useAuth();
+
   return (
     <section className="relative py-28 bg-[#090a0c] overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-container-padding relative z-10">
@@ -41,10 +44,11 @@ export function CallToAction() {
               </a>
 
               <Link
-                to="/register"
-                className="w-full sm:w-auto glass-button-outline text-white font-label-sm text-xs uppercase tracking-widest py-4 px-8 rounded-xl flex items-center justify-center gap-2 hover:border-white/40 cursor-pointer"
+                to={token ? "/listings/new" : "/login"}
+                state={!token ? { from: { pathname: "/listings/new" } } : undefined}
+                className="w-full sm:w-auto glass-button-outline text-white font-label-sm text-xs uppercase tracking-widest py-4 px-8 rounded-xl flex items-center justify-center gap-2 hover:border-white/40 cursor-pointer transition-all"
               >
-                <span>List a Property</span>
+                <span>Post a Listing</span>
                 <span className="material-symbols-outlined text-base">add_business</span>
               </Link>
             </div>
@@ -54,4 +58,3 @@ export function CallToAction() {
     </section>
   );
 }
-

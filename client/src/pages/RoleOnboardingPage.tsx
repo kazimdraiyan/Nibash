@@ -73,6 +73,7 @@ export function RoleOnboardingPage() {
         monthly_income: incomeNum,
         emergency_contact: emergencyContact.trim(),
       });
+      localStorage.setItem(`nibash_tenant_${user.id}`, "true");
       setTenantSuccess(res.message || "Successfully registered as tenant profile!");
     } catch (err: any) {
       setTenantError(err.message || "Failed to become tenant.");

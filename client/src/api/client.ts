@@ -37,6 +37,14 @@ async function request<T>(
   return data as T;
 }
 
+export const makeOwner = async (
+  _userOrId?: { id: number } | number
+): Promise<{ message: string }> => {
+  return request<{ message: string }>("/auth/become-owner", { method: "POST" });
+};
+
+export const makeowner = makeOwner;
+
 export const apiClient = {
   get: <T>(endpoint: string) => request<T>(endpoint, { method: "GET" }),
   post: <T>(endpoint: string, body?: any) =>
@@ -55,4 +63,6 @@ export const apiClient = {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
   delete: <T>(endpoint: string) => request<T>(endpoint, { method: "DELETE" }),
+  makeOwner,
+  makeowner,
 };

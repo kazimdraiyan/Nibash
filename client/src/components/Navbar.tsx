@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 
 export function Navbar() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { token } = useAuth();
 
   return (
     <header className="bg-[#090a0c]/90 backdrop-blur-xl w-full h-20 border-b border-white/10 sticky top-0 z-50 transition-all duration-300">
@@ -58,8 +58,17 @@ export function Navbar() {
         </nav>
 
         {/* Action Buttons */}
-        {user ? (
-          <ProfileMenu />
+        {token ? (
+          <div className="flex items-center gap-3">
+            <Link
+              to="/listings/new"
+              className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest font-label-sm glass-button-silver text-[#090a0c] font-semibold hover:scale-105 transition-all shadow-sm cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-base">add_circle</span>
+              <span>Post a Listing</span>
+            </Link>
+            <ProfileMenu />
+          </div>
         ) : (
           <div className="flex items-center gap-3">
             <Link
