@@ -2,7 +2,7 @@ export function WhyChooseUs() {
   const pillars = [
     {
       icon: "verified_user",
-      title: "100% Verified Residences",
+      title: "100% Verified Apartments",
       description:
         "Every listing undergoes rigorous physical property inspections and deed verification before publication. Zero duplicate or ghost listings.",
       stat: "Zero Frauds",

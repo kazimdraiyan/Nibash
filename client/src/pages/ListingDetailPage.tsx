@@ -8,6 +8,7 @@ import {
   getUserApplication,
   saveUserApplication,
 } from "../utils/applicationStorage";
+import { getAreaName } from "../utils/areaLookup";
 
 interface Review {
   rating: number;
@@ -21,6 +22,13 @@ interface Application {
   listing_id: number;
   status: string;
   applied_at: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+}
+
+interface OwnerInfo {
+  id: number;
   name?: string;
   email?: string;
   phone?: string;
@@ -51,6 +59,10 @@ export function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Owner details state
+  const [owner, setOwner] = useState<OwnerInfo | null>(null);
+  const [ownerLoading, setOwnerLoading] = useState(false);
+
   // Application state
   const [isTenant, setIsTenant] = useState<boolean>(() => {
     if (!user) return false;
@@ -80,12 +92,44 @@ export function ListingDetailPage() {
       const listingRes = await apiClient.get<{ listing: BackendListing }>(`/listings/${id}`);
       setListing(listingRes.listing);
 
+      // Fetch owner details
+      const ownerId = listingRes.listing.owner_id;
+      setOwnerLoading(true);
+      if (user && user.id === ownerId) {
+        setOwner({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+        });
+        setOwnerLoading(false);
+      } else {
+        try {
+          const res = await apiClient.get<{ user?: any; owner?: any }>(`/users/${ownerId}`);
+          const ownerData = res.user || res.owner;
+          if (ownerData) {
+            setOwner({
+              id: ownerId,
+              name: ownerData.name,
+              email: ownerData.email,
+              phone: ownerData.phone,
+            });
+          } else {
+            setOwner({ id: ownerId });
+          }
+        } catch {
+          // Gracefully fallback to available listing owner ID
+          setOwner({ id: ownerId });
+        } finally {
+          setOwnerLoading(false);
+        }
+      }
+
       // 2. Fetch reviews for this listing
       try {
         const reviewsRes = await apiClient.get<{ reviews: Review[] }>(`/reviews/listings/${id}`);
         setReviews(reviewsRes.reviews || []);
       } catch {
-        // Reviews may be empty or route might return 404 if no reviews
         setReviews([]);
       }
 
@@ -99,7 +143,7 @@ export function ListingDetailPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load listing details.");
+      setError(err.message || "Failed to load apartment details.");
     } finally {
       setLoading(false);
     }
@@ -128,14 +172,15 @@ export function ListingDetailPage() {
   useEffect(() => {
     if (showSuccessModal) {
       const timer = setTimeout(() => {
-        window.location.reload();
-      }, 2500);
+        setShowSuccessModal(false);
+        fetchDetails();
+      }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [showSuccessModal]);
+  }, [showSuccessModal, fetchDetails]);
 
   const handleDirectApply = async () => {
-    if (!id || applying || isApplied) return;
+    if (!id || !user || applying || isApplied) return;
     setApplying(true);
     setApplyError(null);
     setApplySuccess(null);
@@ -148,7 +193,7 @@ export function ListingDetailPage() {
         localStorage.setItem(`nibash_tenant_${user.id}`, "true");
         saveUserApplication(user.id, {
           listingId: id,
-          listingTitle: listing?.title || `Residence #${id}`,
+          listingTitle: listing?.title || `Apartment #${id}`,
           appliedAt: new Date().toISOString(),
           status: "pending",
           applicantName: user.name,
@@ -162,13 +207,12 @@ export function ListingDetailPage() {
     } catch (err: any) {
       const msg = err.message || "";
       if (msg.includes("tenant_profile_required")) {
-        // Not a registered tenant yet — show tenant information form
         setShowTenantForm(true);
       } else if (msg.includes("already applied to this listing")) {
         if (user) {
           saveUserApplication(user.id, {
             listingId: id,
-            listingTitle: listing?.title || `Residence #${id}`,
+            listingTitle: listing?.title || `Apartment #${id}`,
             appliedAt: new Date().toISOString(),
             status: "pending",
             applicantName: user.name,
@@ -230,7 +274,7 @@ export function ListingDetailPage() {
         localStorage.setItem(`nibash_tenant_${user.id}`, "true");
         saveUserApplication(user.id, {
           listingId: id,
-          listingTitle: listing?.title || `Residence #${id}`,
+          listingTitle: listing?.title || `Apartment #${id}`,
           appliedAt: new Date().toISOString(),
           status: "pending",
           monthlyIncome: inc,
@@ -249,7 +293,7 @@ export function ListingDetailPage() {
         if (user) {
           saveUserApplication(user.id, {
             listingId: id,
-            listingTitle: listing?.title || `Residence #${id}`,
+            listingTitle: listing?.title || `Apartment #${id}`,
             appliedAt: new Date().toISOString(),
             status: "pending",
             applicantName: user.name,
@@ -267,22 +311,28 @@ export function ListingDetailPage() {
   };
 
   const handleRejectApplicant = async (tenantId: number) => {
-    if (!id || !confirm("Are you sure you want to reject this applicant?")) return;
+    if (!id || !user) return;
     try {
       await apiClient.put(`/applications/${id}/${tenantId}`, { status: "rejected" });
-      fetchDetails();
+      setApplications((prev) =>
+        prev.map((app) => (app.tenant_id === tenantId ? { ...app, status: "rejected" } : app))
+      );
     } catch (err: any) {
-      alert(err.message || "Failed to reject application.");
+      alert(err.message || "Failed to reject applicant.");
     }
   };
 
   const handleDeleteListing = async () => {
-    if (!id || !confirm("Are you sure you want to delete this listing? This cannot be undone.")) return;
+    if (!id || !user) return;
+    const confirmDelete = window.confirm(
+      "Are you sure you want to mark this listing as unavailable? This will archive the property."
+    );
+    if (!confirmDelete) return;
+
     setDeleting(true);
     try {
       await apiClient.delete(`/listings/${id}`);
-      alert("Listing deleted successfully.");
-      navigate("/listings");
+      navigate("/my-listings");
     } catch (err: any) {
       alert(err.message || "Failed to delete listing.");
       setDeleting(false);
@@ -293,7 +343,7 @@ export function ListingDetailPage() {
     return (
       <div className="py-24 text-center text-slate-400">
         <div className="w-8 h-8 rounded-full border-2 border-white/40 border-t-transparent animate-spin mx-auto mb-3" />
-        <p className="text-sm">Loading residence specification...</p>
+        <p className="text-sm">Loading apartment specification...</p>
       </div>
     );
   }
@@ -302,7 +352,7 @@ export function ListingDetailPage() {
     return (
       <div className="max-w-xl mx-auto py-16 px-4 text-center">
         <div className="p-4 bg-red-950/50 border border-red-800 text-red-300 rounded-lg mb-4 text-sm">
-          {error || "Residence not found."}
+          {error || "Apartment not found."}
         </div>
         <Link
           to="/listings"
@@ -314,7 +364,7 @@ export function ListingDetailPage() {
     );
   }
 
-  const isOwner = user && user.id === listing.owner_id;
+  const isOwner = Boolean(user && Number(user.id) === Number(listing.owner_id));
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-4">
@@ -344,18 +394,28 @@ export function ListingDetailPage() {
         )}
       </div>
 
-      {/* Main Specs Banner */}
+      {/* Main Specs Banner: Property Information */}
       <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-8 mb-8">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
+            {/* Area Name using Area Lookup */}
             <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2.5 py-1 rounded">
-              Area #{listing.area_id}
+              {getAreaName(listing.area_id)}
             </span>
-            <span className="text-xs font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded">
-              Status: {listing.status}
-            </span>
+            {/* Status Chip: Only visible to the listing owner */}
+            {isOwner && (
+              <span
+                className={`text-xs font-medium px-2.5 py-1 rounded border capitalize ${
+                  listing.status?.toLowerCase() === "waiting" ||
+                  listing.status?.toLowerCase() === "pending"
+                    ? "text-amber-300 bg-amber-950/60 border-amber-800/60"
+                    : "text-emerald-400 bg-emerald-950/60 border-emerald-800/60"
+                }`}
+              >
+                Status: {listing.status}
+              </span>
+            )}
           </div>
-          <span className="text-xs text-slate-400 font-mono">Owner ID: {listing.owner_id}</span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{listing.title}</h1>
@@ -467,63 +527,148 @@ export function ListingDetailPage() {
         </div>
       </div>
 
+      {/* Owner Information Section - Clearly distinguished from Property Information */}
+      <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-8 mb-8">
+        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
+          <div className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-xl text-[#d4b068]">
+              shield_person
+            </span>
+            <h2 className="text-lg font-bold text-white">Owner Information</h2>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4b068]/15 text-[#d4b068] border border-[#d4b068]/30">
+            <span className="material-symbols-outlined text-xs">verified</span>
+            <span>Registered Owner</span>
+          </span>
+        </div>
+
+        {ownerLoading ? (
+          <div className="py-4 text-center text-xs text-slate-400">
+            Loading owner information...
+          </div>
+        ) : owner ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
+              <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
+                Owner Reference
+              </span>
+              <span className="font-mono font-medium text-white">
+                Owner #{owner.id}
+              </span>
+            </div>
+
+            {owner.name && (
+              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
+                <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
+                  Owner Name
+                </span>
+                <span className="font-medium text-white">
+                  {owner.name}
+                </span>
+              </div>
+            )}
+
+            {owner.email && (
+              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
+                <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
+                  Email
+                </span>
+                <span className="font-mono text-white text-xs">
+                  {owner.email}
+                </span>
+              </div>
+            )}
+
+            {owner.phone && (
+              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
+                <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
+                  Phone
+                </span>
+                <span className="font-mono text-white text-xs">
+                  {owner.phone}
+                </span>
+              </div>
+            )}
+
+            <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
+              <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
+                Verification Status
+              </span>
+              <span className="text-emerald-400 flex items-center gap-1 text-xs font-semibold">
+                <span className="material-symbols-outlined text-sm">verified_user</span>
+                Verified Property Owner
+              </span>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400">Owner information is currently unavailable.</p>
+        )}
+      </div>
+
       {/* Two Column Section: Applications / Apply and Reviews */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Apply Form OR Owner Applications List */}
+        {/* Left Column: Applications for Owner OR Apply for Tenant */}
         <div className="lg:col-span-7">
           {isOwner ? (
             <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6">
-              <h2 className="text-xl font-bold text-white mb-1">Incoming Applications</h2>
-              <p className="text-xs text-slate-400 mb-4">
-                Review tenants who applied for this residence. Propose a lease contract or reject.
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-white">Applications Received</h2>
+                <span className="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">
+                  {applications.length}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mb-6">
+                Review tenants who applied for this apartment. Propose a lease contract or reject.
               </p>
 
               {applications.length === 0 ? (
                 <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
-                  No applications received yet for this listing.
+                  No applications received yet for this apartment.
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
-                  {applications.map((app, idx) => (
+                <div className="flex flex-col gap-4">
+                  {applications.map((app) => (
                     <div
-                      key={idx}
-                      className="border border-slate-800 bg-[#090a0c] p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                      key={app.tenant_id}
+                      className="p-4 rounded-xl bg-[#090a0c] border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                     >
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold text-white">
-                            Tenant #{app.tenant_id}
+                          <span className="font-semibold text-white text-sm">
+                            {app.name || `Tenant #${app.tenant_id}`}
                           </span>
                           <span
                             className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded ${
                               app.status === "approved"
                                 ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
                                 : app.status === "rejected"
-                                ? "bg-red-950 text-red-300 border border-red-800"
+                                ? "bg-rose-950 text-rose-300 border border-rose-800"
                                 : "bg-amber-950 text-amber-300 border border-amber-800"
                             }`}
                           >
                             {app.status}
                           </span>
                         </div>
-                        <span className="text-xs text-slate-500">
-                          Applied: {new Date(app.applied_at || Date.now()).toLocaleDateString()}
-                        </span>
+                        {app.email && <p className="text-xs text-slate-400 font-mono">{app.email}</p>}
+                        {app.phone && <p className="text-xs text-slate-400 font-mono">{app.phone}</p>}
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          Applied: {new Date(app.applied_at).toLocaleDateString()}
+                        </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 self-end sm:self-center">
                         {app.status === "pending" && (
                           <>
                             <Link
-                              to={`/contracts/new?listingId=${listing.id}&tenantId=${app.tenant_id}`}
-                              className="bg-white text-slate-900 px-3 py-1.5 rounded text-xs font-medium hover:bg-slate-200 transition"
+                              to={`/contracts/new?listingId=${id}&tenantId=${app.tenant_id}`}
+                              className="bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold px-3 py-1.5 rounded-lg text-xs transition"
                             >
                               Propose Contract
                             </Link>
                             <button
                               type="button"
                               onClick={() => handleRejectApplicant(app.tenant_id)}
-                              className="bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800 px-2.5 py-1.5 rounded text-xs cursor-pointer"
+                              className="bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
                             >
                               Reject
                             </button>
@@ -537,7 +682,7 @@ export function ListingDetailPage() {
             </div>
           ) : (
             <div id="apply-section" className="border border-slate-800 bg-[#12151c] rounded-2xl p-6">
-              <h2 className="text-xl font-bold text-white mb-1">Apply for this Residence</h2>
+              <h2 className="text-xl font-bold text-white mb-1">Apply for this Apartment</h2>
               <p className="text-xs text-slate-400 mb-6">
                 Submit your rental application directly to the owner.
               </p>
@@ -584,7 +729,7 @@ export function ListingDetailPage() {
                     </div>
 
                     <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                      You have already submitted an application for this residence. The property owner will review your credentials and propose a lease agreement.
+                      You have already submitted an application for this apartment. The property owner will review your credentials and propose a lease agreement.
                     </p>
 
                     <div className="flex flex-col gap-2.5 pt-3 border-t border-slate-800 text-xs">
@@ -600,41 +745,23 @@ export function ListingDetailPage() {
                           {existingApp?.appliedAt ? new Date(existingApp.appliedAt).toLocaleDateString() : "Recently"}
                         </span>
                       </div>
-                      {existingApp?.applicantName && (
-                        <div className="flex items-center justify-between text-slate-400">
-                          <span>Applicant</span>
-                          <span className="text-white font-medium">{existingApp.applicantName}</span>
-                        </div>
-                      )}
-                      {existingApp?.applicantEmail && (
-                        <div className="flex items-center justify-between text-slate-400">
-                          <span>Email</span>
-                          <span className="text-white font-medium font-mono">{existingApp.applicantEmail}</span>
-                        </div>
-                      )}
-                      {existingApp?.applicantPhone && (
-                        <div className="flex items-center justify-between text-slate-400">
-                          <span>Phone</span>
-                          <span className="text-white font-medium font-mono">{existingApp.applicantPhone}</span>
-                        </div>
-                      )}
                       {existingApp?.monthlyIncome && (
                         <div className="flex items-center justify-between text-slate-400">
-                          <span>Monthly Income</span>
-                          <span className="text-white font-medium">৳{Number(existingApp.monthlyIncome).toLocaleString()}</span>
+                          <span>Reported Income</span>
+                          <span className="text-slate-200 font-mono">
+                            ৳{Number(existingApp.monthlyIncome).toLocaleString()} / mo
+                          </span>
                         </div>
                       )}
                       {existingApp?.emergencyContact && (
                         <div className="flex items-center justify-between text-slate-400">
                           <span>Emergency Contact</span>
-                          <span className="text-white font-medium font-mono">{existingApp.emergencyContact}</span>
+                          <span className="text-slate-200 font-mono">
+                            {existingApp.emergencyContact}
+                          </span>
                         </div>
                       )}
                     </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-400 text-center leading-relaxed">
-                    Duplicate applications cannot be submitted. You will be contacted once the owner reviews your request.
                   </div>
                 </div>
               ) : showTenantForm ? (
@@ -659,7 +786,7 @@ export function ListingDetailPage() {
                       value={applyIncome}
                       onChange={(e) => setApplyIncome(e.target.value)}
                       placeholder="e.g. 80000"
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black"
+                      className="w-full bg-[#12151c] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                     />
                   </div>
 
@@ -678,7 +805,7 @@ export function ListingDetailPage() {
                       value={applyContact}
                       onChange={(e) => setApplyContact(e.target.value)}
                       placeholder="01XXXXXXXXX"
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black"
+                      className="w-full bg-[#12151c] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                     />
                   </div>
 
@@ -711,25 +838,25 @@ export function ListingDetailPage() {
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed">
                       {isTenant
-                        ? "Your existing tenant credentials will be used to submit your lease application directly."
-                        : "Click Apply to submit your application for this residence."}
+                        ? "Your profile is registered with tenant credentials. Click Apply to instantly submit your application to the landlord."
+                        : "Click Apply to submit your application for this apartment."}
                     </p>
                   </div>
 
                   <button
                     type="button"
-                    onClick={handleDirectApply}
+                    onClick={isTenant ? handleDirectApply : () => setShowTenantForm(true)}
                     disabled={applying}
-                    className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm flex items-center justify-center gap-2 shadow-sm"
                   >
                     {applying ? (
                       <>
                         <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                        <span>Submitting Application...</span>
+                        <span>Applying...</span>
                       </>
                     ) : (
                       <>
-                        <span>Apply</span>
+                        <span>Apply for this Apartment</span>
                         <span className="material-symbols-outlined text-base">arrow_forward</span>
                       </>
                     )}

@@ -8,7 +8,7 @@ import {
   type StoredApplication,
 } from "../utils/applicationStorage";
 import { ApplicationInfoModal } from "../components/ApplicationInfoModal";
-import { StatusBadge } from "../components/ActualListings";
+import { PropertyCard } from "../components/PropertyCard";
 
 export interface BackendListing {
   id: number | string;
@@ -30,129 +30,8 @@ export interface BackendListing {
   monthly_due_date?: number | string | null;
   pet_allowed?: boolean | null;
   security_deposit?: number | string | null;
-}
-
-function ListingCard({
-  item,
-  isOwn,
-  isApplied,
-  onOpenAppInfo,
-}: {
-  item: BackendListing;
-  isOwn: boolean;
-  isApplied: boolean;
-  onOpenAppInfo: (item: BackendListing, app: StoredApplication | null) => void;
-}) {
-  const { user } = useAuth();
-  const existingApp = isApplied && user ? getUserApplication(user.id, item.id) : null;
-
-  const rentFormatted =
-    item.rent !== undefined && item.rent !== null && item.rent !== "" && !isNaN(Number(item.rent))
-      ? `৳${Number(item.rent).toLocaleString()} / month`
-      : null;
-
-  return (
-    <Link
-      to={`/listings/${item.id}`}
-      className="border border-slate-800 bg-[#12151c] rounded-xl p-5 flex flex-col justify-between hover:border-slate-700 transition cursor-pointer group block text-left"
-    >
-      <div>
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <span className="text-[11px] font-mono uppercase bg-slate-800 text-slate-300 px-2 py-0.5 rounded">
-            Area #{item.area_id}
-          </span>
-          <div
-            className="flex items-center gap-1.5"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            {isOwn && (
-              <span className="text-[11px] font-medium text-[#d4b068] bg-[#d4b068]/10 border border-[#d4b068]/30 px-2 py-0.5 rounded">
-                Your Listing
-              </span>
-            )}
-            {isApplied && (
-              <span className="text-[11px] font-medium text-emerald-300 bg-emerald-950/70 border border-emerald-600/50 px-2 py-0.5 rounded flex items-center gap-1">
-                <span className="material-symbols-outlined text-xs">done_all</span> Applied
-              </span>
-            )}
-            <StatusBadge status={item.status} />
-          </div>
-        </div>
-
-        <div className="mb-2">
-          <h2 className="text-lg font-semibold text-white line-clamp-1 group-hover:text-[#d4b068] transition-colors">
-            {item.title}
-          </h2>
-          {rentFormatted && (
-            <p className="text-sm font-bold text-[#d4b068] font-mono mt-0.5">
-              {rentFormatted}
-            </p>
-          )}
-        </div>
-
-        <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
-          {item.description}
-        </p>
-
-        <div className="grid grid-cols-3 gap-2 py-2 border-y border-slate-800 text-center text-xs text-slate-300 mb-4">
-          <div>
-            <span className="font-semibold text-white">{item.bedroom_count}</span> Beds
-          </div>
-          <div>
-            <span className="font-semibold text-white">{item.bathroom_count}</span> Baths
-          </div>
-          <div>
-            Floor <span className="font-semibold text-white">{item.on_which_floor}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-        <span className="text-xs text-slate-500 font-mono">ID: #{item.id}</span>
-        {isOwn ? (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-[#d4b068] bg-[#d4b068]/15 border border-[#d4b068]/30 px-2.5 py-1 rounded">
-              Your Listing
-            </span>
-            <span className="text-xs text-slate-400 group-hover:text-white underline transition">
-              View
-            </span>
-          </div>
-        ) : isApplied ? (
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onOpenAppInfo(item, existingApp);
-              }}
-              className="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-semibold px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm"
-            >
-              <span className="material-symbols-outlined text-sm">assignment_turned_in</span>
-              <span>Applied</span>
-            </button>
-            <span className="text-xs text-slate-400 group-hover:text-white transition">
-              Details
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 group-hover:text-white transition">
-              Details
-            </span>
-            <span className="bg-white text-slate-900 font-semibold px-4 py-1.5 rounded-lg text-xs group-hover:bg-slate-200 transition flex items-center gap-1">
-              <span>Apply</span>
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </span>
-          </div>
-        )}
-      </div>
-    </Link>
-  );
+  imageUrl?: string;
+  imageAlt?: string;
 }
 
 export function ListingsPage() {
@@ -216,7 +95,13 @@ export function ListingsPage() {
       item.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleOpenAppInfo = (item: BackendListing, app: StoredApplication | null) => {
+  // Filter public listings so user's own listings are separated when logged in
+  const publicListings = user
+    ? filtered.filter((l) => Number(l.owner_id) !== Number(user.id))
+    : filtered;
+
+  const handleOpenAppInfo = (item: BackendListing) => {
+    const app = user ? getUserApplication(user.id, item.id) : null;
     setSelectedApp({ listing: item, application: app });
   };
 
@@ -225,7 +110,7 @@ export function ListingsPage() {
       {/* Header & Actions */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Browse Residences</h1>
+          <h1 className="text-3xl font-bold text-white mb-1">Browse Apartments</h1>
           <p className="text-sm text-slate-400">
             Real approved properties stored in PostgreSQL database.
           </p>
@@ -271,7 +156,7 @@ export function ListingsPage() {
       )}
 
       {/* Empty State */}
-      {!loading && !error && filtered.length === 0 && (!token || filteredMyListings.length === 0) && (
+      {!loading && !error && publicListings.length === 0 && (!token || filteredMyListings.length === 0) && (
         <div className="py-20 text-center border border-dashed border-slate-800 rounded-2xl p-8 my-4">
           <span className="material-symbols-outlined text-4xl text-slate-500 mb-2">
             apartment
@@ -279,7 +164,7 @@ export function ListingsPage() {
           <h3 className="text-lg font-medium text-white mb-1">No Listings Found</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mb-4">
             {searchTerm
-              ? "No residences match your current search query."
+              ? "No apartments match your current search query."
               : "There are currently no approved property listings in the database."}
           </p>
           <Link
@@ -292,7 +177,7 @@ export function ListingsPage() {
       )}
 
       {/* Listings Content */}
-      {!loading && !error && (filtered.length > 0 || (Boolean(token && user) && filteredMyListings.length > 0)) && (
+      {!loading && !error && (publicListings.length > 0 || (Boolean(token && user) && filteredMyListings.length > 0)) && (
         <>
           {/* My Listings Section (only appears when user is logged in) */}
           {Boolean(token && user) && (
@@ -317,9 +202,9 @@ export function ListingsPage() {
               {filteredMyListings.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredMyListings.map((item) => (
-                    <ListingCard
+                    <PropertyCard
                       key={item.id}
-                      item={item}
+                      listing={item}
                       isOwn={true}
                       isApplied={false}
                       onOpenAppInfo={handleOpenAppInfo}
@@ -333,7 +218,7 @@ export function ListingsPage() {
                     to="/listings/new"
                     className="inline-block bg-white text-slate-900 font-medium px-3.5 py-1.5 rounded-lg text-xs hover:bg-slate-200 transition"
                   >
-                    Post a Residence
+                    Post an Apartment
                   </Link>
                 </div>
               )}
@@ -348,20 +233,19 @@ export function ListingsPage() {
                   Public Listings
                 </h2>
                 <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
-                  {filtered.length}
+                  {publicListings.length}
                 </span>
               </div>
             )}
-            {filtered.length > 0 ? (
+            {publicListings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filtered.map((item) => {
-                  const isOwn = Boolean(user && item.owner_id === user.id);
+                {publicListings.map((item) => {
                   const isApplied = Boolean(user && hasUserApplied(user.id, item.id));
                   return (
-                    <ListingCard
+                    <PropertyCard
                       key={item.id}
-                      item={item}
-                      isOwn={isOwn}
+                      listing={item}
+                      isOwn={false}
                       isApplied={isApplied}
                       onOpenAppInfo={handleOpenAppInfo}
                     />
@@ -382,7 +266,8 @@ export function ListingsPage() {
         <ApplicationInfoModal
           listing={selectedApp.listing}
           application={
-            selectedApp.application || {
+            selectedApp.application ||
+            (user ? getUserApplication(user.id, selectedApp.listing.id) : null) || {
               listingId: selectedApp.listing.id,
               listingTitle: selectedApp.listing.title,
               appliedAt: new Date().toISOString(),

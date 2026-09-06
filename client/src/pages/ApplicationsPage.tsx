@@ -106,7 +106,7 @@ export function ApplicationsPage() {
           </span>
           <h3 className="text-lg font-medium text-white mb-1">No Applications Received</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mb-4">
-            When tenants apply for your residences, they will appear here for review and digital contract proposal.
+            When tenants apply for your apartments, they will appear here for review and digital contract proposal.
           </p>
           <Link
             to="/listings/new"
@@ -143,7 +143,7 @@ export function ApplicationsPage() {
                 </div>
 
                 <div className="text-sm text-slate-200 font-medium mb-1">
-                  Property #{app.listing_id}: {app.title || "Residence"}
+                  Property #{app.listing_id}: {app.title || "Apartment"}
                 </div>
                 <div className="text-xs text-slate-500">
                   Applied on {new Date(app.applied_at || Date.now()).toLocaleDateString()}
@@ -155,7 +155,7 @@ export function ApplicationsPage() {
                   to={`/listings/${app.listing_id}`}
                   className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded text-xs font-medium"
                 >
-                  View Residence
+                  View Apartment
                 </Link>
 
                 {app.status === "pending" && (

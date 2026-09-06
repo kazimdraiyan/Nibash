@@ -114,7 +114,7 @@ export function ContractFormPage() {
                 required
                 value={listingId}
                 onChange={(e) => setListingId(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
             <div>
@@ -130,7 +130,7 @@ export function ContractFormPage() {
                 required
                 value={tenantId}
                 onChange={(e) => setTenantId(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
           </div>
@@ -149,7 +149,7 @@ export function ContractFormPage() {
                 required
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
             <div>
@@ -165,7 +165,7 @@ export function ContractFormPage() {
                 required
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
           </div>
@@ -186,7 +186,7 @@ export function ContractFormPage() {
                 required
                 value={rent}
                 onChange={(e) => setRent(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
 
@@ -205,7 +205,7 @@ export function ContractFormPage() {
                 required
                 value={securityDeposit}
                 onChange={(e) => setSecurityDeposit(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
 
@@ -223,7 +223,7 @@ export function ContractFormPage() {
                 required
                 value={electricityBill}
                 onChange={(e) => setElectricityBill(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
 
@@ -241,7 +241,7 @@ export function ContractFormPage() {
                 required
                 value={waterBill}
                 onChange={(e) => setWaterBill(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
 
@@ -259,7 +259,7 @@ export function ContractFormPage() {
                 required
                 value={serviceCharge}
                 onChange={(e) => setServiceCharge(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
 
@@ -278,7 +278,7 @@ export function ContractFormPage() {
                 required
                 value={monthlyDueDate}
                 onChange={(e) => setMonthlyDueDate(e.target.value)}
-                className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
               />
             </div>
           </div>
@@ -289,19 +289,19 @@ export function ContractFormPage() {
               type="checkbox"
               checked={petAllowed}
               onChange={(e) => setPetAllowed(e.target.checked)}
-              className="w-4 h-4 rounded text-black accent-black cursor-pointer"
+              className="w-4 h-4 rounded text-black accent-[#d4b068] cursor-pointer"
             />
             <label htmlFor="contract-pet-allowed" className="text-sm text-slate-300 cursor-pointer">
-              Pets Allowed under this contract
+              Pets Allowed in this Lease
             </label>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 w-full bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm"
+            className="mt-4 w-full bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm shadow-md"
           >
-            {loading ? "Proposing Contract..." : "Send Contract Proposal to Tenant"}
+            {loading ? "Proposing Contract..." : "Propose Digital Lease Agreement"}
           </button>
         </form>
       </div>

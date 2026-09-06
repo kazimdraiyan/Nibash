@@ -24,7 +24,7 @@ export function Footer() {
                 Nibash
               </span>
               <span className="text-[9px] uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm block mt-1">
-                Luxury Residences
+                Luxury Apartments
               </span>
             </div>
           </Link>
@@ -44,7 +44,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Column 2: Residences */}
+        {/* Column 2: Apartments */}
         <div className="md:col-span-3 flex flex-col gap-4">
           <span className="font-label-sm text-xs uppercase tracking-widest text-[#cbd5e1] font-semibold">
             Featured Areas
@@ -62,7 +62,7 @@ export function Footer() {
             </li>
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Dhanmondi Lakeside Residences
+                Dhanmondi Lakeside Apartments
               </a>
             </li>
             <li>
@@ -86,7 +86,7 @@ export function Footer() {
           <ul className="flex flex-col gap-2.5 text-sm text-[#94a3b8]">
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Browse Residences
+                Browse Apartments
               </a>
             </li>
             <li>

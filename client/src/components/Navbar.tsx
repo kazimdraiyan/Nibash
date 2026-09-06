@@ -24,7 +24,7 @@ export function Navbar() {
               Nibash
             </span>
             <span className="text-[9px] uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm block mt-1">
-              Luxury Residences
+              Luxury Apartments
             </span>
           </div>
         </Link>
@@ -35,7 +35,7 @@ export function Navbar() {
             to="/listings"
             className="text-xs uppercase tracking-widest font-label-sm text-[#94a3b8] hover:text-white transition-colors"
           >
-            Residences
+            Apartments
           </Link>
           <a
             href="/#how-it-works"

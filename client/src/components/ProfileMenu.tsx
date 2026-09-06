@@ -80,7 +80,7 @@ export function ProfileMenu() {
               className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
             >
               <span className="material-symbols-outlined text-base">apartment</span>
-              <span>All Residences</span>
+              <span>All Apartments</span>
             </button>
 
             <button
@@ -103,17 +103,6 @@ export function ProfileMenu() {
             >
               <span className="material-symbols-outlined text-base">assignment</span>
               <span>Applications</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate("/onboarding");
-              }}
-              className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
-            >
-              <span className="material-symbols-outlined text-base">badge</span>
-              <span>Role Onboarding</span>
             </button>
 
             <div className="h-px bg-[#b8bec9] my-1" />

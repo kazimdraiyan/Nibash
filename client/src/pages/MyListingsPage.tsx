@@ -2,22 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { StatusBadge } from "../components/ActualListings";
+import { getAreaName } from "../utils/areaLookup";
 import type { BackendListing } from "./ListingsPage";
-
-const DHAKA_AREAS: Record<number, string> = {
-  1: "Azimpur",
-  2: "Dhanmondi",
-  3: "Mohammadpur",
-  4: "Gulshan",
-  5: "Banani",
-  6: "Mirpur",
-  7: "Khilkhet",
-  8: "Uttara",
-  9: "Bashundhara",
-  10: "Tejgaon",
-  11: "Lalbagh",
-  12: "Badda",
-};
 
 export interface ListingWithApplications extends BackendListing {
   applicationCount: number;
@@ -44,7 +30,7 @@ function ApplicationCountBadge({ count }: { count: number }) {
 }
 
 function MyListingCard({ item }: { item: ListingWithApplications }) {
-  const areaName = DHAKA_AREAS[item.area_id] || `Area #${item.area_id}`;
+  const areaName = getAreaName(item.area_id);
   const rentFormatted =
     item.rent !== undefined && item.rent !== null && item.rent !== "" && !isNaN(Number(item.rent))
       ? `৳${Number(item.rent).toLocaleString()} / month`
@@ -206,12 +192,12 @@ export function MyListingsPage() {
               className="text-xs text-slate-400 hover:text-white transition flex items-center gap-1"
             >
               <span className="material-symbols-outlined text-xs">arrow_back</span>
-              <span>All Residences</span>
+              <span>All Apartments</span>
             </Link>
           </div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold text-white tracking-tight">
-              My Residences & Listings
+              My Apartments & Listings
             </h1>
             {!loading && (
               <span className="text-xs font-semibold text-[#d4b068] bg-[#d4b068]/15 border border-[#d4b068]/30 px-2.5 py-0.5 rounded-full">
@@ -279,7 +265,7 @@ export function MyListingsPage() {
           </div>
           <h3 className="text-lg font-bold text-white mb-2">No Property Listings Yet</h3>
           <p className="text-xs text-slate-400 mb-6 leading-relaxed">
-            You have not registered any residence listings in the Nibash database. Publish your property to find verified tenants and receive lease applications.
+            You have not registered any apartment listings in the Nibash database. Publish your property to find verified tenants and receive lease applications.
           </p>
           <Link
             to="/listings/new"
@@ -350,7 +336,7 @@ export function MyListingsPage() {
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                 <h2 className="text-xl font-bold text-white tracking-tight">
-                  Other Residences
+                  Other Apartments
                 </h2>
                 <span className="text-xs font-semibold text-rose-300 bg-rose-950/70 border border-rose-600/60 px-2.5 py-0.5 rounded-full">
                   {otherListings.length}

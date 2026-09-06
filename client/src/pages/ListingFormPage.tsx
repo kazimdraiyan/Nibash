@@ -2,21 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
-
-const DHAKA_AREAS = [
-  { id: 1, name: "Azimpur", lat: 23.7298, lng: 90.3854 },
-  { id: 2, name: "Dhanmondi", lat: 23.7450, lng: 90.3767 },
-  { id: 3, name: "Mohammadpur", lat: 23.7664, lng: 90.3586 },
-  { id: 4, name: "Gulshan", lat: 23.7917, lng: 90.4167 },
-  { id: 5, name: "Banani", lat: 23.7950, lng: 90.4047 },
-  { id: 6, name: "Mirpur", lat: 23.8046, lng: 90.3631 },
-  { id: 7, name: "Khilkhet", lat: 23.8311, lng: 90.4243 },
-  { id: 8, name: "Uttara", lat: 23.8770, lng: 90.3770 },
-  { id: 9, name: "Bashundhara", lat: 23.8167, lng: 90.4326 },
-  { id: 10, name: "Tejgaon", lat: 23.7640, lng: 90.3917 },
-  { id: 11, name: "Lalbagh", lat: 23.7198, lng: 90.3897 },
-  { id: 12, name: "Badda", lat: 23.7716, lng: 90.4274 },
-];
+import { DHAKA_AREAS } from "../utils/areaLookup";
 
 export function ListingFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -52,87 +38,76 @@ export function ListingFormPage() {
   const handleAreaChange = (newAreaId: number) => {
     setAreaId(newAreaId);
     const matched = DHAKA_AREAS.find((a) => a.id === newAreaId);
-    if (matched) {
+    if (matched && matched.lat && matched.lng) {
       setLatitude(matched.lat);
       setLongitude(matched.lng);
     }
   };
 
-  // If edit mode, fetch existing listing details
+  // If edit mode, load existing data
   useEffect(() => {
     if (!isEdit || !id) return;
-    const fetchExisting = async () => {
+    async function loadExistingListing() {
       try {
         const res = await apiClient.get<{ listing: any }>(`/listings/${id}`);
         const data = res.listing;
         setTitle(data.title || "");
         setDescription(data.description || "");
         setAreaId(data.area_id || 4);
-        setLatitude(data.latitude || 23.7917);
-        setLongitude(data.longitude || 90.4167);
-        setBedroomCount(String(data.bedroom_count || 3));
-        setBathroomCount(String(data.bathroom_count || 3));
+        setLatitude(parseFloat(data.latitude) || 23.7917);
+        setLongitude(parseFloat(data.longitude) || 90.4167);
+        setBedroomCount(String(data.bedroom_count || 1));
+        setBathroomCount(String(data.bathroom_count || 1));
         setOnWhichFloor(String(data.on_which_floor || 1));
+        setRent(String(data.rent || ""));
+        setElectricityBill(String(data.electricity_bill || ""));
+        setWaterBill(String(data.water_bill || ""));
+        setServiceCharge(String(data.service_charge || ""));
+        setMonthlyDueDate(String(data.monthly_due_date || "1"));
+        setSecurityDeposit(String(data.security_deposit || ""));
+        setPetAllowed(Boolean(data.pet_allowed));
       } catch (err: any) {
-        setError(err.message || "Failed to load listing for editing.");
+        setError(err.message || "Failed to fetch existing listing.");
       } finally {
         setInitialLoading(false);
       }
-    };
-    fetchExisting();
+    }
+    loadExistingListing();
   }, [id, isEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) {
-      setError("Please log in to submit listings.");
-      return;
-    }
-
-    setLoading(true);
     setError(null);
+    setLoading(true);
 
     const payload = {
       title: title.trim(),
       description: description.trim(),
-      area_id: Number(areaId),
       latitude: Number(latitude),
       longitude: Number(longitude),
-      bedroom_count: Number(bedroomCount),
-      bathroom_count: Number(bathroomCount),
-      on_which_floor: Number(onWhichFloor),
-      rent: Number(rent),
-      electricity_bill: Number(electricityBill),
-      water_bill: Number(waterBill),
-      service_charge: Number(serviceCharge),
-      monthly_due_date: Number(monthlyDueDate),
-      security_deposit: Number(securityDeposit),
-      pet_allowed: Boolean(petAllowed),
+      bedroom_count: parseInt(bedroomCount, 10),
+      bathroom_count: parseInt(bathroomCount, 10),
+      on_which_floor: parseInt(onWhichFloor, 10),
+      area_id: Number(areaId),
+      rent: parseFloat(rent),
+      electricity_bill: parseFloat(electricityBill),
+      water_bill: parseFloat(waterBill),
+      service_charge: parseFloat(serviceCharge),
+      monthly_due_date: parseInt(monthlyDueDate, 10),
+      pet_allowed: petAllowed,
+      security_deposit: parseFloat(securityDeposit),
     };
 
-    if (isEdit) {
-      try {
-        await apiClient.patch(`/listings/${id}`, payload);
-        alert("Listing updated successfully!");
-        navigate(`/listings/${id}`);
-      } catch (err: any) {
-        setError(err.message || "Failed to update listing.");
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
     try {
-      const createRes = await apiClient.post<{ message: string; listingId: number }>(
-        "/listings",
-        payload
-      );
-      alert(createRes.message || "Listing created successfully!");
-      navigate("/listings");
-    } catch (createErr: any) {
-      console.error("[Listing Creation] Listing creation failed:", createErr);
-      setError(createErr.message || "Failed to create listing.");
+      if (isEdit) {
+        await apiClient.patch(`/listings/${id}`, payload);
+        navigate(`/listings/${id}`);
+      } else {
+        const res = await apiClient.post<{ message: string; listingId: number }>("/listings", payload);
+        navigate(`/listings/${res.listingId}`);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to save listing. Please verify inputs.");
     } finally {
       setLoading(false);
     }
@@ -140,13 +115,17 @@ export function ListingFormPage() {
 
   if (!token) {
     return (
-      <div className="max-w-md mx-auto py-16 px-4 text-center">
-        <h2 className="text-xl font-bold text-white mb-2">Authentication Required</h2>
-        <p className="text-sm text-slate-400 mb-6">
-          You must be logged in to create or edit property listings.
+      <div className="max-w-xl mx-auto py-16 px-4 text-center">
+        <h1 className="text-2xl font-bold mb-3">Authentication Required</h1>
+        <p className="text-slate-400 mb-6">
+          Please log in to post or manage property listings.
         </p>
-        <Link to="/login" className="bg-white text-slate-900 px-4 py-2 rounded text-xs font-medium">
-          Log In
+        <Link
+          to="/login"
+          state={{ from: { pathname: isEdit ? `/listings/${id}/edit` : "/listings/new" } }}
+          className="inline-block bg-white text-black px-6 py-2.5 rounded-lg font-medium hover:bg-slate-200 transition"
+        >
+          Go to Login
         </Link>
       </div>
     );
@@ -156,7 +135,7 @@ export function ListingFormPage() {
     return (
       <div className="py-24 text-center text-slate-400">
         <div className="w-8 h-8 rounded-full border-2 border-white/40 border-t-transparent animate-spin mx-auto mb-3" />
-        <p className="text-sm">Loading listing details...</p>
+        <p className="text-sm">Loading listing data...</p>
       </div>
     );
   }
@@ -171,7 +150,7 @@ export function ListingFormPage() {
 
       <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-white mb-1">
-          {isEdit ? "Edit Property Listing" : "Create New Residence Listing"}
+          {isEdit ? "Edit Property Listing" : "Create New Apartment Listing"}
         </h1>
         <p className="text-xs text-slate-400 mb-6">
           Fill in the architectural specifications and monthly lease financial terms.
@@ -187,7 +166,7 @@ export function ListingFormPage() {
           {/* Section 1: Basic Information */}
           <div>
             <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 border-b border-slate-800 pb-1">
-              1. Residence Details
+              1. Apartment Details
             </h2>
 
             <div className="flex flex-col gap-4">
@@ -204,8 +183,8 @@ export function ListingFormPage() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. The Imperial Residence, Road 79"
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-black"
+                  placeholder="e.g. The Imperial Apartment, Road 79"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                 />
               </div>
 
@@ -223,7 +202,7 @@ export function ListingFormPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe the architectural highlights, view, ambient light, security, and fittings..."
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-black"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                 />
               </div>
 
@@ -239,10 +218,10 @@ export function ListingFormPage() {
                     id="listing-area"
                     value={areaId}
                     onChange={(e) => handleAreaChange(Number(e.target.value))}
-                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-black"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                   >
                     {DHAKA_AREAS.map((area) => (
-                      <option key={area.id} value={area.id}>
+                      <option key={area.id} value={area.id} className="bg-[#12151c] text-white">
                         {area.name} (Area #{area.id})
                       </option>
                     ))}
@@ -263,7 +242,7 @@ export function ListingFormPage() {
                       step="0.0001"
                       value={latitude}
                       onChange={(e) => setLatitude(parseFloat(e.target.value))}
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                     />
                   </div>
                   <div>
@@ -279,7 +258,7 @@ export function ListingFormPage() {
                       step="0.0001"
                       value={longitude}
                       onChange={(e) => setLongitude(parseFloat(e.target.value))}
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                     />
                   </div>
                 </div>
@@ -300,7 +279,7 @@ export function ListingFormPage() {
                     required
                     value={bedroomCount}
                     onChange={(e) => setBedroomCount(e.target.value)}
-                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                   />
                 </div>
                 <div>
@@ -317,7 +296,7 @@ export function ListingFormPage() {
                     required
                     value={bathroomCount}
                     onChange={(e) => setBathroomCount(e.target.value)}
-                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                   />
                 </div>
                 <div>
@@ -334,7 +313,7 @@ export function ListingFormPage() {
                     required
                     value={onWhichFloor}
                     onChange={(e) => setOnWhichFloor(e.target.value)}
-                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                   />
                 </div>
               </div>
@@ -363,7 +342,7 @@ export function ListingFormPage() {
                   required
                   value={rent}
                   onChange={(e) => setRent(e.target.value)}
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                 />
               </div>
 
@@ -382,7 +361,7 @@ export function ListingFormPage() {
                   required
                   value={securityDeposit}
                   onChange={(e) => setSecurityDeposit(e.target.value)}
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                 />
               </div>
 
@@ -400,7 +379,7 @@ export function ListingFormPage() {
                   required
                   value={electricityBill}
                   onChange={(e) => setElectricityBill(e.target.value)}
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                 />
               </div>
 
@@ -418,7 +397,7 @@ export function ListingFormPage() {
                   required
                   value={waterBill}
                   onChange={(e) => setWaterBill(e.target.value)}
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                 />
               </div>
 
@@ -436,7 +415,7 @@ export function ListingFormPage() {
                   required
                   value={serviceCharge}
                   onChange={(e) => setServiceCharge(e.target.value)}
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                 />
               </div>
 
@@ -455,7 +434,7 @@ export function ListingFormPage() {
                   required
                   value={monthlyDueDate}
                   onChange={(e) => setMonthlyDueDate(e.target.value)}
-                  className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                 />
               </div>
             </div>
@@ -466,10 +445,10 @@ export function ListingFormPage() {
                 type="checkbox"
                 checked={petAllowed}
                 onChange={(e) => setPetAllowed(e.target.checked)}
-                className="w-4 h-4 rounded text-black accent-black cursor-pointer"
+                className="w-4 h-4 rounded text-black accent-[#d4b068] cursor-pointer"
               />
               <label htmlFor="pet-allowed" className="text-sm text-slate-300 cursor-pointer">
-                Pets Allowed in this Residence
+                Pets Allowed in this Apartment
               </label>
             </div>
           </div>
@@ -477,9 +456,9 @@ export function ListingFormPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 w-full bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm"
+            className="mt-2 w-full bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm shadow-md"
           >
-            {loading ? "Saving Residence..." : isEdit ? "Update Residence" : "Publish Residence Listing"}
+            {loading ? "Saving Apartment..." : isEdit ? "Update Apartment" : "Publish Apartment Listing"}
           </button>
         </form>
       </div>

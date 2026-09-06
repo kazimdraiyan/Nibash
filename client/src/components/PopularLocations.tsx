@@ -32,7 +32,7 @@ export function PopularLocations() {
       city: "Dhaka North",
       listingsCount: 46,
       priceFrom: "৳110,000",
-      description: "Unrivaled security, tranquil parks, and ambassadorial residences.",
+      description: "Unrivaled security, tranquil parks, and ambassadorial apartments.",
       imageUrl:
         "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     },
@@ -78,7 +78,7 @@ export function PopularLocations() {
               </span>
             </h2>
             <p className="text-[#94a3b8] text-sm md:text-base max-w-xl mt-2 font-normal">
-              Find your ideal residence in Dhaka's most sought-after urban sanctuaries.
+              Find your ideal apartment in Dhaka's most sought-after urban sanctuaries.
             </p>
           </div>
 
@@ -115,7 +115,7 @@ export function PopularLocations() {
                   {loc.city}
                 </span>
                 <span className="glass-panel-silver px-3 py-1 rounded-full text-xs font-label-sm font-semibold text-[#f8fafc] border border-white/20">
-                  {loc.listingsCount} Residences
+                  {loc.listingsCount} Apartments
                 </span>
               </div>
 
@@ -134,7 +134,7 @@ export function PopularLocations() {
                 </p>
 
                 <div className="pt-2 flex items-center gap-1 text-xs font-label-sm uppercase tracking-widest text-[#cbd5e1] group-hover:text-white group-hover:translate-x-1 transition-transform">
-                  <span>Explore Residences</span>
+                  <span>Explore Apartments</span>
                   <span className="material-symbols-outlined text-sm">north_east</span>
                 </div>
               </div>

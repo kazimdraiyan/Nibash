@@ -1,6 +1,5 @@
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
-import { PropertyGrid } from "./components/PropertyGrid";
 import { HowItWorks } from "./components/HowItWorks";
 import { PopularLocations } from "./components/PopularLocations";
 import { WhyChooseUs } from "./components/WhyChooseUs";
@@ -8,7 +7,6 @@ import { CallToAction } from "./components/CallToAction";
 import { Footer } from "./components/Footer";
 import { LoginPage } from "./components/LoginPage";
 import { RegisterPage } from "./components/RegisterPage";
-import { RoleOnboardingPage } from "./pages/RoleOnboardingPage";
 import { ListingsPage } from "./pages/ListingsPage";
 import { MyListingsPage } from "./pages/MyListingsPage";
 import { ListingDetailPage } from "./pages/ListingDetailPage";
@@ -19,7 +17,6 @@ import { ContractDetailPage } from "./pages/ContractDetailPage";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ActualListings } from "./components/ActualListings";
-import { mockListings } from "./data/mockListings";
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
@@ -27,7 +24,6 @@ function HomePage() {
   return (
     <>
       <Hero />
-      <PropertyGrid listings={mockListings} />
       <ActualListings />
       <div id="how-it-works">
         <HowItWorks />
@@ -51,7 +47,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#090a0c] text-white">
         <div className="w-12 h-12 rounded-full border-2 border-white/60 border-t-transparent animate-spin mb-4" />
         <span className="text-xs uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm">
-          Loading Nibash Residences...
+          Loading Nibash Apartments...
         </span>
       </div>
     );
@@ -67,14 +63,6 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/onboarding"
-            element={
-              <ProtectedRoute>
-                <RoleOnboardingPage />
-              </ProtectedRoute>
-            }
-          />
           <Route path="/listings" element={<ListingsPage />} />
           <Route
             path="/my-listings"
@@ -132,4 +120,3 @@ export default function App() {
     </div>
   );
 }
-

@@ -69,7 +69,7 @@ export function LoginPage() {
               </h2>
 
               <p className="text-sm text-[#94a3b8] leading-relaxed max-w-sm font-normal">
-                Access your curated luxury residences, oversee legally structured digital contracts,
+                Access your curated luxury apartments, oversee legally structured digital contracts,
                 and manage verified rental leases with seamless bank-grade protection.
               </p>
             </div>
@@ -80,7 +80,7 @@ export function LoginPage() {
                 <div>
                   <span className="block font-serif text-3xl text-white font-light">1,200+</span>
                   <span className="text-[11px] uppercase tracking-widest text-[#94a3b8] font-label-sm mt-1 block">
-                    Verified Residences
+                    Verified Apartments
                   </span>
                 </div>
                 <div>

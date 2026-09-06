@@ -1,11 +1,11 @@
 export interface Listing {
-  id: string;
+  id: string | number;
   title?: string;
-  imageUrl: string;
+  imageUrl?: string;
   imageAlt?: string;
   beds: number;
   baths: number;
-  sqft: number;
+  sqft?: number;
   price: number;
   location: string;
   propertyType?: "Apartment" | "Penthouse" | "Duplex" | "Studio";
@@ -16,4 +16,3 @@ export interface Listing {
   petAllowed?: boolean;
   tags?: string[];
 }
-

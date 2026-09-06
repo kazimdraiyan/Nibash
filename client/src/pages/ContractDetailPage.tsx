@@ -209,7 +209,7 @@ export function ContractDetailPage() {
           {error || "Contract not found or not authorized."}
         </div>
         <Link to="/listings" className="inline-block bg-slate-800 text-white px-4 py-2 rounded text-xs">
-          Browse Residences
+          Browse Apartments
         </Link>
       </div>
     );
@@ -428,7 +428,7 @@ export function ContractDetailPage() {
                       required
                       value={payAmount}
                       onChange={(e) => setPayAmount(e.target.value)}
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                     />
                   </div>
                   <div>
@@ -442,11 +442,11 @@ export function ContractDetailPage() {
                       id="payment-method"
                       value={payMethod}
                       onChange={(e) => setPayMethod(e.target.value as any)}
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                     >
-                      <option value="bKash">bKash</option>
-                      <option value="SSLCommerz">SSLCommerz</option>
-                      <option value="Cash">Cash</option>
+                      <option value="bKash" className="bg-[#12151c] text-white">bKash</option>
+                      <option value="SSLCommerz" className="bg-[#12151c] text-white">SSLCommerz</option>
+                      <option value="Cash" className="bg-[#12151c] text-white">Cash</option>
                     </select>
                   </div>
                 </div>
@@ -465,7 +465,7 @@ export function ContractDetailPage() {
                       value={bKashTx}
                       onChange={(e) => setBKashTx(e.target.value)}
                       placeholder="e.g. 9J4K2L1A"
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                     />
                   </div>
                 )}
@@ -484,7 +484,7 @@ export function ContractDetailPage() {
                       value={sslTx}
                       onChange={(e) => setSslTx(e.target.value)}
                       placeholder="e.g. SSL-9821812"
-                      className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                     />
                   </div>
                 )}
@@ -534,13 +534,13 @@ export function ContractDetailPage() {
                     id="review-rating"
                     value={rating}
                     onChange={(e) => setRating(e.target.value)}
-                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                   >
-                    <option value="5">★★★★★ (5 Stars - Exceptional)</option>
-                    <option value="4">★★★★☆ (4 Stars - Very Good)</option>
-                    <option value="3">★★★☆☆ (3 Stars - Average)</option>
-                    <option value="2">★★☆☆☆ (2 Stars - Below Average)</option>
-                    <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+                    <option value="5" className="bg-[#12151c] text-white">★★★★★ (5 Stars - Exceptional)</option>
+                    <option value="4" className="bg-[#12151c] text-white">★★★★☆ (4 Stars - Very Good)</option>
+                    <option value="3" className="bg-[#12151c] text-white">★★★☆☆ (3 Stars - Average)</option>
+                    <option value="2" className="bg-[#12151c] text-white">★★☆☆☆ (2 Stars - Below Average)</option>
+                    <option value="1" className="bg-[#12151c] text-white">★☆☆☆☆ (1 Star - Poor)</option>
                   </select>
                 </div>
 
@@ -560,7 +560,7 @@ export function ContractDetailPage() {
                     value={reviewDesc}
                     onChange={(e) => setReviewDesc(e.target.value)}
                     placeholder="Describe your tenancy experience, building amenities, landlord responsiveness..."
-                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                   />
                 </div>
 

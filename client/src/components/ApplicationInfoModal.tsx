@@ -16,7 +16,7 @@ export function ApplicationInfoModal({
   if (!application) return null;
 
   const listingId = application.listingId;
-  const listingTitle = application.listingTitle || listing?.title || `Residence #${listingId}`;
+  const listingTitle = application.listingTitle || listing?.title || `Apartment #${listingId}`;
   const appliedDate = application.appliedAt
     ? new Date(application.appliedAt).toLocaleDateString(undefined, {
         year: "numeric",
@@ -58,7 +58,7 @@ export function ApplicationInfoModal({
         {/* Listing Summary */}
         <div className="mb-6 p-4 rounded-xl bg-[#090a0c] border border-slate-800">
           <div className="text-[11px] text-[#d4b068] font-mono uppercase mb-1">
-            Residence #{listingId}
+            Apartment #{listingId}
           </div>
           <h4 className="text-base font-semibold text-white line-clamp-1 mb-1">
             {listingTitle}

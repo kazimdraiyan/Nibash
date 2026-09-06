@@ -119,14 +119,6 @@ export function Hero() {
       <div className="relative z-10 max-w-[1440px] w-full mx-auto px-container-padding grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Left Column: Headline, Description & Glass Search Widget */}
         <div className="lg:col-span-6 flex flex-col gap-8">
-          {/* Tagline pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel-subtle border border-white/10 w-fit shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#d4b068] animate-pulse" />
-            <span className="font-label-sm text-[11px] uppercase tracking-[0.2em] text-[#e2e8f0]">
-              Curated Luxury Living
-            </span>
-          </div>
-
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-[#f8f9fa] leading-[1.12]">
             Find a Place That{" "}
@@ -137,7 +129,7 @@ export function Hero() {
 
           {/* Subtitle */}
           <p className="text-base sm:text-lg text-[#94a3b8] max-w-xl font-normal leading-relaxed">
-            Discover and rent handpicked luxury residences, panoramic sky penthouses,
+            Discover and rent handpicked luxury apartments, panoramic sky penthouses,
             and bespoke homes with verified authenticity and seamless digital contracts.
           </p>
 
@@ -202,7 +194,7 @@ export function Hero() {
                   className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none cursor-pointer"
                 >
                   <option value="All Types" className="bg-[#12151c] text-white">
-                    All Residences
+                    All Apartments
                   </option>
                   <option value="Penthouse" className="bg-[#12151c] text-white">
                     Sky Penthouse
@@ -294,7 +286,7 @@ export function Hero() {
                 1,200<span className="text-[#cbd5e1] font-sans">+</span>
               </div>
               <p className="text-xs text-[#94a3b8] uppercase tracking-wider font-label-sm mt-0.5">
-                Verified Residences
+                Verified Apartments
               </p>
             </div>
             <div>
@@ -407,7 +399,7 @@ export function Hero() {
                             verified
                           </span>
                           <span className="font-label-sm text-[11px] uppercase tracking-wider text-white">
-                            Verified Residence
+                            Verified Apartment
                           </span>
                         </div>
 
@@ -487,39 +479,9 @@ export function Hero() {
                 east
               </span>
             </button>
-
-            {/* Stable Trust Badge 1 (Top Right) */}
-            <div className="absolute -top-3 right-4 sm:right-8 glass-panel-subtle px-4 py-2.5 rounded-2xl border border-white/15 flex items-center gap-3 z-35 shadow-xl hidden sm:flex">
-              <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#cbd5e1]">
-                <span className="material-symbols-outlined text-lg">gavel</span>
-              </div>
-              <div>
-                <span className="block text-xs font-semibold text-white">
-                  Legally Structured
-                </span>
-                <span className="block text-[11px] text-[#94a3b8]">
-                  Online Lease Contracts
-                </span>
-              </div>
-            </div>
-
-            {/* Stable Trust Badge 2 (Bottom Left) */}
-            <div className="absolute -bottom-3 left-2 sm:left-4 glass-panel-subtle px-4 py-2.5 rounded-2xl border border-white/15 flex items-center gap-3 z-35 shadow-xl">
-              <div className="w-9 h-9 rounded-xl bg-[#d4b068]/15 border border-[#d4b068]/30 flex items-center justify-center text-[#ebd6a5]">
-                <span className="material-symbols-outlined text-lg">shield</span>
-              </div>
-              <div>
-                <span className="block text-xs font-semibold text-white">
-                  Escrow Protected
-                </span>
-                <span className="block text-[11px] text-[#94a3b8]">
-                  Automated Rent Receipts
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Indicator Dots Below Images (Clean 3 dots for the 3 residences, NO arrows below) */}
+          {/* Indicator Dots Below Images (Clean 3 dots for the 3 apartments, NO arrows below) */}
           <div className="flex items-center justify-center gap-2 mt-7">
             {showcaseItems.map((_, idx) => (
               <button

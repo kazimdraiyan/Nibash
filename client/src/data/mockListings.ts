@@ -41,7 +41,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: "3",
-    title: "Lakeside Serenity Residence",
+    title: "Lakeside Serenity Apartment",
     imageUrl:
       "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Spacious contemporary apartment with lake views and premium kitchen",
