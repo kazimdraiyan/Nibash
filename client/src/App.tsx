@@ -12,6 +12,7 @@ import { MyListingsPage } from "./pages/MyListingsPage";
 import { ListingDetailPage } from "./pages/ListingDetailPage";
 import { ListingFormPage } from "./pages/ListingFormPage";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
+import { MyApplicationsPage } from "./pages/MyApplicationsPage";
 import { ContractFormPage } from "./pages/ContractFormPage";
 import { ContractDetailPage } from "./pages/ContractDetailPage";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -86,6 +87,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <ListingFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-applications"
+            element={
+              <ProtectedRoute>
+                <MyApplicationsPage />
               </ProtectedRoute>
             }
           />

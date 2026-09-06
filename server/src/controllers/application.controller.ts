@@ -22,6 +22,15 @@ export async function apply(req: Request, res: Response) {
   res.json({ message: "applied successfully" });
 }
 
+export async function getMy(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const applications = await applicationService.getMyApplications(req.user.id);
+  res.json({ applications });
+}
+
 export async function getAll(req: Request, res: Response) {
   if (!req.user) {
     res.status(401).json({ error: "unauthorized" });

@@ -97,12 +97,12 @@ export function ProfileMenu() {
             <button
               onClick={() => {
                 setOpen(false);
-                navigate("/owner/applications");
+                navigate("/my-applications");
               }}
               className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
             >
-              <span className="material-symbols-outlined text-base">assignment</span>
-              <span>Applications</span>
+              <span className="material-symbols-outlined text-base">assignment_turned_in</span>
+              <span>My Applications</span>
             </button>
 
             <div className="h-px bg-[#b8bec9] my-1" />

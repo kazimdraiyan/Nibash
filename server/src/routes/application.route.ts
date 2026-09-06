@@ -6,6 +6,7 @@ import * as applicationController from "../controllers/application.controller.js
 const router = Router();
 
 router.post("/", authMiddleware, asyncHandler(applicationController.apply));
+router.get("/my", authMiddleware, asyncHandler(applicationController.getMy));
 router.get("/", authMiddleware, asyncHandler(applicationController.getAll));
 router.get(
   "/:listingId",

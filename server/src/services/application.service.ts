@@ -97,3 +97,40 @@ export async function rejectApplication(
     ["rejected", tenantId, listingId],
   );
 }
+
+export async function getMyApplications(tenantId: number) {
+  const result = await pool.query(
+    `SELECT 
+       a.tenant_id,
+       a.listing_id,
+       a.applied_at,
+       a.status,
+       l.title,
+       l.description,
+       l.bedroom_count,
+       l.bathroom_count,
+       l.on_which_floor,
+       l.area_id,
+       l.owner_id,
+       l.status AS listing_status,
+       t.rent,
+       t.electricity_bill,
+       t.water_bill,
+       t.service_charge,
+       t.monthly_due_date,
+       t.pet_allowed,
+       t.security_deposit,
+       tn.monthly_income,
+       tn.emergency_contact
+     FROM applies a
+     JOIN listings l ON a.listing_id = l.id
+     LEFT JOIN initial_terms it ON it.listing_id = l.id
+     LEFT JOIN terms t ON t.id = it.terms_id
+     LEFT JOIN tenants tn ON tn.user_id = a.tenant_id
+     WHERE a.tenant_id = $1
+     ORDER BY a.applied_at DESC`,
+    [tenantId],
+  );
+  return result.rows;
+}
+
