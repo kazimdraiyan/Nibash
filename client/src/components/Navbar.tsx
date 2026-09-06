@@ -61,6 +61,17 @@ export function Navbar() {
         {token ? (
           <div className="flex items-center gap-3">
             <Link
+              to="/my-listings"
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest font-label-sm transition-all border cursor-pointer ${
+                location.pathname === "/my-listings"
+                  ? "bg-[#d4b068]/15 text-[#d4b068] border-[#d4b068]/40"
+                  : "bg-white/5 text-slate-300 border-white/10 hover:text-white hover:border-white/30 hover:bg-white/10"
+              }`}
+            >
+              <span className="material-symbols-outlined text-base text-[#d4b068]">real_estate_agent</span>
+              <span>My Listings</span>
+            </Link>
+            <Link
               to="/listings/new"
               className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest font-label-sm glass-button-silver text-[#090a0c] font-semibold hover:scale-105 transition-all shadow-sm cursor-pointer"
             >

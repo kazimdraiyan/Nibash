@@ -7,17 +7,41 @@ import {
 
 export async function getAllListings() {
   const result = await pool.query(
-    "SELECT * FROM listings WHERE status='approved'",
+    "SELECT l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id WHERE l.status='approved'",
   );
   return result.rows;
 }
 
-export async function getListingById(id: string) {
+export async function getMylistings(owner : number) {
+  const result= await pool.query("select l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id where l.owner_id=$1",[owner]);
+  return result.rows;
+  
+}
+export async function getListingById(
+  id: string,
+  ownerId?: number | null
+) {
   const result = await pool.query(
-    "SELECT * FROM listings WHERE status='approved' AND id=$1",
-    [id],
+    `SELECT l.*, 
+            t.rent, 
+            t.electricity_bill, 
+            t.water_bill, 
+            t.service_charge, 
+            t.monthly_due_date, 
+            t.pet_allowed, 
+            t.security_deposit
+     FROM listings l
+     JOIN initial_terms it ON it.listing_id = l.id
+     JOIN terms t ON t.id = it.terms_id
+     WHERE l.id = $1 
+       AND (l.status = 'approved' OR l.owner_id = $2)`,
+    [id, ownerId]
   );
-  if (result.rows.length === 0) throw new AppError(404, "listing not found");
+
+  if (result.rows.length === 0) {
+    throw new AppError(404, "Listing not found");
+  }
+
   return result.rows[0];
 }
 

@@ -27,4 +27,24 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+
+export const optionalAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    next();  // no token — just continue, req.user stays undefined
+    return;
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const isValid = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: number;
+      email: string;
+    };
+    req.user = isValid;
+  } catch {
+    // invalid token — ignore it, treat as unauthenticated
+  }
+  next();
+};
+
 export default authMiddleware;

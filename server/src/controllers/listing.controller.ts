@@ -11,8 +11,18 @@ export async function getAll(req: Request, res: Response) {
   res.json({ listings });
 }
 
+export async function getMy(req: Request , res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const owner = req.user.id;
+  const listings = await listingService.getMylistings(owner);
+  res.json({listings});
+}
+
 export async function getById(req: Request, res: Response) {
-  const listing = await listingService.getListingById(req.params.id as string);
+  const listing = await listingService.getListingById(req.params.id as string, req.user?.id ?? null);
   res.json({ listing });
 }
 

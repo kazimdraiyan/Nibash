@@ -10,9 +10,43 @@ import {
 } from "../utils/applicationStorage";
 import { ApplicationInfoModal } from "./ApplicationInfoModal";
 
+export function StatusBadge({ status }: { status: string }) {
+  const s = status?.toLowerCase() || "";
+  if (s === "waiting" || s === "pending") {
+    return (
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300 bg-amber-950/70 border border-amber-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+        {status}
+      </span>
+    );
+  }
+  if (s === "approved") {
+    return (
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300 bg-emerald-950/70 border border-emerald-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+        {status}
+      </span>
+    );
+  }
+  if (s === "unavailable" || s === "occupied" || s === "rejected") {
+    return (
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-rose-300 bg-rose-950/70 border border-rose-500/50 px-2 py-0.5 rounded flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+        {status}
+      </span>
+    );
+  }
+  return (
+    <span className="text-[11px] font-medium text-slate-300 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded">
+      {status}
+    </span>
+  );
+}
+
 export function ActualListings() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [listings, setListings] = useState<BackendListing[]>([]);
+  const [myListings, setMyListings] = useState<BackendListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,6 +56,7 @@ export function ActualListings() {
     application: StoredApplication | null;
   } | null>(null);
 
+  // Existing public listings fetch from /listings (remains completely unchanged)
   useEffect(() => {
     async function fetchListings() {
       try {
@@ -35,6 +70,25 @@ export function ActualListings() {
     }
     fetchListings();
   }, []);
+
+  // Additional fetch for authenticated user's own listings from /listings/my
+  useEffect(() => {
+    async function fetchMyListings() {
+      if (!token) return;
+      try {
+        const data = await apiClient.get<{ listings: BackendListing[] }>("/listings/my");
+        setMyListings(data.listings || []);
+      } catch (err: any) {
+        console.error("Failed to load user's listings:", err);
+      }
+    }
+
+    if (token) {
+      fetchMyListings();
+    } else {
+      setMyListings([]);
+    }
+  }, [token]);
 
   if (loading) {
     return (
@@ -57,7 +111,7 @@ export function ActualListings() {
     );
   }
 
-  if (listings.length === 0) {
+  if (listings.length === 0 && myListings.length === 0) {
     return (
       <section className="py-20 bg-[#090a0c]">
         <div className="max-w-[1440px] mx-auto px-container-padding text-center">
@@ -68,12 +122,14 @@ export function ActualListings() {
     );
   }
 
-  const myListings = user ? listings.filter((l) => l.owner_id === user.id) : [];
-  const otherListings = user ? listings.filter((l) => l.owner_id !== user.id) : listings;
-
   const handleOpenAppInfo = (item: BackendListing, app: StoredApplication | null) => {
     setSelectedApp({ listing: item, application: app });
   };
+
+  // Filter out the owner's own listings if user is logged in
+  const publicListings = user
+    ? listings.filter((l) => Number(l.owner_id) !== Number(user.id))
+    : listings;
 
   return (
     <section className="py-20 bg-[#090a0c] border-t border-slate-800">
@@ -92,36 +148,67 @@ export function ActualListings() {
           </p>
         </div>
 
-        {/* My Listings */}
-        {myListings.length > 0 && (
-          <div className="mb-10">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-[#d4b068] mb-4">
-              My Listings
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myListings.map((item) => (
-                <ListingCard
-                  key={item.id}
-                  item={item}
-                  isOwn={true}
-                  isApplied={false}
-                  onOpenAppInfo={handleOpenAppInfo}
-                />
-              ))}
+        {/* My Listings - Only appears when user is logged in */}
+        {Boolean(token && user) && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-[#d4b068]">
+                  My Listings
+                </h3>
+                <span className="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                  {myListings.length}
+                </span>
+              </div>
+              <Link
+                to="/listings/new"
+                className="text-xs text-slate-400 hover:text-white transition"
+              >
+                + Post New
+              </Link>
             </div>
+
+            {myListings.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {myListings.map((item) => (
+                  <ListingCard
+                    key={item.id}
+                    item={item}
+                    isOwn={true}
+                    isApplied={false}
+                    onOpenAppInfo={handleOpenAppInfo}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="border border-dashed border-slate-800 bg-[#12151c]/40 rounded-xl p-6 text-center">
+                <p className="text-xs text-slate-400 mb-2">You haven't posted any property listings yet.</p>
+                <Link
+                  to="/listings/new"
+                  className="inline-block bg-white text-slate-900 font-medium px-3.5 py-1.5 rounded-lg text-xs hover:bg-slate-200 transition"
+                >
+                  Post a Residence
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Other Listings */}
-        {otherListings.length > 0 && (
-          <div>
-            {myListings.length > 0 && (
-              <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
-                Other Listings
+        {/* Public Listings Grid - Owners only discover other people's listings */}
+        <div>
+          {Boolean(token && user) && (
+            <div className="flex items-center gap-3 mb-4">
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+                Public Listings
               </h3>
-            )}
+              <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
+                {publicListings.length}
+              </span>
+            </div>
+          )}
+          {publicListings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {otherListings.map((item) => {
+              {publicListings.map((item) => {
                 const isApplied = Boolean(user && hasUserApplied(user.id, item.id));
                 return (
                   <ListingCard
@@ -134,8 +221,12 @@ export function ActualListings() {
                 );
               })}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="text-center py-10 border border-dashed border-slate-800 rounded-xl">
+              <p className="text-xs text-slate-400">No approved public listings available.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Application Details Modal */}
@@ -174,14 +265,28 @@ function ListingCard({
   const { user } = useAuth();
   const existingApp = isApplied && user ? getUserApplication(user.id, item.id) : null;
 
+  const rentFormatted =
+    item.rent !== undefined && item.rent !== null && item.rent !== "" && !isNaN(Number(item.rent))
+      ? `৳${Number(item.rent).toLocaleString()} / month`
+      : null;
+
   return (
-    <div className="border border-slate-800 bg-[#12151c] rounded-xl p-5 flex flex-col justify-between hover:border-slate-700 transition">
+    <Link
+      to={`/listings/${item.id}`}
+      className="border border-slate-800 bg-[#12151c] rounded-xl p-5 flex flex-col justify-between hover:border-slate-700 transition cursor-pointer group block text-left"
+    >
       <div>
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-[11px] font-mono uppercase bg-slate-800 text-slate-300 px-2 py-0.5 rounded">
             Area #{item.area_id}
           </span>
-          <div className="flex items-center gap-1.5">
+          <div
+            className="flex items-center gap-1.5"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
             {isOwn && (
               <span className="text-[11px] font-medium text-[#d4b068] bg-[#d4b068]/10 border border-[#d4b068]/30 px-2 py-0.5 rounded">
                 Your Listing
@@ -192,19 +297,27 @@ function ListingCard({
                 <span className="material-symbols-outlined text-xs">done_all</span> Applied
               </span>
             )}
-            <span className="text-[11px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
-              {item.status}
-            </span>
+            <StatusBadge status={item.status} />
           </div>
         </div>
 
-        <h3 className="text-lg font-semibold text-white mb-2 line-clamp-1">{item.title}</h3>
+        <div className="mb-2">
+          <h3 className="text-lg font-semibold text-white line-clamp-1 group-hover:text-[#d4b068] transition-colors">
+            {item.title}
+          </h3>
+          {rentFormatted && (
+            <p className="text-sm font-bold text-[#d4b068] font-mono mt-0.5">
+              {rentFormatted}
+            </p>
+          )}
+        </div>
+
         <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">{item.description}</p>
 
         <div className="grid grid-cols-3 gap-2 py-2 border-y border-slate-800 text-center text-xs text-slate-300 mb-4">
-          <div><span className="font-semibold">{item.bedroom_count}</span> Beds</div>
-          <div><span className="font-semibold">{item.bathroom_count}</span> Baths</div>
-          <div>Floor <span className="font-semibold">{item.on_which_floor}</span></div>
+          <div><span className="font-semibold text-white">{item.bedroom_count}</span> Beds</div>
+          <div><span className="font-semibold text-white">{item.bathroom_count}</span> Baths</div>
+          <div>Floor <span className="font-semibold text-white">{item.on_which_floor}</span></div>
         </div>
       </div>
 
@@ -215,49 +328,40 @@ function ListingCard({
             <span className="text-xs font-semibold text-[#d4b068] bg-[#d4b068]/15 border border-[#d4b068]/30 px-2.5 py-1 rounded">
               Your Listing
             </span>
-            <Link
-              to={`/listings/${item.id}`}
-              className="text-xs text-slate-400 hover:text-white underline transition"
-            >
+            <span className="text-xs text-slate-400 group-hover:text-white underline transition">
               View
-            </Link>
+            </span>
           </div>
         ) : isApplied ? (
           <div className="flex items-center gap-2.5">
             <button
               type="button"
-              onClick={() => onOpenAppInfo(item, existingApp)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenAppInfo(item, existingApp);
+              }}
               className="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-semibold px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
               <span className="material-symbols-outlined text-sm">assignment_turned_in</span>
               <span>Applied</span>
             </button>
-            <Link
-              to={`/listings/${item.id}`}
-              className="text-xs text-slate-400 hover:text-white transition"
-            >
+            <span className="text-xs text-slate-400 group-hover:text-white transition">
               Details
-            </Link>
+            </span>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <Link
-              to={`/listings/${item.id}`}
-              className="text-xs text-slate-400 hover:text-white transition"
-            >
+            <span className="text-xs text-slate-400 group-hover:text-white transition">
               Details
-            </Link>
-            <Link
-              to={`/listings/${item.id}#apply-section`}
-              state={{ autoApply: true }}
-              className="bg-white text-slate-900 font-semibold px-4 py-1.5 rounded-lg text-xs hover:bg-slate-200 transition flex items-center gap-1 cursor-pointer"
-            >
+            </span>
+            <span className="bg-white text-slate-900 font-semibold px-4 py-1.5 rounded-lg text-xs group-hover:bg-slate-200 transition flex items-center gap-1">
               <span>Apply</span>
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </Link>
+            </span>
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }

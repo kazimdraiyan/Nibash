@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { apiClient, makeOwner } from "../api/client";
+import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 
 const DHAKA_AREAS = [
@@ -22,7 +22,7 @@ export function ListingFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  const { token, user } = useAuth();
+  const { token } = useAuth();
 
   // Form State
   const [title, setTitle] = useState("");
@@ -47,7 +47,6 @@ export function ListingFormPage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEdit);
   const [error, setError] = useState<string | null>(null);
-  const [warning, setWarning] = useState<string | null>(null);
 
   // Handle Area Change to automatically update lat/lng coordinates
   const handleAreaChange = (newAreaId: number) => {
@@ -92,21 +91,6 @@ export function ListingFormPage() {
 
     setLoading(true);
     setError(null);
-    setWarning(null);
-
-    // Resolve user details safely from auth state or token payload
-    let authenticatedUserId = user?.id;
-    let authenticatedUserEmail = user?.email;
-    let authenticatedUserName = user?.name;
-    if (!authenticatedUserId && token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        authenticatedUserId = payload.id;
-        authenticatedUserEmail = payload.email;
-      } catch {
-        // ignore decoding errors
-      }
-    }
 
     const payload = {
       title: title.trim(),
@@ -139,48 +123,16 @@ export function ListingFormPage() {
       return;
     }
 
-    // 1. Create listing using existing API
-    let createRes: { message: string; listingId: number };
     try {
-      createRes = await apiClient.post<{ message: string; listingId: number }>(
+      const createRes = await apiClient.post<{ message: string; listingId: number }>(
         "/listings",
         payload
       );
-      console.log(
-        "[Listing Creation] Listing creation request succeeded. Listing ID:",
-        createRes.listingId,
-        createRes
-      );
+      alert(createRes.message || "Listing created successfully!");
+      navigate("/listings");
     } catch (createErr: any) {
       console.error("[Listing Creation] Listing creation failed:", createErr);
       setError(createErr.message || "Failed to create listing.");
-      setLoading(false);
-      return;
-    }
-
-    // 2. Listing creation succeeded. Now call makeOwner route (/auth/become-owner)
-    try {
-      console.log(
-        "[Owner Registration] Sending makeOwner request for authenticated user:",
-        {
-          id: authenticatedUserId,
-          name: authenticatedUserName,
-          email: authenticatedUserEmail,
-        }
-      );
-      const ownerRes = await makeOwner(authenticatedUserId);
-      console.log("[Owner Registration] makeOwner request succeeded:", ownerRes);
-
-      alert(createRes.message || "Listing created successfully!");
-      navigate("/listings");
-    } catch (ownerErr: any) {
-      console.error(
-        "[Owner Registration] makeOwner request failed:",
-        ownerErr
-      );
-      const warningMsg = `Listing was created successfully (ID: ${createRes.listingId}), but owner registration failed: ${ownerErr.message || "Unknown error"}.`;
-      setWarning(warningMsg);
-      alert(`Warning: ${warningMsg}`);
     } finally {
       setLoading(false);
     }
@@ -228,12 +180,6 @@ export function ListingFormPage() {
         {error && (
           <div className="p-3 mb-6 rounded bg-red-950/60 border border-red-800 text-red-300 text-xs">
             {error}
-          </div>
-        )}
-
-        {warning && (
-          <div className="p-3 mb-6 rounded bg-amber-950/60 border border-amber-800 text-amber-300 text-xs">
-            {warning}
           </div>
         )}
 

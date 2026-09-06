@@ -10,6 +10,7 @@ import { LoginPage } from "./components/LoginPage";
 import { RegisterPage } from "./components/RegisterPage";
 import { RoleOnboardingPage } from "./pages/RoleOnboardingPage";
 import { ListingsPage } from "./pages/ListingsPage";
+import { MyListingsPage } from "./pages/MyListingsPage";
 import { ListingDetailPage } from "./pages/ListingDetailPage";
 import { ListingFormPage } from "./pages/ListingFormPage";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
@@ -75,6 +76,14 @@ export default function App() {
             }
           />
           <Route path="/listings" element={<ListingsPage />} />
+          <Route
+            path="/my-listings"
+            element={
+              <ProtectedRoute>
+                <MyListingsPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/listings/new"
             element={

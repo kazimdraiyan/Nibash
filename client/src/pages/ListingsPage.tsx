@@ -8,6 +8,7 @@ import {
   type StoredApplication,
 } from "../utils/applicationStorage";
 import { ApplicationInfoModal } from "../components/ApplicationInfoModal";
+import { StatusBadge } from "../components/ActualListings";
 
 export interface BackendListing {
   id: number | string;
@@ -22,6 +23,13 @@ export interface BackendListing {
   owner_id: number;
   status: string;
   created_at?: string;
+  rent?: number | string | null;
+  electricity_bill?: number | string | null;
+  water_bill?: number | string | null;
+  service_charge?: number | string | null;
+  monthly_due_date?: number | string | null;
+  pet_allowed?: boolean | null;
+  security_deposit?: number | string | null;
 }
 
 function ListingCard({
@@ -38,14 +46,28 @@ function ListingCard({
   const { user } = useAuth();
   const existingApp = isApplied && user ? getUserApplication(user.id, item.id) : null;
 
+  const rentFormatted =
+    item.rent !== undefined && item.rent !== null && item.rent !== "" && !isNaN(Number(item.rent))
+      ? `৳${Number(item.rent).toLocaleString()} / month`
+      : null;
+
   return (
-    <div className="border border-slate-800 bg-[#12151c] rounded-xl p-5 flex flex-col justify-between hover:border-slate-700 transition">
+    <Link
+      to={`/listings/${item.id}`}
+      className="border border-slate-800 bg-[#12151c] rounded-xl p-5 flex flex-col justify-between hover:border-slate-700 transition cursor-pointer group block text-left"
+    >
       <div>
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-[11px] font-mono uppercase bg-slate-800 text-slate-300 px-2 py-0.5 rounded">
             Area #{item.area_id}
           </span>
-          <div className="flex items-center gap-1.5">
+          <div
+            className="flex items-center gap-1.5"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
             {isOwn && (
               <span className="text-[11px] font-medium text-[#d4b068] bg-[#d4b068]/10 border border-[#d4b068]/30 px-2 py-0.5 rounded">
                 Your Listing
@@ -56,28 +78,34 @@ function ListingCard({
                 <span className="material-symbols-outlined text-xs">done_all</span> Applied
               </span>
             )}
-            <span className="text-[11px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
-              {item.status}
-            </span>
+            <StatusBadge status={item.status} />
           </div>
         </div>
 
-        <h2 className="text-lg font-semibold text-white mb-2 line-clamp-1">
-          {item.title}
-        </h2>
+        <div className="mb-2">
+          <h2 className="text-lg font-semibold text-white line-clamp-1 group-hover:text-[#d4b068] transition-colors">
+            {item.title}
+          </h2>
+          {rentFormatted && (
+            <p className="text-sm font-bold text-[#d4b068] font-mono mt-0.5">
+              {rentFormatted}
+            </p>
+          )}
+        </div>
+
         <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
           {item.description}
         </p>
 
         <div className="grid grid-cols-3 gap-2 py-2 border-y border-slate-800 text-center text-xs text-slate-300 mb-4">
           <div>
-            <span className="font-semibold">{item.bedroom_count}</span> Beds
+            <span className="font-semibold text-white">{item.bedroom_count}</span> Beds
           </div>
           <div>
-            <span className="font-semibold">{item.bathroom_count}</span> Baths
+            <span className="font-semibold text-white">{item.bathroom_count}</span> Baths
           </div>
           <div>
-            Floor <span className="font-semibold">{item.on_which_floor}</span>
+            Floor <span className="font-semibold text-white">{item.on_which_floor}</span>
           </div>
         </div>
       </div>
@@ -89,56 +117,48 @@ function ListingCard({
             <span className="text-xs font-semibold text-[#d4b068] bg-[#d4b068]/15 border border-[#d4b068]/30 px-2.5 py-1 rounded">
               Your Listing
             </span>
-            <Link
-              to={`/listings/${item.id}`}
-              className="text-xs text-slate-400 hover:text-white underline transition"
-            >
+            <span className="text-xs text-slate-400 group-hover:text-white underline transition">
               View
-            </Link>
+            </span>
           </div>
         ) : isApplied ? (
           <div className="flex items-center gap-2.5">
             <button
               type="button"
-              onClick={() => onOpenAppInfo(item, existingApp)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenAppInfo(item, existingApp);
+              }}
               className="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-semibold px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
               <span className="material-symbols-outlined text-sm">assignment_turned_in</span>
               <span>Applied</span>
             </button>
-            <Link
-              to={`/listings/${item.id}`}
-              className="text-xs text-slate-400 hover:text-white transition"
-            >
+            <span className="text-xs text-slate-400 group-hover:text-white transition">
               Details
-            </Link>
+            </span>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <Link
-              to={`/listings/${item.id}`}
-              className="text-xs text-slate-400 hover:text-white transition"
-            >
+            <span className="text-xs text-slate-400 group-hover:text-white transition">
               Details
-            </Link>
-            <Link
-              to={`/listings/${item.id}#apply-section`}
-              state={{ autoApply: true }}
-              className="bg-white text-slate-900 font-semibold px-4 py-1.5 rounded-lg text-xs hover:bg-slate-200 transition flex items-center gap-1 cursor-pointer"
-            >
+            </span>
+            <span className="bg-white text-slate-900 font-semibold px-4 py-1.5 rounded-lg text-xs group-hover:bg-slate-200 transition flex items-center gap-1">
               <span>Apply</span>
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </Link>
+            </span>
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
 
 export function ListingsPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [listings, setListings] = useState<BackendListing[]>([]);
+  const [myListings, setMyListings] = useState<BackendListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -166,18 +186,35 @@ export function ListingsPage() {
     fetchListings();
   }, []);
 
+  useEffect(() => {
+    async function fetchMyListings() {
+      if (!token) return;
+      try {
+        const data = await apiClient.get<{ listings: BackendListing[] }>("/listings/my");
+        setMyListings(data.listings || []);
+      } catch (err: any) {
+        console.error("Failed to load user's listings:", err);
+      }
+    }
+
+    if (token) {
+      fetchMyListings();
+    } else {
+      setMyListings([]);
+    }
+  }, [token]);
+
   const filtered = listings.filter(
     (item) =>
       item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const myListings = user
-    ? filtered.filter((item) => item.owner_id === user.id)
-    : [];
-  const otherListings = user
-    ? filtered.filter((item) => item.owner_id !== user.id)
-    : filtered;
+  const filteredMyListings = myListings.filter(
+    (item) =>
+      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleOpenAppInfo = (item: BackendListing, app: StoredApplication | null) => {
     setSelectedApp({ listing: item, application: app });
@@ -234,7 +271,7 @@ export function ListingsPage() {
       )}
 
       {/* Empty State */}
-      {!loading && !error && filtered.length === 0 && (
+      {!loading && !error && filtered.length === 0 && (!token || filteredMyListings.length === 0) && (
         <div className="py-20 text-center border border-dashed border-slate-800 rounded-2xl p-8 my-4">
           <span className="material-symbols-outlined text-4xl text-slate-500 mb-2">
             apartment
@@ -255,62 +292,88 @@ export function ListingsPage() {
       )}
 
       {/* Listings Content */}
-      {!loading && !error && filtered.length > 0 && (
+      {!loading && !error && (filtered.length > 0 || (Boolean(token && user) && filteredMyListings.length > 0)) && (
         <>
-          {/* My Listings Section */}
-          {myListings.length > 0 && (
+          {/* My Listings Section (only appears when user is logged in) */}
+          {Boolean(token && user) && (
             <div className="mb-10">
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-[#d4b068]">
-                  My Listings
-                </h2>
-                <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
-                  {myListings.length}
-                </span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-[#d4b068]">
+                    My Listings
+                  </h2>
+                  <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
+                    {filteredMyListings.length}
+                  </span>
+                </div>
+                <Link
+                  to="/listings/new"
+                  className="text-xs text-slate-400 hover:text-white transition"
+                >
+                  + Post New
+                </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myListings.map((item) => (
-                  <ListingCard
-                    key={item.id}
-                    item={item}
-                    isOwn={true}
-                    isApplied={false}
-                    onOpenAppInfo={handleOpenAppInfo}
-                  />
-                ))}
-              </div>
+
+              {filteredMyListings.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredMyListings.map((item) => (
+                    <ListingCard
+                      key={item.id}
+                      item={item}
+                      isOwn={true}
+                      isApplied={false}
+                      onOpenAppInfo={handleOpenAppInfo}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="border border-dashed border-slate-800 bg-[#12151c]/40 rounded-xl p-6 text-center">
+                  <p className="text-xs text-slate-400 mb-2">You haven't posted any property listings yet.</p>
+                  <Link
+                    to="/listings/new"
+                    className="inline-block bg-white text-slate-900 font-medium px-3.5 py-1.5 rounded-lg text-xs hover:bg-slate-200 transition"
+                  >
+                    Post a Residence
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Other Listings Section */}
-          {otherListings.length > 0 && (
-            <div>
-              {myListings.length > 0 && (
-                <div className="flex items-center gap-3 mb-4">
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
-                    Other Listings
-                  </h2>
-                  <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
-                    {otherListings.length}
-                  </span>
-                </div>
-              )}
+          {/* Public Listings Section */}
+          <div>
+            {Boolean(token && user) && (
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+                  Public Listings
+                </h2>
+                <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
+                  {filtered.length}
+                </span>
+              </div>
+            )}
+            {filtered.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {otherListings.map((item) => {
+                {filtered.map((item) => {
+                  const isOwn = Boolean(user && item.owner_id === user.id);
                   const isApplied = Boolean(user && hasUserApplied(user.id, item.id));
                   return (
                     <ListingCard
                       key={item.id}
                       item={item}
-                      isOwn={false}
+                      isOwn={isOwn}
                       isApplied={isApplied}
                       onOpenAppInfo={handleOpenAppInfo}
                     />
                   );
                 })}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-10 border border-dashed border-slate-800 rounded-xl">
+                <p className="text-xs text-slate-400">No public listings match your query.</p>
+              </div>
+            )}
+          </div>
         </>
       )}
 

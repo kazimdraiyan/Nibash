@@ -26,6 +26,18 @@ interface Application {
   phone?: string;
 }
 
+function formatDueDate(day: number | string) {
+  const d = typeof day === "string" ? parseInt(day, 10) : day;
+  if (isNaN(d)) return `${day}th of each month`;
+  const j = d % 10;
+  const k = d % 100;
+  let suffix = "th";
+  if (j === 1 && k !== 11) suffix = "st";
+  else if (j === 2 && k !== 12) suffix = "nd";
+  else if (j === 3 && k !== 13) suffix = "rd";
+  return `${d}${suffix} of each month`;
+}
+
 export function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -350,6 +362,87 @@ export function ListingDetailPage() {
         <p className="text-sm text-slate-300 whitespace-pre-line leading-relaxed mb-6">
           {listing.description}
         </p>
+
+        {/* Lease Terms Section */}
+        {((listing.rent !== undefined && listing.rent !== null && listing.rent !== "") ||
+          (listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "") ||
+          (listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "") ||
+          (listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "") ||
+          (listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "") ||
+          (listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "") ||
+          (listing.pet_allowed !== undefined && listing.pet_allowed !== null)) && (
+          <div className="mb-6 p-5 sm:p-6 rounded-xl bg-[#090a0c] border border-slate-800">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#d4b068] mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-base">receipt_long</span>
+              <span>Lease Terms</span>
+            </h2>
+
+            <div className="divide-y divide-slate-800/70 text-xs sm:text-sm">
+              {listing.rent !== undefined && listing.rent !== null && listing.rent !== "" && !isNaN(Number(listing.rent)) && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Rent</span>
+                  <span className="text-white font-mono font-bold">
+                    ৳{Number(listing.rent).toLocaleString()} / month
+                  </span>
+                </div>
+              )}
+
+              {listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "" && !isNaN(Number(listing.electricity_bill)) && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Electricity bill</span>
+                  <span className="text-slate-200 font-mono">
+                    ৳{Number(listing.electricity_bill).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "" && !isNaN(Number(listing.water_bill)) && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Water bill</span>
+                  <span className="text-slate-200 font-mono">
+                    ৳{Number(listing.water_bill).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "" && !isNaN(Number(listing.service_charge)) && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Service charge</span>
+                  <span className="text-slate-200 font-mono">
+                    ৳{Number(listing.service_charge).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "" && !isNaN(Number(listing.security_deposit)) && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Security deposit</span>
+                  <span className="text-slate-200 font-mono">
+                    ৳{Number(listing.security_deposit).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "" && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Monthly due date</span>
+                  <span className="text-slate-200 font-medium">
+                    {formatDueDate(listing.monthly_due_date)}
+                  </span>
+                </div>
+              )}
+
+              {listing.pet_allowed !== undefined && listing.pet_allowed !== null && (
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-slate-400 font-medium">Pet allowed</span>
+                  <span className="text-slate-200 font-medium">
+                    {listing.pet_allowed ? "Yes" : "No"}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Specs Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#090a0c] border border-slate-800 text-center">

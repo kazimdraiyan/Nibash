@@ -18,4 +18,5 @@ router.put(
   asyncHandler(applicationController.reject),
 );
 
+
 export default router;
