@@ -113,6 +113,8 @@ export function PropertyCard({
   const imageUrl =
     "imageUrl" in listing && typeof listing.imageUrl === "string" && listing.imageUrl.trim() !== ""
       ? listing.imageUrl.trim()
+      : "images" in listing && Array.isArray(listing.images) && listing.images.length > 0 && listing.images[0]?.url
+      ? listing.images[0].url
       : null;
 
   const hasValidImage = Boolean(imageUrl && !imgError);

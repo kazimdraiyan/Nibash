@@ -9,6 +9,7 @@ import {
 } from "../utils/applicationStorage";
 import { ApplicationInfoModal } from "../components/ApplicationInfoModal";
 import { PropertyCard } from "../components/PropertyCard";
+import type { ListingImage } from "../types/listing";
 
 export interface BackendListing {
   id: number | string;
@@ -32,6 +33,7 @@ export interface BackendListing {
   security_deposit?: number | string | null;
   imageUrl?: string;
   imageAlt?: string;
+  images?: ListingImage[];
 }
 
 export function ListingsPage() {

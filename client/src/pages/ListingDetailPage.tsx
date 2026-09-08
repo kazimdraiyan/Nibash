@@ -83,6 +83,47 @@ export function ListingDetailPage() {
   // Delete state
   const [deleting, setDeleting] = useState(false);
 
+  // Photo gallery state
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [failedImages, setFailedImages] = useState<Record<number, boolean>>({});
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // Compute available photos from listing
+  const photoList = (listing?.images && Array.isArray(listing.images) && listing.images.length > 0)
+    ? listing.images
+    : listing?.imageUrl
+    ? [{ id: 0, url: listing.imageUrl }]
+    : [];
+
+  useEffect(() => {
+    setSelectedPhotoIndex(0);
+    setFailedImages({});
+  }, [id]);
+
+  const handlePrevPhoto = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (photoList.length <= 1) return;
+    setSelectedPhotoIndex((prev) => (prev === 0 ? photoList.length - 1 : prev - 1));
+  }, [photoList.length]);
+
+  const handleNextPhoto = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (photoList.length <= 1) return;
+    setSelectedPhotoIndex((prev) => (prev === photoList.length - 1 ? 0 : prev + 1));
+  }, [photoList.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isLightboxOpen) {
+        if (e.key === "ArrowLeft") handlePrevPhoto();
+        if (e.key === "ArrowRight") handleNextPhoto();
+        if (e.key === "Escape") setIsLightboxOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, handlePrevPhoto, handleNextPhoto]);
+
   const fetchDetails = useCallback(async () => {
     if (!id) return;
     setLoading(true);
@@ -390,6 +431,136 @@ export function ListingDetailPage() {
             >
               {deleting ? "Deleting..." : "Delete Listing"}
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Photo Gallery Banner */}
+      <div className="mb-8 rounded-2xl overflow-hidden border border-slate-800 bg-[#12151c] shadow-2xl">
+        {photoList.length > 0 ? (
+          <div>
+            {/* Primary Featured Image */}
+            <div
+              className="relative w-full aspect-[16/9] sm:aspect-[21/9] max-h-[500px] bg-[#090a0c] overflow-hidden group cursor-pointer"
+              onClick={() => setIsLightboxOpen(true)}
+            >
+              {!failedImages[selectedPhotoIndex] ? (
+                <img
+                  src={photoList[selectedPhotoIndex].url}
+                  alt={`${listing.title} photo ${selectedPhotoIndex + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                  onError={() =>
+                    setFailedImages((prev) => ({ ...prev, [selectedPhotoIndex]: true }))
+                  }
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 bg-[#090a0c]">
+                  <svg className="w-12 h-12 mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-xs font-medium">Image preview unavailable</p>
+                </div>
+              )}
+
+              {/* Gradient Vignette for UI controls contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+
+              {/* Top Bar: Photo count & Fullscreen trigger */}
+              <div className="absolute top-4 inset-x-4 flex items-center justify-between pointer-events-none">
+                <span className="bg-black/75 backdrop-blur-md text-white border border-white/15 text-xs font-mono px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>{selectedPhotoIndex + 1} / {photoList.length}</span>
+                </span>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLightboxOpen(true);
+                  }}
+                  className="pointer-events-auto bg-black/75 hover:bg-black text-white border border-white/15 text-xs px-3 py-1.5 rounded-full backdrop-blur-md transition shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                  <span className="hidden sm:inline">View Fullscreen</span>
+                </button>
+              </div>
+
+              {/* Prev / Next Arrows (when more than 1 image) */}
+              {photoList.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrevPhoto}
+                    aria-label="Previous photo"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextPhoto}
+                    aria-label="Next photo"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail Strip (when more than 1 image) */}
+            {photoList.length > 1 && (
+              <div className="p-3 sm:p-4 bg-[#0d1017] border-t border-slate-800 flex items-center gap-2.5 overflow-x-auto">
+                {photoList.map((photo, idx) => {
+                  const isSelected = idx === selectedPhotoIndex;
+                  return (
+                    <button
+                      key={photo.id || idx}
+                      type="button"
+                      onClick={() => setSelectedPhotoIndex(idx)}
+                      className={`relative flex-shrink-0 w-20 sm:w-24 aspect-[4/3] rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                        isSelected
+                          ? "ring-2 ring-white border-white scale-[1.02] opacity-100 shadow-md"
+                          : "border-slate-800 opacity-60 hover:opacity-100 hover:border-slate-600"
+                      }`}
+                    >
+                      <img
+                        src={photo.url}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      {idx === 0 && (
+                        <span className="absolute bottom-1 left-1 bg-black/80 backdrop-blur-xs text-amber-300 border border-amber-500/30 text-[9px] font-mono px-1 rounded">
+                          Cover
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Clean Fallback when listing has no photos */
+          <div className="w-full py-16 px-6 flex flex-col items-center justify-center text-center bg-gradient-to-b from-[#12151c] to-[#0d1017]">
+            <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-400 mb-3 shadow-inner">
+              <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-slate-200 mb-1">No Photos Uploaded</h3>
+            <p className="text-xs text-slate-400 max-w-sm">
+              The property owner hasn't uploaded interior or exterior photographs for this listing yet.
+            </p>
           </div>
         )}
       </div>
@@ -927,6 +1098,116 @@ export function ListingDetailPage() {
               OK
             </button>
           </div>
+        </div>
+      )}
+      {/* Lightbox Modal */}
+      {isLightboxOpen && photoList.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 select-none animate-fadeIn"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Lightbox Top Bar */}
+          <div
+            className="flex items-center justify-between w-full max-w-6xl mx-auto text-white z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <h3 className="text-sm font-semibold truncate max-w-xs sm:max-w-md text-white">
+                {listing.title}
+              </h3>
+              <p className="text-xs text-slate-400 font-mono">
+                Photo {selectedPhotoIndex + 1} of {photoList.length}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsLightboxOpen(false)}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+              aria-label="Close fullscreen gallery"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Lightbox Main Image & Navigation */}
+          <div
+            className="relative flex-1 flex items-center justify-center my-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!failedImages[selectedPhotoIndex] ? (
+              <img
+                src={photoList[selectedPhotoIndex].url}
+                alt={`${listing.title} photo ${selectedPhotoIndex + 1}`}
+                className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
+                onError={() =>
+                  setFailedImages((prev) => ({ ...prev, [selectedPhotoIndex]: true }))
+                }
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-slate-400 p-8 rounded-xl bg-slate-900/60 border border-slate-800">
+                <svg className="w-12 h-12 mb-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="text-sm font-medium">Image unavailable</p>
+              </div>
+            )}
+
+            {photoList.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePrevPhoto}
+                  className="absolute left-2 sm:left-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleNextPhoto}
+                  className="absolute right-2 sm:right-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
+                  aria-label="Next image"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Lightbox Bottom Thumbnail Bar */}
+          {photoList.length > 1 && (
+            <div
+              className="w-full max-w-4xl mx-auto flex items-center justify-center gap-2 overflow-x-auto py-2 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {photoList.map((photo, idx) => (
+                <button
+                  key={photo.id || idx}
+                  type="button"
+                  onClick={() => setSelectedPhotoIndex(idx)}
+                  className={`w-14 sm:w-16 aspect-[4/3] rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${
+                    idx === selectedPhotoIndex
+                      ? "ring-2 ring-white border-white scale-105 opacity-100"
+                      : "border-white/20 opacity-50 hover:opacity-100"
+                  }`}
+                >
+                  <img
+                    src={photo.url}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
