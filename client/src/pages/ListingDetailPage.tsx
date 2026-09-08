@@ -92,8 +92,8 @@ export function ListingDetailPage() {
   const photoList = (listing?.images && Array.isArray(listing.images) && listing.images.length > 0)
     ? listing.images
     : listing?.imageUrl
-    ? [{ id: 0, url: listing.imageUrl }]
-    : [];
+      ? [{ id: 0, url: listing.imageUrl }]
+      : [];
 
   useEffect(() => {
     setSelectedPhotoIndex(0);
@@ -406,385 +406,334 @@ export function ListingDetailPage() {
   }
 
   const isOwner = Boolean(user && Number(user.id) === Number(listing.owner_id));
-
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
-      {/* Back Link & Actions */}
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      {/* Back Link */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        <Link to="/listings" className="text-xs text-slate-400 hover:text-white flex items-center gap-1">
-          ← Back to Listings
+        <Link
+          to="/listings"
+          className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Listings</span>
         </Link>
-
-        {isOwner && (
-          <div className="flex items-center gap-2">
-            <Link
-              to={`/listings/${id}/edit`}
-              className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded text-xs font-medium"
-            >
-              Edit Listing
-            </Link>
-            <button
-              type="button"
-              onClick={handleDeleteListing}
-              disabled={deleting}
-              className="bg-red-900/60 hover:bg-red-900 text-red-200 border border-red-800 px-3 py-1.5 rounded text-xs font-medium cursor-pointer"
-            >
-              {deleting ? "Deleting..." : "Delete Listing"}
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* Photo Gallery Banner */}
-      <div className="mb-8 rounded-2xl overflow-hidden border border-slate-800 bg-[#12151c] shadow-2xl">
-        {photoList.length > 0 ? (
-          <div>
-            {/* Primary Featured Image */}
-            <div
-              className="relative w-full aspect-[16/9] sm:aspect-[21/9] max-h-[500px] bg-[#090a0c] overflow-hidden group cursor-pointer"
-              onClick={() => setIsLightboxOpen(true)}
-            >
-              {!failedImages[selectedPhotoIndex] ? (
-                <img
-                  src={photoList[selectedPhotoIndex].url}
-                  alt={`${listing.title} photo ${selectedPhotoIndex + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
-                  onError={() =>
-                    setFailedImages((prev) => ({ ...prev, [selectedPhotoIndex]: true }))
-                  }
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 bg-[#090a0c]">
-                  <svg className="w-12 h-12 mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <p className="text-xs font-medium">Image preview unavailable</p>
-                </div>
-              )}
-
-              {/* Gradient Vignette for UI controls contrast */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
-
-              {/* Top Bar: Photo count & Fullscreen trigger */}
-              <div className="absolute top-4 inset-x-4 flex items-center justify-between pointer-events-none">
-                <span className="bg-black/75 backdrop-blur-md text-white border border-white/15 text-xs font-mono px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span>{selectedPhotoIndex + 1} / {photoList.length}</span>
-                </span>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLightboxOpen(true);
-                  }}
-                  className="pointer-events-auto bg-black/75 hover:bg-black text-white border border-white/15 text-xs px-3 py-1.5 rounded-full backdrop-blur-md transition shadow-md flex items-center gap-1.5 cursor-pointer"
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* MAIN COLUMN: Photo Gallery, Description, Lease Terms & Details, Owner Information, Applications (if owner), Reviews */}
+        <div className="contents lg:flex lg:flex-col lg:col-span-7 xl:col-span-8 lg:gap-8">
+          {/* 1. Photo Gallery (order-1 on mobile) */}
+          <div className="order-1 rounded-2xl overflow-hidden border border-slate-800 bg-[#12151c]">
+            {photoList.length > 0 ? (
+              <div>
+                {/* Primary Featured Image */}
+                <div
+                  className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[16/10] max-h-[480px] overflow-hidden group cursor-pointer bg-[#090a0c]"
+                  onClick={() => setIsLightboxOpen(true)}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                  </svg>
-                  <span className="hidden sm:inline">View Fullscreen</span>
-                </button>
-              </div>
+                  {!failedImages[selectedPhotoIndex] ? (
+                    <img
+                      src={photoList[selectedPhotoIndex].url}
+                      alt={`${listing.title} photo ${selectedPhotoIndex + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                      onError={() =>
+                        setFailedImages((prev) => ({ ...prev, [selectedPhotoIndex]: true }))
+                      }
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-500">
+                      <svg className="w-12 h-12 mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-xs font-medium">Image preview unavailable</p>
+                    </div>
+                  )}
 
-              {/* Prev / Next Arrows (when more than 1 image) */}
-              {photoList.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handlePrevPhoto}
-                    aria-label="Previous photo"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
+                  {/* Top Bar: Photo count & Fullscreen trigger */}
+                  <div className="absolute top-3 inset-x-3 sm:top-4 sm:inset-x-4 flex items-center justify-between pointer-events-none">
+                    <span className="bg-black/75 backdrop-blur-md text-white border border-white/15 text-xs font-mono px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span>{selectedPhotoIndex + 1} / {photoList.length}</span>
+                    </span>
 
-                  <button
-                    type="button"
-                    onClick={handleNextPhoto}
-                    aria-label="Next photo"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Thumbnail Strip (when more than 1 image) */}
-            {photoList.length > 1 && (
-              <div className="p-3 sm:p-4 bg-[#0d1017] border-t border-slate-800 flex items-center gap-2.5 overflow-x-auto">
-                {photoList.map((photo, idx) => {
-                  const isSelected = idx === selectedPhotoIndex;
-                  return (
                     <button
-                      key={photo.id || idx}
                       type="button"
-                      onClick={() => setSelectedPhotoIndex(idx)}
-                      className={`relative flex-shrink-0 w-20 sm:w-24 aspect-[4/3] rounded-lg overflow-hidden border transition-all cursor-pointer ${
-                        isSelected
-                          ? "ring-2 ring-white border-white scale-[1.02] opacity-100 shadow-md"
-                          : "border-slate-800 opacity-60 hover:opacity-100 hover:border-slate-600"
-                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsLightboxOpen(true);
+                      }}
+                      className="pointer-events-auto bg-black/75 hover:bg-black text-white border border-white/15 text-xs px-3 py-1.5 rounded-full backdrop-blur-md transition shadow-md flex items-center gap-1.5 cursor-pointer"
                     >
-                      <img
-                        src={photo.url}
-                        alt={`Thumbnail ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                      {idx === 0 && (
-                        <span className="absolute bottom-1 left-1 bg-black/80 backdrop-blur-xs text-amber-300 border border-amber-500/30 text-[9px] font-mono px-1 rounded">
-                          Cover
-                        </span>
-                      )}
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      </svg>
+                      <span className="hidden sm:inline">View Fullscreen</span>
                     </button>
-                  );
-                })}
+                  </div>
+
+                  {/* Prev / Next Arrows (when more than 1 image) */}
+                  {photoList.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handlePrevPhoto}
+                        aria-label="Previous photo"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleNextPhoto}
+                        aria-label="Next photo"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Thumbnail Strip (when more than 1 image) */}
+                {photoList.length > 1 && (
+                  <div className="p-3 sm:p-4 bg-[#0d1017] border-t border-slate-800 flex items-center gap-2.5 overflow-x-auto">
+                    {photoList.map((photo, idx) => {
+                      const isSelected = idx === selectedPhotoIndex;
+                      return (
+                        <button
+                          key={photo.id || idx}
+                          type="button"
+                          onClick={() => setSelectedPhotoIndex(idx)}
+                          className={`relative flex-shrink-0 w-20 sm:w-24 aspect-[4/3] rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                            isSelected
+                              ? "ring-2 ring-white border-white scale-[1.02] opacity-100 shadow-md"
+                              : "border-slate-800 opacity-60 hover:opacity-100 hover:border-slate-600"
+                          }`}
+                        >
+                          <img
+                            src={photo.url}
+                            alt={`Thumbnail ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {idx === 0 && (
+                            <span className="absolute bottom-1 left-1 bg-black/80 backdrop-blur-xs text-amber-300 border border-amber-500/30 text-[9px] font-mono px-1 rounded">
+                              Cover
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Clean Fallback when listing has no photos */
+              <div className="w-full py-16 px-6 flex flex-col items-center justify-center text-center bg-gradient-to-b from-[#12151c] to-[#0d1017]">
+                <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-400 mb-3 shadow-inner">
+                  <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-slate-200 mb-1">No Photos Uploaded</h3>
+                <p className="text-xs text-slate-400 max-w-sm">
+                  The property owner hasn't uploaded interior or exterior photographs for this listing yet.
+                </p>
               </div>
             )}
           </div>
-        ) : (
-          /* Clean Fallback when listing has no photos */
-          <div className="w-full py-16 px-6 flex flex-col items-center justify-center text-center bg-gradient-to-b from-[#12151c] to-[#0d1017]">
-            <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-400 mb-3 shadow-inner">
-              <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-semibold text-slate-200 mb-1">No Photos Uploaded</h3>
-            <p className="text-xs text-slate-400 max-w-sm">
-              The property owner hasn't uploaded interior or exterior photographs for this listing yet.
+
+          {/* 2. Description (order-3 on mobile) */}
+          <div className="order-3 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg text-[#d4b068]">description</span>
+              <span>About this Property</span>
+            </h2>
+            <p className="text-sm text-slate-300 whitespace-pre-line leading-relaxed">
+              {listing.description}
             </p>
           </div>
-        )}
-      </div>
 
-      {/* Main Specs Banner: Property Information */}
-      <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-8 mb-8">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2">
-            {/* Area Name using Area Lookup */}
-            <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2.5 py-1 rounded">
-              {getAreaName(listing.area_id)}
-            </span>
-            {/* Status Chip: Only visible to the listing owner */}
-            {isOwner && (
-              <span
-                className={`text-xs font-medium px-2.5 py-1 rounded border capitalize ${
-                  listing.status?.toLowerCase() === "waiting" ||
-                  listing.status?.toLowerCase() === "pending"
-                    ? "text-amber-300 bg-amber-950/60 border-amber-800/60"
-                    : "text-emerald-400 bg-emerald-950/60 border-emerald-800/60"
-                }`}
-              >
-                Status: {listing.status}
-              </span>
-            )}
-          </div>
-        </div>
+          {/* 3. Detailed Lease Terms & Financial Information (order-4 on mobile) */}
+          {((listing.rent !== undefined && listing.rent !== null && listing.rent !== "") ||
+            (listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "") ||
+            (listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "") ||
+            (listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "") ||
+            (listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "") ||
+            (listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "") ||
+            (listing.pet_allowed !== undefined && listing.pet_allowed !== null)) && (
+            <div className="order-4 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+              <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-lg text-[#d4b068]">receipt_long</span>
+                <span>Lease Terms & Details</span>
+              </h2>
 
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{listing.title}</h1>
-        <p className="text-sm text-slate-300 whitespace-pre-line leading-relaxed mb-6">
-          {listing.description}
-        </p>
+              <div className="divide-y divide-slate-800/80 text-sm">
+                {listing.rent !== undefined && listing.rent !== null && listing.rent !== "" && !isNaN(Number(listing.rent)) && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Monthly Rent</span>
+                    <span className="text-white font-mono font-bold text-base">
+                      ৳{Number(listing.rent).toLocaleString()} / month
+                    </span>
+                  </div>
+                )}
 
-        {/* Lease Terms Section */}
-        {((listing.rent !== undefined && listing.rent !== null && listing.rent !== "") ||
-          (listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "") ||
-          (listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "") ||
-          (listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "") ||
-          (listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "") ||
-          (listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "") ||
-          (listing.pet_allowed !== undefined && listing.pet_allowed !== null)) && (
-          <div className="mb-6 p-5 sm:p-6 rounded-xl bg-[#090a0c] border border-slate-800">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#d4b068] mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-base">receipt_long</span>
-              <span>Lease Terms</span>
-            </h2>
+                {listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "" && !isNaN(Number(listing.electricity_bill)) && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Electricity bill</span>
+                    <span className="text-slate-200 font-mono">
+                      ৳{Number(listing.electricity_bill).toLocaleString()}
+                    </span>
+                  </div>
+                )}
 
-            <div className="divide-y divide-slate-800/70 text-xs sm:text-sm">
-              {listing.rent !== undefined && listing.rent !== null && listing.rent !== "" && !isNaN(Number(listing.rent)) && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Rent</span>
-                  <span className="text-white font-mono font-bold">
-                    ৳{Number(listing.rent).toLocaleString()} / month
-                  </span>
-                </div>
-              )}
+                {listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "" && !isNaN(Number(listing.water_bill)) && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Water bill</span>
+                    <span className="text-slate-200 font-mono">
+                      ৳{Number(listing.water_bill).toLocaleString()}
+                    </span>
+                  </div>
+                )}
 
-              {listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "" && !isNaN(Number(listing.electricity_bill)) && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Electricity bill</span>
-                  <span className="text-slate-200 font-mono">
-                    ৳{Number(listing.electricity_bill).toLocaleString()}
-                  </span>
-                </div>
-              )}
+                {listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "" && !isNaN(Number(listing.service_charge)) && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Service charge</span>
+                    <span className="text-slate-200 font-mono">
+                      ৳{Number(listing.service_charge).toLocaleString()}
+                    </span>
+                  </div>
+                )}
 
-              {listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "" && !isNaN(Number(listing.water_bill)) && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Water bill</span>
-                  <span className="text-slate-200 font-mono">
-                    ৳{Number(listing.water_bill).toLocaleString()}
-                  </span>
-                </div>
-              )}
+                {listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "" && !isNaN(Number(listing.security_deposit)) && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Security deposit</span>
+                    <span className="text-slate-200 font-mono">
+                      ৳{Number(listing.security_deposit).toLocaleString()}
+                    </span>
+                  </div>
+                )}
 
-              {listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "" && !isNaN(Number(listing.service_charge)) && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Service charge</span>
-                  <span className="text-slate-200 font-mono">
-                    ৳{Number(listing.service_charge).toLocaleString()}
-                  </span>
-                </div>
-              )}
+                {listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "" && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Monthly due date</span>
+                    <span className="text-slate-200 font-medium">
+                      {formatDueDate(listing.monthly_due_date)}
+                    </span>
+                  </div>
+                )}
 
-              {listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "" && !isNaN(Number(listing.security_deposit)) && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Security deposit</span>
-                  <span className="text-slate-200 font-mono">
-                    ৳{Number(listing.security_deposit).toLocaleString()}
-                  </span>
-                </div>
-              )}
-
-              {listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "" && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Monthly due date</span>
-                  <span className="text-slate-200 font-medium">
-                    {formatDueDate(listing.monthly_due_date)}
-                  </span>
-                </div>
-              )}
-
-              {listing.pet_allowed !== undefined && listing.pet_allowed !== null && (
-                <div className="flex items-center justify-between py-2.5">
-                  <span className="text-slate-400 font-medium">Pet allowed</span>
-                  <span className="text-slate-200 font-medium">
-                    {listing.pet_allowed ? "Yes" : "No"}
-                  </span>
-                </div>
-              )}
+                {listing.pet_allowed !== undefined && listing.pet_allowed !== null && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-slate-400 font-medium">Pet policy</span>
+                    <span className={`font-medium px-2.5 py-0.5 rounded-full text-xs ${
+                      listing.pet_allowed
+                        ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800"
+                        : "bg-slate-800 text-slate-300"
+                    }`}>
+                      {listing.pet_allowed ? "Pets Allowed" : "No Pets"}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Specs Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#090a0c] border border-slate-800 text-center">
-          <div>
-            <span className="block text-xs uppercase text-slate-500 mb-0.5 font-medium">Bedrooms</span>
-            <span className="text-lg font-bold text-white">{listing.bedroom_count}</span>
-          </div>
-          <div>
-            <span className="block text-xs uppercase text-slate-500 mb-0.5 font-medium">Bathrooms</span>
-            <span className="text-lg font-bold text-white">{listing.bathroom_count}</span>
-          </div>
-          <div>
-            <span className="block text-xs uppercase text-slate-500 mb-0.5 font-medium">Floor</span>
-            <span className="text-lg font-bold text-white">{listing.on_which_floor}</span>
-          </div>
-          <div>
-            <span className="block text-xs uppercase text-slate-500 mb-0.5 font-medium">Coordinates</span>
-            <span className="text-xs font-mono text-slate-300">
-              {Number(listing.latitude).toFixed(2)}, {Number(listing.longitude).toFixed(2)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Owner Information Section - Clearly distinguished from Property Information */}
-      <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-8 mb-8">
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
-          <div className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-xl text-[#d4b068]">
-              shield_person
-            </span>
-            <h2 className="text-lg font-bold text-white">Owner Information</h2>
-          </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4b068]/15 text-[#d4b068] border border-[#d4b068]/30">
-            <span className="material-symbols-outlined text-xs">verified</span>
-            <span>Registered Owner</span>
-          </span>
-        </div>
-
-        {ownerLoading ? (
-          <div className="py-4 text-center text-xs text-slate-400">
-            Loading owner information...
-          </div>
-        ) : owner ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-            <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
-              <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
-                Owner Reference
-              </span>
-              <span className="font-mono font-medium text-white">
-                Owner #{owner.id}
+          {/* 4. Owner Information Section (order-6 on mobile) */}
+          <div className="order-6 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                  shield_person
+                </span>
+                <h2 className="text-base font-bold text-white">Owner Information</h2>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4b068]/15 text-[#d4b068] border border-[#d4b068]/30">
+                <span className="material-symbols-outlined text-xs">verified</span>
+                <span>Registered Owner</span>
               </span>
             </div>
 
-            {owner.name && (
-              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
-                <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
-                  Owner Name
-                </span>
-                <span className="font-medium text-white">
-                  {owner.name}
-                </span>
+            {ownerLoading ? (
+              <div className="py-4 text-center text-xs text-slate-400">
+                Loading owner information...
               </div>
-            )}
+            ) : owner ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
+                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                    Owner Reference
+                  </span>
+                  <span className="font-mono font-medium text-white">
+                    Owner #{owner.id}
+                  </span>
+                </div>
 
-            {owner.email && (
-              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
-                <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
-                  Email
-                </span>
-                <span className="font-mono text-white text-xs">
-                  {owner.email}
-                </span>
+                {owner.name && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Owner Name
+                    </span>
+                    <span className="font-medium text-white">
+                      {owner.name}
+                    </span>
+                  </div>
+                )}
+
+                {owner.email && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Email
+                    </span>
+                    <span className="font-mono text-white text-xs truncate block">
+                      {owner.email}
+                    </span>
+                  </div>
+                )}
+
+                {owner.phone && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Phone
+                    </span>
+                    <span className="font-mono text-white text-xs">
+                      {owner.phone}
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                    Verification Status
+                  </span>
+                  <span className="text-emerald-400 flex items-center gap-1 text-xs font-semibold">
+                    <span className="material-symbols-outlined text-sm">verified_user</span>
+                    Verified Property Owner
+                  </span>
+                </div>
               </div>
+            ) : (
+              <p className="text-xs text-slate-400">Owner information is currently unavailable.</p>
             )}
-
-            {owner.phone && (
-              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
-                <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
-                  Phone
-                </span>
-                <span className="font-mono text-white text-xs">
-                  {owner.phone}
-                </span>
-              </div>
-            )}
-
-            <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
-              <span className="text-xs uppercase tracking-wider text-slate-400 block mb-1">
-                Verification Status
-              </span>
-              <span className="text-emerald-400 flex items-center gap-1 text-xs font-semibold">
-                <span className="material-symbols-outlined text-sm">verified_user</span>
-                Verified Property Owner
-              </span>
-            </div>
           </div>
-        ) : (
-          <p className="text-xs text-slate-400">Owner information is currently unavailable.</p>
-        )}
-      </div>
 
-      {/* Two Column Section: Applications / Apply and Reviews */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Applications for Owner OR Apply for Tenant */}
-        <div className="lg:col-span-7">
-          {isOwner ? (
-            <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6">
+          {/* 5. If Owner: Applications Received (order-7 on mobile) */}
+          {isOwner && (
+            <div className="order-7 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-white">Applications Received</h2>
-                <span className="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <span className="material-symbols-outlined text-lg text-[#d4b068]">group</span>
+                  <span>Applications Received</span>
+                </h2>
+                <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-mono border border-slate-700">
                   {applications.length}
                 </span>
               </div>
@@ -851,40 +800,174 @@ export function ListingDetailPage() {
                 </div>
               )}
             </div>
-          ) : (
-            <div id="apply-section" className="border border-slate-800 bg-[#12151c] rounded-2xl p-6">
-              <h2 className="text-xl font-bold text-white mb-1">Apply for this Apartment</h2>
-              <p className="text-xs text-slate-400 mb-6">
-                Submit your rental application directly to the owner.
-              </p>
+          )}
 
-              {applySuccess && (
-                <div className="p-3 mb-4 rounded bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs">
-                  {applySuccess}
-                </div>
+          {/* 6. Tenant Reviews (order-8 on mobile) */}
+          <div className="order-8 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-lg text-amber-400">star</span>
+                <span>Tenant Reviews</span>
+              </h2>
+              {reviews.length > 0 && (
+                <span className="text-xs bg-slate-800 text-amber-300 px-2.5 py-1 rounded-full font-medium border border-slate-700">
+                  ★ {reviews[0]?.average_rating ? Number(reviews[0].average_rating).toFixed(1) : "N/A"}
+                </span>
               )}
-              {applyError && (
-                <div className="p-3 mb-4 rounded bg-red-950/60 border border-red-800 text-red-300 text-xs">
-                  {applyError}
-                </div>
-              )}
+            </div>
 
-              {!user ? (
-                <div className="p-4 text-center border border-slate-800 rounded-xl">
-                  <p className="text-xs text-slate-400 mb-3">
-                    You must be logged in to apply for this property.
-                  </p>
-                  <Link
-                    to="/login"
-                    state={{ from: { pathname: `/listings/${id}` } }}
-                    className="inline-block bg-white text-slate-900 px-4 py-2 rounded text-xs font-medium"
+            {reviews.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
+                No verified tenant reviews yet for this listing.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {reviews.map((rev, idx) => (
+                  <div key={idx} className="p-3.5 bg-[#090a0c] border border-slate-800/80 rounded-xl">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex text-amber-400 text-xs">
+                        {"★".repeat(rev.rating)}
+                        {"☆".repeat(5 - rev.rating)}
+                      </div>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(rev.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">{rev.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* SIDEBAR COLUMN: Information Card + Actions Card */}
+        <aside className="contents lg:flex lg:flex-col lg:col-span-5 xl:col-span-4 lg:sticky lg:top-6 lg:gap-6">
+          {/* 1. Listing Information Card (order-2 on mobile) */}
+          <div className="order-2 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
+            {/* Area Badge & Status */}
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2.5 py-1 rounded">
+                  {getAreaName(listing.area_id)}
+                </span>
+                {isOwner && (
+                  <span
+                    className={`text-xs font-medium px-2.5 py-1 rounded border capitalize ${
+                      listing.status?.toLowerCase() === "waiting" ||
+                      listing.status?.toLowerCase() === "pending"
+                        ? "text-amber-300 bg-amber-950/60 border-amber-800/60"
+                        : "text-emerald-400 bg-emerald-950/60 border-emerald-800/60"
+                    }`}
                   >
-                    Log In to Apply
-                  </Link>
+                    Status: {listing.status}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs font-mono text-slate-500">Ref #{listing.id}</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-4 leading-snug">
+              {listing.title}
+            </h1>
+
+            {/* Price Display */}
+            {listing.rent !== undefined && listing.rent !== null && listing.rent !== "" && !isNaN(Number(listing.rent)) && (
+              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800/90 mb-5">
+                <span className="block text-[11px] uppercase tracking-wider text-slate-400 mb-0.5">
+                  Monthly Rent
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-bold font-mono text-white">
+                    ৳{Number(listing.rent).toLocaleString()}
+                  </span>
+                  <span className="text-xs text-slate-400 font-medium">/ month</span>
                 </div>
-              ) : isApplied ? (
-                <div className="flex flex-col gap-4">
-                  <div className="p-5 rounded-2xl bg-[#090a0c] border border-emerald-800/60 shadow-lg">
+              </div>
+            )}
+
+            {/* Key Property Specs */}
+            <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-[#090a0c] border border-slate-800 text-center">
+              <div className="p-2">
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Bedrooms</span>
+                <span className="text-base font-bold text-white">{listing.bedroom_count}</span>
+              </div>
+              <div className="p-2">
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Bathrooms</span>
+                <span className="text-base font-bold text-white">{listing.bathroom_count}</span>
+              </div>
+              <div className="p-2 border-t border-slate-800/80">
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Floor</span>
+                <span className="text-base font-bold text-white">{listing.on_which_floor}</span>
+              </div>
+              <div className="p-2 border-t border-slate-800/80">
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Coordinates</span>
+                <span className="text-xs font-mono text-slate-300 block truncate">
+                  {Number(listing.latitude).toFixed(2)}, {Number(listing.longitude).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Actions Card (order-5 on mobile) */}
+          <div className="order-5 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
+            {isOwner ? (
+              <div>
+                <h3 className="text-sm font-bold text-white mb-2">Owner Controls</h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  Manage this listing or update information.
+                </p>
+                <div className="flex flex-col gap-2.5">
+                  <Link
+                    to={`/listings/${id}/edit`}
+                    className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 px-4 rounded-xl text-xs transition text-center border border-slate-700"
+                  >
+                    Edit Listing Details
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleDeleteListing}
+                    disabled={deleting}
+                    className="w-full bg-red-950/60 hover:bg-red-900 border border-red-800 text-red-200 py-2.5 px-4 rounded-xl text-xs transition cursor-pointer disabled:opacity-50"
+                  >
+                    {deleting ? "Deleting..." : "Delete Listing"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div id="apply-section">
+                <h3 className="text-base font-bold text-white mb-1">Apply for this Apartment</h3>
+                <p className="text-xs text-slate-400 mb-5">
+                  Submit your rental application directly to the owner.
+                </p>
+
+                {applySuccess && (
+                  <div className="p-3 mb-4 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs">
+                    {applySuccess}
+                  </div>
+                )}
+                {applyError && (
+                  <div className="p-3 mb-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs">
+                    {applyError}
+                  </div>
+                )}
+
+                {!user ? (
+                  <div className="p-4 text-center border border-slate-800 rounded-xl bg-[#090a0c]">
+                    <p className="text-xs text-slate-400 mb-3">
+                      You must be logged in to apply for this property.
+                    </p>
+                    <Link
+                      to="/login"
+                      state={{ from: { pathname: `/listings/${id}` } }}
+                      className="inline-block w-full bg-white hover:bg-slate-200 text-slate-900 font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-sm text-center"
+                    >
+                      Log In to Apply
+                    </Link>
+                  </div>
+                ) : isApplied ? (
+                  <div className="p-4 rounded-xl bg-[#090a0c] border border-emerald-800/60 shadow-lg">
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2">
                         <span className="material-symbols-outlined text-emerald-400 text-xl">
@@ -903,7 +986,7 @@ export function ListingDetailPage() {
                       You have already submitted an application for this apartment. The property owner will review your credentials and propose a lease agreement.
                     </p>
 
-                    <div className="flex flex-col gap-2.5 pt-3 border-t border-slate-800 text-xs">
+                    <div className="flex flex-col gap-2 pt-3 border-t border-slate-800 text-xs">
                       <div className="flex items-center justify-between text-slate-400">
                         <span>Application Status</span>
                         <span className="text-emerald-400 font-semibold uppercase font-mono text-[11px]">
@@ -934,146 +1017,109 @@ export function ListingDetailPage() {
                       )}
                     </div>
                   </div>
-                </div>
-              ) : showTenantForm ? (
-                <form onSubmit={handleSubmitTenantForm} className="flex flex-col gap-4">
-                  <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-200 text-xs flex items-start gap-2">
-                    <span className="material-symbols-outlined text-amber-400 text-base shrink-0 mt-0.5">info</span>
-                    <span>Please enter your tenant profile details to complete your application.</span>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="apply-income"
-                      className="block text-xs uppercase font-medium text-slate-400 mb-1"
-                    >
-                      Monthly Income (BDT) *
-                    </label>
-                    <input
-                      id="apply-income"
-                      type="number"
-                      min="1000"
-                      required
-                      value={applyIncome}
-                      onChange={(e) => setApplyIncome(e.target.value)}
-                      placeholder="e.g. 80000"
-                      className="w-full bg-[#12151c] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="apply-contact"
-                      className="block text-xs uppercase font-medium text-slate-400 mb-1"
-                    >
-                      Emergency Contact (11 digits) *
-                    </label>
-                    <input
-                      id="apply-contact"
-                      type="tel"
-                      required
-                      maxLength={11}
-                      value={applyContact}
-                      onChange={(e) => setApplyContact(e.target.value)}
-                      placeholder="01XXXXXXXXX"
-                      className="w-full bg-[#12151c] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={applying}
-                    className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm flex items-center justify-center gap-2 mt-1 shadow-sm"
-                  >
-                    {applying ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                        <span>Submitting Application...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Submit Application</span>
-                        <span className="material-symbols-outlined text-base">arrow_forward</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="material-symbols-outlined text-emerald-400 text-lg">verified</span>
-                      <span className="text-sm font-semibold text-white">
-                        {isTenant ? "Verified Tenant Profile" : "Rental Application"}
-                      </span>
+                ) : showTenantForm ? (
+                  <form onSubmit={handleSubmitTenantForm} className="flex flex-col gap-4">
+                    <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-200 text-xs flex items-start gap-2">
+                      <span className="material-symbols-outlined text-amber-400 text-base shrink-0 mt-0.5">info</span>
+                      <span>Please enter your tenant profile details to complete your application.</span>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      {isTenant
-                        ? "Your profile is registered with tenant credentials. Click Apply to instantly submit your application to the landlord."
-                        : "Click Apply to submit your application for this apartment."}
-                    </p>
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={isTenant ? handleDirectApply : () => setShowTenantForm(true)}
-                    disabled={applying}
-                    className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm flex items-center justify-center gap-2 shadow-sm"
-                  >
-                    {applying ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                        <span>Applying...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Apply for this Apartment</span>
-                        <span className="material-symbols-outlined text-base">arrow_forward</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                    <div>
+                      <label
+                        htmlFor="apply-income"
+                        className="block text-xs uppercase font-medium text-slate-400 mb-1"
+                      >
+                        Monthly Income (BDT) *
+                      </label>
+                      <input
+                        id="apply-income"
+                        type="number"
+                        min="1000"
+                        required
+                        value={applyIncome}
+                        onChange={(e) => setApplyIncome(e.target.value)}
+                        placeholder="e.g. 80000"
+                        className="w-full bg-[#12151c] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                      />
+                    </div>
 
-        {/* Right Column: Reviews */}
-        <div className="lg:col-span-5">
-          <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-white">Tenant Reviews</h2>
-              {reviews.length > 0 && (
-                <span className="text-xs bg-slate-800 text-amber-300 px-2 py-0.5 rounded font-medium">
-                  ★ {reviews[0]?.average_rating ? Number(reviews[0].average_rating).toFixed(1) : "N/A"}
-                </span>
-              )}
-            </div>
+                    <div>
+                      <label
+                        htmlFor="apply-contact"
+                        className="block text-xs uppercase font-medium text-slate-400 mb-1"
+                      >
+                        Emergency Contact (11 digits) *
+                      </label>
+                      <input
+                        id="apply-contact"
+                        type="tel"
+                        required
+                        maxLength={11}
+                        value={applyContact}
+                        onChange={(e) => setApplyContact(e.target.value)}
+                        placeholder="01XXXXXXXXX"
+                        className="w-full bg-[#12151c] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                      />
+                    </div>
 
-            {reviews.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
-                No verified tenant reviews yet for this listing.
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {reviews.map((rev, idx) => (
-                  <div key={idx} className="p-3 bg-[#090a0c] border border-slate-800/80 rounded-xl">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex text-amber-400 text-xs">
-                        {"★".repeat(rev.rating)}
-                        {"☆".repeat(5 - rev.rating)}
+                    <button
+                      type="submit"
+                      disabled={applying}
+                      className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm flex items-center justify-center gap-2 mt-1 shadow-sm"
+                    >
+                      {applying ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                          <span>Submitting Application...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Submit Application</span>
+                          <span className="material-symbols-outlined text-base">arrow_forward</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="material-symbols-outlined text-emerald-400 text-lg">verified</span>
+                        <span className="text-sm font-semibold text-white">
+                          {isTenant ? "Verified Tenant Profile" : "Rental Application"}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500">
-                        {new Date(rev.created_at).toLocaleDateString()}
-                      </span>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {isTenant
+                          ? "Your profile is registered with tenant credentials. Click Apply to instantly submit your application to the landlord."
+                          : "Click Apply to submit your application for this apartment."}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">{rev.description}</p>
+
+                    <button
+                      type="button"
+                      onClick={isTenant ? handleDirectApply : () => setShowTenantForm(true)}
+                      disabled={applying}
+                      className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      {applying ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                          <span>Applying...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Apply for this Apartment</span>
+                          <span className="material-symbols-outlined text-base">arrow_forward</span>
+                        </>
+                      )}
+                    </button>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
-        </div>
+        </aside>
       </div>
 
       {/* Success Modal */}
@@ -1193,11 +1239,10 @@ export function ListingDetailPage() {
                   key={photo.id || idx}
                   type="button"
                   onClick={() => setSelectedPhotoIndex(idx)}
-                  className={`w-14 sm:w-16 aspect-[4/3] rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${
-                    idx === selectedPhotoIndex
+                  className={`w-14 sm:w-16 aspect-[4/3] rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${idx === selectedPhotoIndex
                       ? "ring-2 ring-white border-white scale-105 opacity-100"
                       : "border-white/20 opacity-50 hover:opacity-100"
-                  }`}
+                    }`}
                 >
                   <img
                     src={photo.url}
