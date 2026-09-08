@@ -4,19 +4,41 @@ import {
   CreateListingInput,
   UpdateListingInput,
 } from "../schemas/listing.schema.js";
+import { getPublicUrl } from "./media.service.js";
 
 export async function getAllListings() {
   const result = await pool.query(
     "SELECT l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id WHERE l.status='approved'",
   );
-  return result.rows;
+  return attachMediaToListingResults(result.rows);
 }
 
 export async function getMylistings(owner : number) {
   const result= await pool.query("select l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id where l.owner_id=$1",[owner]);
-  return result.rows;
-  
+  return attachMediaToListingResults(result.rows);
 }
+
+// Attach media URLs to listings
+async function attachMediaToListingResults(listings: any[]) {
+  if (listings.length === 0) return listings;
+  const ids = listings.map((l) => l.id);
+  const media = await pool.query(
+    `SELECT lm.listing_id, m.id, m.media_path, lm.sort_order
+     FROM listing_media lm
+     JOIN media m ON m.id = lm.media_id
+     WHERE lm.listing_id = ANY($1)
+     ORDER BY lm.sort_order`,
+    [ids]
+  );
+  const byListing = new Map<number, any[]>();
+  for (const row of media.rows) {
+    const arr = byListing.get(row.listing_id) ?? [];
+    arr.push({ id: row.id, url: getPublicUrl(row.media_path) });
+    byListing.set(row.listing_id, arr);
+  }
+  return listings.map((l) => ({ ...l, images: byListing.get(l.id) ?? [] }));
+}
+
 export async function getListingById(
   id: string,
   ownerId?: number | null
@@ -42,7 +64,8 @@ export async function getListingById(
     throw new AppError(404, "Listing not found");
   }
 
-  return result.rows[0];
+  const [withMedia] = await attachMediaToListingResults([result.rows[0]]);
+  return withMedia;
 }
 
 export async function createListing(ownerId: number, data: CreateListingInput) {

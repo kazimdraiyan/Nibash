@@ -50,3 +50,10 @@ create table document_media(
     media_id int not null references media(id) on delete cascade,
     primary key (document_id, media_id)
 );
+
+CREATE TABLE listing_media (
+    listing_id INT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    media_id   INT NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+    sort_order INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (listing_id, media_id)
+);

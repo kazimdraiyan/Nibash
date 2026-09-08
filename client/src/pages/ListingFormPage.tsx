@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { DHAKA_AREAS } from "../utils/areaLookup";
+import { uploadListingImages } from "../api/uploadImages";
 
 export function ListingFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,9 @@ export function ListingFormPage() {
   const [bedroomCount, setBedroomCount] = useState("3");
   const [bathroomCount, setBathroomCount] = useState("3");
   const [onWhichFloor, setOnWhichFloor] = useState("4");
+  const [images, setImages] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   // Initial Terms State
   const [rent, setRent] = useState("65000");
@@ -43,6 +47,20 @@ export function ListingFormPage() {
       setLongitude(matched.lng);
     }
   };
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    setImages((prev) => [...prev, ...files].slice(0, 10)); // cap at 10
+    setPreviewUrls((prev) => [
+      ...prev,
+      ...files.map((f) => URL.createObjectURL(f)),
+    ]);
+  }
+
+  function removeImage(index: number) {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+  }
 
   // If edit mode, load existing data
   useEffect(() => {
@@ -99,13 +117,34 @@ export function ListingFormPage() {
     };
 
     try {
+      let targetId: string;
+
       if (isEdit) {
         await apiClient.patch(`/listings/${id}`, payload);
-        navigate(`/listings/${id}`);
+        targetId = id!;
       } else {
-        const res = await apiClient.post<{ message: string; listingId: number }>("/listings", payload);
-        navigate(`/listings/${res.listingId}`);
+        const res = await apiClient.post<{
+          message: string;
+          listingId: number;
+        }>("/listings", payload);
+        targetId = String(res.listingId);
       }
+
+      if (images.length > 0) {
+        setUploading(true);
+        try {
+          await uploadListingImages(targetId, images);
+        } catch (err: any) {
+          // show image upload error separately
+          setError(`Image upload failed: ${err.message || "unknown error"}`);
+          setUploading(false);
+          setLoading(false);
+          return;
+        }
+        setUploading(false);
+      }
+
+      navigate(`/listings/${targetId}`);
     } catch (err: any) {
       setError(err.message || "Failed to save listing. Please verify inputs.");
     } finally {
@@ -122,7 +161,11 @@ export function ListingFormPage() {
         </p>
         <Link
           to="/login"
-          state={{ from: { pathname: isEdit ? `/listings/${id}/edit` : "/listings/new" } }}
+          state={{
+            from: {
+              pathname: isEdit ? `/listings/${id}/edit` : "/listings/new",
+            },
+          }}
           className="inline-block bg-white text-black px-6 py-2.5 rounded-lg font-medium hover:bg-slate-200 transition"
         >
           Go to Login
@@ -143,7 +186,10 @@ export function ListingFormPage() {
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
       <div className="mb-6">
-        <Link to="/listings" className="text-xs text-slate-400 hover:text-white">
+        <Link
+          to="/listings"
+          className="text-xs text-slate-400 hover:text-white"
+        >
           ← Back to Listings
         </Link>
       </div>
@@ -153,7 +199,8 @@ export function ListingFormPage() {
           {isEdit ? "Edit Property Listing" : "Create New Apartment Listing"}
         </h1>
         <p className="text-xs text-slate-400 mb-6">
-          Fill in the architectural specifications and monthly lease financial terms.
+          Fill in the architectural specifications and monthly lease financial
+          terms.
         </p>
 
         {error && (
@@ -221,7 +268,11 @@ export function ListingFormPage() {
                     className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
                   >
                     {DHAKA_AREAS.map((area) => (
-                      <option key={area.id} value={area.id} className="bg-[#12151c] text-white">
+                      <option
+                        key={area.id}
+                        value={area.id}
+                        className="bg-[#12151c] text-white"
+                      >
                         {area.name} (Area #{area.id})
                       </option>
                     ))}
@@ -447,18 +498,50 @@ export function ListingFormPage() {
                 onChange={(e) => setPetAllowed(e.target.checked)}
                 className="w-4 h-4 rounded text-black accent-[#d4b068] cursor-pointer"
               />
-              <label htmlFor="pet-allowed" className="text-sm text-slate-300 cursor-pointer">
+              <label
+                htmlFor="pet-allowed"
+                className="text-sm text-slate-300 cursor-pointer"
+              >
                 Pets Allowed in this Apartment
               </label>
             </div>
           </div>
+
+          <div>
+            <label htmlFor="images">Photos</label>
+            <input
+              id="images"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={handleImageSelect}
+            />
+            <div className="image-preview-grid">
+              {previewUrls.map((url, i) => (
+                <div key={url} className="image-preview-item">
+                  <img src={url} alt={`preview ${i}`} />
+                  <button type="button" onClick={() => removeImage(i)}>
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button type="submit" disabled={uploading}>
+            {uploading ? "Uploading images..." : "Create Listing"}
+          </button>
 
           <button
             type="submit"
             disabled={loading}
             className="mt-2 w-full bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm shadow-md"
           >
-            {loading ? "Saving Apartment..." : isEdit ? "Update Apartment" : "Publish Apartment Listing"}
+            {loading
+              ? "Saving Apartment..."
+              : isEdit
+                ? "Update Apartment"
+                : "Publish Apartment Listing"}
           </button>
         </form>
       </div>
