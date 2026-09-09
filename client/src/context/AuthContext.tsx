@@ -12,6 +12,7 @@ export interface User {
   name: string;
   nid: string;
   phone: string;
+  is_verifier: boolean;
 }
 
 interface AuthContextType {

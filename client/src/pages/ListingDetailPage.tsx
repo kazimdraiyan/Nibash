@@ -69,7 +69,9 @@ export function ListingDetailPage() {
     return localStorage.getItem(`nibash_tenant_${user.id}`) === "true";
   });
   const [appliedRefresh, setAppliedRefresh] = useState(0);
-  const isApplied = Boolean(user && id && (hasUserApplied(user.id, id) || appliedRefresh > 0));
+  const isApplied = Boolean(
+    user && id && (hasUserApplied(user.id, id) || appliedRefresh > 0),
+  );
   const existingApp = user && id ? getUserApplication(user.id, id) : null;
 
   const [showTenantForm, setShowTenantForm] = useState(false);
@@ -89,28 +91,41 @@ export function ListingDetailPage() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Compute available photos from listing
-  const photoList = (listing?.images && Array.isArray(listing.images) && listing.images.length > 0)
-    ? listing.images
-    : listing?.imageUrl
-      ? [{ id: 0, url: listing.imageUrl }]
-      : [];
+  const photoList =
+    listing?.images &&
+    Array.isArray(listing.images) &&
+    listing.images.length > 0
+      ? listing.images
+      : listing?.imageUrl
+        ? [{ id: 0, url: listing.imageUrl }]
+        : [];
 
   useEffect(() => {
     setSelectedPhotoIndex(0);
     setFailedImages({});
   }, [id]);
 
-  const handlePrevPhoto = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (photoList.length <= 1) return;
-    setSelectedPhotoIndex((prev) => (prev === 0 ? photoList.length - 1 : prev - 1));
-  }, [photoList.length]);
+  const handlePrevPhoto = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (photoList.length <= 1) return;
+      setSelectedPhotoIndex((prev) =>
+        prev === 0 ? photoList.length - 1 : prev - 1,
+      );
+    },
+    [photoList.length],
+  );
 
-  const handleNextPhoto = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (photoList.length <= 1) return;
-    setSelectedPhotoIndex((prev) => (prev === photoList.length - 1 ? 0 : prev + 1));
-  }, [photoList.length]);
+  const handleNextPhoto = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (photoList.length <= 1) return;
+      setSelectedPhotoIndex((prev) =>
+        prev === photoList.length - 1 ? 0 : prev + 1,
+      );
+    },
+    [photoList.length],
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -130,7 +145,9 @@ export function ListingDetailPage() {
     setError(null);
     try {
       // 1. Fetch listing details
-      const listingRes = await apiClient.get<{ listing: BackendListing }>(`/listings/${id}`);
+      const listingRes = await apiClient.get<{ listing: BackendListing }>(
+        `/listings/${id}`,
+      );
       setListing(listingRes.listing);
 
       // Fetch owner details
@@ -146,7 +163,9 @@ export function ListingDetailPage() {
         setOwnerLoading(false);
       } else {
         try {
-          const res = await apiClient.get<{ user?: any; owner?: any }>(`/users/${ownerId}`);
+          const res = await apiClient.get<{ user?: any; owner?: any }>(
+            `/users/${ownerId}`,
+          );
           const ownerData = res.user || res.owner;
           if (ownerData) {
             setOwner({
@@ -168,7 +187,9 @@ export function ListingDetailPage() {
 
       // 2. Fetch reviews for this listing
       try {
-        const reviewsRes = await apiClient.get<{ reviews: Review[] }>(`/reviews/listings/${id}`);
+        const reviewsRes = await apiClient.get<{ reviews: Review[] }>(
+          `/reviews/listings/${id}`,
+        );
         setReviews(reviewsRes.reviews || []);
       } catch {
         setReviews([]);
@@ -177,7 +198,9 @@ export function ListingDetailPage() {
       // 3. If current logged-in user is the owner, fetch applicants
       if (user && listingRes.listing.owner_id === user.id) {
         try {
-          const appsRes = await apiClient.get<{ applications: Application[] }>(`/applications/${id}`);
+          const appsRes = await apiClient.get<{ applications: Application[] }>(
+            `/applications/${id}`,
+          );
           setApplications(appsRes.applications || []);
         } catch {
           setApplications([]);
@@ -297,7 +320,9 @@ export function ListingDetailPage() {
     }
 
     if (!/^01\d{9}$/.test(applyContact.trim())) {
-      setApplyError("Emergency contact must be an 11-digit Bangladeshi number starting with 01.");
+      setApplyError(
+        "Emergency contact must be an 11-digit Bangladeshi number starting with 01.",
+      );
       return;
     }
 
@@ -354,19 +379,39 @@ export function ListingDetailPage() {
   const handleRejectApplicant = async (tenantId: number) => {
     if (!id || !user) return;
     try {
-      await apiClient.put(`/applications/${id}/${tenantId}`, { status: "rejected" });
+      await apiClient.put(`/applications/${id}/${tenantId}`, {
+        status: "rejected",
+      });
       setApplications((prev) =>
-        prev.map((app) => (app.tenant_id === tenantId ? { ...app, status: "rejected" } : app))
+        prev.map((app) =>
+          app.tenant_id === tenantId ? { ...app, status: "rejected" } : app,
+        ),
       );
     } catch (err: any) {
       alert(err.message || "Failed to reject applicant.");
     }
   };
 
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+
+  const handleVerify = async () => {
+    if (!id) return;
+    setVerifying(true);
+    setVerifyError(null);
+    try {
+      await apiClient.post(`/verify/listings/${id}/verify`);
+      navigate("/verify");
+    } catch (err: any) {
+      setVerifyError(err.message || "Failed to verify listing.");
+      setVerifying(false);
+    }
+  };
+
   const handleDeleteListing = async () => {
     if (!id || !user) return;
     const confirmDelete = window.confirm(
-      "Are you sure you want to mark this listing as unavailable? This will archive the property."
+      "Are you sure you want to mark this listing as unavailable? This will archive the property.",
     );
     if (!confirmDelete) return;
 
@@ -414,8 +459,18 @@ export function ListingDetailPage() {
           to="/listings"
           className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
           </svg>
           <span>Back to Listings</span>
         </Link>
@@ -439,25 +494,52 @@ export function ListingDetailPage() {
                       alt={`${listing.title} photo ${selectedPhotoIndex + 1}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
                       onError={() =>
-                        setFailedImages((prev) => ({ ...prev, [selectedPhotoIndex]: true }))
+                        setFailedImages((prev) => ({
+                          ...prev,
+                          [selectedPhotoIndex]: true,
+                        }))
                       }
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-500">
-                      <svg className="w-12 h-12 mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        className="w-12 h-12 mb-2 text-slate-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
-                      <p className="text-xs font-medium">Image preview unavailable</p>
+                      <p className="text-xs font-medium">
+                        Image preview unavailable
+                      </p>
                     </div>
                   )}
 
                   {/* Top Bar: Photo count & Fullscreen trigger */}
                   <div className="absolute top-3 inset-x-3 sm:top-4 sm:inset-x-4 flex items-center justify-between pointer-events-none">
                     <span className="bg-black/75 backdrop-blur-md text-white border border-white/15 text-xs font-mono px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        className="w-3.5 h-3.5 text-slate-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
-                      <span>{selectedPhotoIndex + 1} / {photoList.length}</span>
+                      <span>
+                        {selectedPhotoIndex + 1} / {photoList.length}
+                      </span>
                     </span>
 
                     <button
@@ -468,8 +550,18 @@ export function ListingDetailPage() {
                       }}
                       className="pointer-events-auto bg-black/75 hover:bg-black text-white border border-white/15 text-xs px-3 py-1.5 rounded-full backdrop-blur-md transition shadow-md flex items-center gap-1.5 cursor-pointer"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                        />
                       </svg>
                       <span className="hidden sm:inline">View Fullscreen</span>
                     </button>
@@ -484,8 +576,18 @@ export function ListingDetailPage() {
                         aria-label="Previous photo"
                         className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M15 19l-7-7 7-7"
+                          />
                         </svg>
                       </button>
 
@@ -495,8 +597,18 @@ export function ListingDetailPage() {
                         aria-label="Next photo"
                         className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/95 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                     </>
@@ -539,13 +651,26 @@ export function ListingDetailPage() {
               /* Clean Fallback when listing has no photos */
               <div className="w-full py-16 px-6 flex flex-col items-center justify-center text-center bg-gradient-to-b from-[#12151c] to-[#0d1017]">
                 <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-400 mb-3 shadow-inner">
-                  <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  <svg
+                    className="w-8 h-8 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
                   </svg>
                 </div>
-                <h3 className="text-sm font-semibold text-slate-200 mb-1">No Photos Uploaded</h3>
+                <h3 className="text-sm font-semibold text-slate-200 mb-1">
+                  No Photos Uploaded
+                </h3>
                 <p className="text-xs text-slate-400 max-w-sm">
-                  The property owner hasn't uploaded interior or exterior photographs for this listing yet.
+                  The property owner hasn't uploaded interior or exterior
+                  photographs for this listing yet.
                 </p>
               </div>
             )}
@@ -554,7 +679,9 @@ export function ListingDetailPage() {
           {/* 2. Description (order-3 on mobile) */}
           <div className="order-3 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg text-[#d4b068]">description</span>
+              <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                description
+              </span>
               <span>About this Property</span>
             </h2>
             <p className="text-sm text-slate-300 whitespace-pre-line leading-relaxed">
@@ -563,86 +690,135 @@ export function ListingDetailPage() {
           </div>
 
           {/* 3. Detailed Lease Terms & Financial Information (order-4 on mobile) */}
-          {((listing.rent !== undefined && listing.rent !== null && listing.rent !== "") ||
-            (listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "") ||
-            (listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "") ||
-            (listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "") ||
-            (listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "") ||
-            (listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "") ||
-            (listing.pet_allowed !== undefined && listing.pet_allowed !== null)) && (
+          {((listing.rent !== undefined &&
+            listing.rent !== null &&
+            listing.rent !== "") ||
+            (listing.electricity_bill !== undefined &&
+              listing.electricity_bill !== null &&
+              listing.electricity_bill !== "") ||
+            (listing.water_bill !== undefined &&
+              listing.water_bill !== null &&
+              listing.water_bill !== "") ||
+            (listing.service_charge !== undefined &&
+              listing.service_charge !== null &&
+              listing.service_charge !== "") ||
+            (listing.security_deposit !== undefined &&
+              listing.security_deposit !== null &&
+              listing.security_deposit !== "") ||
+            (listing.monthly_due_date !== undefined &&
+              listing.monthly_due_date !== null &&
+              listing.monthly_due_date !== "") ||
+            (listing.pet_allowed !== undefined &&
+              listing.pet_allowed !== null)) && (
             <div className="order-4 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
               <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg text-[#d4b068]">receipt_long</span>
+                <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                  receipt_long
+                </span>
                 <span>Lease Terms & Details</span>
               </h2>
 
               <div className="divide-y divide-slate-800/80 text-sm">
-                {listing.rent !== undefined && listing.rent !== null && listing.rent !== "" && !isNaN(Number(listing.rent)) && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Monthly Rent</span>
-                    <span className="text-white font-mono font-bold text-base">
-                      ৳{Number(listing.rent).toLocaleString()} / month
-                    </span>
-                  </div>
-                )}
+                {listing.rent !== undefined &&
+                  listing.rent !== null &&
+                  listing.rent !== "" &&
+                  !isNaN(Number(listing.rent)) && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Monthly Rent
+                      </span>
+                      <span className="text-white font-mono font-bold text-base">
+                        ৳{Number(listing.rent).toLocaleString()} / month
+                      </span>
+                    </div>
+                  )}
 
-                {listing.electricity_bill !== undefined && listing.electricity_bill !== null && listing.electricity_bill !== "" && !isNaN(Number(listing.electricity_bill)) && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Electricity bill</span>
-                    <span className="text-slate-200 font-mono">
-                      ৳{Number(listing.electricity_bill).toLocaleString()}
-                    </span>
-                  </div>
-                )}
+                {listing.electricity_bill !== undefined &&
+                  listing.electricity_bill !== null &&
+                  listing.electricity_bill !== "" &&
+                  !isNaN(Number(listing.electricity_bill)) && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Electricity bill
+                      </span>
+                      <span className="text-slate-200 font-mono">
+                        ৳{Number(listing.electricity_bill).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
 
-                {listing.water_bill !== undefined && listing.water_bill !== null && listing.water_bill !== "" && !isNaN(Number(listing.water_bill)) && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Water bill</span>
-                    <span className="text-slate-200 font-mono">
-                      ৳{Number(listing.water_bill).toLocaleString()}
-                    </span>
-                  </div>
-                )}
+                {listing.water_bill !== undefined &&
+                  listing.water_bill !== null &&
+                  listing.water_bill !== "" &&
+                  !isNaN(Number(listing.water_bill)) && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Water bill
+                      </span>
+                      <span className="text-slate-200 font-mono">
+                        ৳{Number(listing.water_bill).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
 
-                {listing.service_charge !== undefined && listing.service_charge !== null && listing.service_charge !== "" && !isNaN(Number(listing.service_charge)) && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Service charge</span>
-                    <span className="text-slate-200 font-mono">
-                      ৳{Number(listing.service_charge).toLocaleString()}
-                    </span>
-                  </div>
-                )}
+                {listing.service_charge !== undefined &&
+                  listing.service_charge !== null &&
+                  listing.service_charge !== "" &&
+                  !isNaN(Number(listing.service_charge)) && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Service charge
+                      </span>
+                      <span className="text-slate-200 font-mono">
+                        ৳{Number(listing.service_charge).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
 
-                {listing.security_deposit !== undefined && listing.security_deposit !== null && listing.security_deposit !== "" && !isNaN(Number(listing.security_deposit)) && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Security deposit</span>
-                    <span className="text-slate-200 font-mono">
-                      ৳{Number(listing.security_deposit).toLocaleString()}
-                    </span>
-                  </div>
-                )}
+                {listing.security_deposit !== undefined &&
+                  listing.security_deposit !== null &&
+                  listing.security_deposit !== "" &&
+                  !isNaN(Number(listing.security_deposit)) && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Security deposit
+                      </span>
+                      <span className="text-slate-200 font-mono">
+                        ৳{Number(listing.security_deposit).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
 
-                {listing.monthly_due_date !== undefined && listing.monthly_due_date !== null && listing.monthly_due_date !== "" && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Monthly due date</span>
-                    <span className="text-slate-200 font-medium">
-                      {formatDueDate(listing.monthly_due_date)}
-                    </span>
-                  </div>
-                )}
+                {listing.monthly_due_date !== undefined &&
+                  listing.monthly_due_date !== null &&
+                  listing.monthly_due_date !== "" && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Monthly due date
+                      </span>
+                      <span className="text-slate-200 font-medium">
+                        {formatDueDate(listing.monthly_due_date)}
+                      </span>
+                    </div>
+                  )}
 
-                {listing.pet_allowed !== undefined && listing.pet_allowed !== null && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-slate-400 font-medium">Pet policy</span>
-                    <span className={`font-medium px-2.5 py-0.5 rounded-full text-xs ${
-                      listing.pet_allowed
-                        ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800"
-                        : "bg-slate-800 text-slate-300"
-                    }`}>
-                      {listing.pet_allowed ? "Pets Allowed" : "No Pets"}
-                    </span>
-                  </div>
-                )}
+                {listing.pet_allowed !== undefined &&
+                  listing.pet_allowed !== null && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-slate-400 font-medium">
+                        Pet policy
+                      </span>
+                      <span
+                        className={`font-medium px-2.5 py-0.5 rounded-full text-xs ${
+                          listing.pet_allowed
+                            ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800"
+                            : "bg-slate-800 text-slate-300"
+                        }`}
+                      >
+                        {listing.pet_allowed ? "Pets Allowed" : "No Pets"}
+                      </span>
+                    </div>
+                  )}
               </div>
             </div>
           )}
@@ -654,10 +830,14 @@ export function ListingDetailPage() {
                 <span className="material-symbols-outlined text-xl text-[#d4b068]">
                   shield_person
                 </span>
-                <h2 className="text-base font-bold text-white">Owner Information</h2>
+                <h2 className="text-base font-bold text-white">
+                  Owner Information
+                </h2>
               </div>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4b068]/15 text-[#d4b068] border border-[#d4b068]/30">
-                <span className="material-symbols-outlined text-xs">verified</span>
+                <span className="material-symbols-outlined text-xs">
+                  verified
+                </span>
                 <span>Registered Owner</span>
               </span>
             </div>
@@ -682,9 +862,7 @@ export function ListingDetailPage() {
                     <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
                       Owner Name
                     </span>
-                    <span className="font-medium text-white">
-                      {owner.name}
-                    </span>
+                    <span className="font-medium text-white">{owner.name}</span>
                   </div>
                 )}
 
@@ -715,13 +893,17 @@ export function ListingDetailPage() {
                     Verification Status
                   </span>
                   <span className="text-emerald-400 flex items-center gap-1 text-xs font-semibold">
-                    <span className="material-symbols-outlined text-sm">verified_user</span>
+                    <span className="material-symbols-outlined text-sm">
+                      verified_user
+                    </span>
                     Verified Property Owner
                   </span>
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-slate-400">Owner information is currently unavailable.</p>
+              <p className="text-xs text-slate-400">
+                Owner information is currently unavailable.
+              </p>
             )}
           </div>
 
@@ -730,7 +912,9 @@ export function ListingDetailPage() {
             <div className="order-7 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
-                  <span className="material-symbols-outlined text-lg text-[#d4b068]">group</span>
+                  <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                    group
+                  </span>
                   <span>Applications Received</span>
                 </h2>
                 <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-mono border border-slate-700">
@@ -738,7 +922,8 @@ export function ListingDetailPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mb-6">
-                Review tenants who applied for this apartment. Propose a lease contract or reject.
+                Review tenants who applied for this apartment. Propose a lease
+                contract or reject.
               </p>
 
               {applications.length === 0 ? (
@@ -762,17 +947,26 @@ export function ListingDetailPage() {
                               app.status === "approved"
                                 ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
                                 : app.status === "rejected"
-                                ? "bg-rose-950 text-rose-300 border border-rose-800"
-                                : "bg-amber-950 text-amber-300 border border-amber-800"
+                                  ? "bg-rose-950 text-rose-300 border border-rose-800"
+                                  : "bg-amber-950 text-amber-300 border border-amber-800"
                             }`}
                           >
                             {app.status}
                           </span>
                         </div>
-                        {app.email && <p className="text-xs text-slate-400 font-mono">{app.email}</p>}
-                        {app.phone && <p className="text-xs text-slate-400 font-mono">{app.phone}</p>}
+                        {app.email && (
+                          <p className="text-xs text-slate-400 font-mono">
+                            {app.email}
+                          </p>
+                        )}
+                        {app.phone && (
+                          <p className="text-xs text-slate-400 font-mono">
+                            {app.phone}
+                          </p>
+                        )}
                         <p className="text-[11px] text-slate-500 mt-1">
-                          Applied: {new Date(app.applied_at).toLocaleDateString()}
+                          Applied:{" "}
+                          {new Date(app.applied_at).toLocaleDateString()}
                         </p>
                       </div>
 
@@ -787,7 +981,9 @@ export function ListingDetailPage() {
                             </Link>
                             <button
                               type="button"
-                              onClick={() => handleRejectApplicant(app.tenant_id)}
+                              onClick={() =>
+                                handleRejectApplicant(app.tenant_id)
+                              }
                               className="bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
                             >
                               Reject
@@ -806,12 +1002,17 @@ export function ListingDetailPage() {
           <div className="order-8 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg text-amber-400">star</span>
+                <span className="material-symbols-outlined text-lg text-amber-400">
+                  star
+                </span>
                 <span>Tenant Reviews</span>
               </h2>
               {reviews.length > 0 && (
                 <span className="text-xs bg-slate-800 text-amber-300 px-2.5 py-1 rounded-full font-medium border border-slate-700">
-                  ★ {reviews[0]?.average_rating ? Number(reviews[0].average_rating).toFixed(1) : "N/A"}
+                  ★{" "}
+                  {reviews[0]?.average_rating
+                    ? Number(reviews[0].average_rating).toFixed(1)
+                    : "N/A"}
                 </span>
               )}
             </div>
@@ -823,7 +1024,10 @@ export function ListingDetailPage() {
             ) : (
               <div className="flex flex-col gap-3">
                 {reviews.map((rev, idx) => (
-                  <div key={idx} className="p-3.5 bg-[#090a0c] border border-slate-800/80 rounded-xl">
+                  <div
+                    key={idx}
+                    className="p-3.5 bg-[#090a0c] border border-slate-800/80 rounded-xl"
+                  >
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex text-amber-400 text-xs">
                         {"★".repeat(rev.rating)}
@@ -833,7 +1037,9 @@ export function ListingDetailPage() {
                         {new Date(rev.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">{rev.description}</p>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {rev.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -864,7 +1070,9 @@ export function ListingDetailPage() {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-mono text-slate-500">Ref #{listing.id}</span>
+              <span className="text-xs font-mono text-slate-500">
+                Ref #{listing.id}
+              </span>
             </div>
 
             {/* Title */}
@@ -873,38 +1081,58 @@ export function ListingDetailPage() {
             </h1>
 
             {/* Price Display */}
-            {listing.rent !== undefined && listing.rent !== null && listing.rent !== "" && !isNaN(Number(listing.rent)) && (
-              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800/90 mb-5">
-                <span className="block text-[11px] uppercase tracking-wider text-slate-400 mb-0.5">
-                  Monthly Rent
-                </span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-bold font-mono text-white">
-                    ৳{Number(listing.rent).toLocaleString()}
+            {listing.rent !== undefined &&
+              listing.rent !== null &&
+              listing.rent !== "" &&
+              !isNaN(Number(listing.rent)) && (
+                <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800/90 mb-5">
+                  <span className="block text-[11px] uppercase tracking-wider text-slate-400 mb-0.5">
+                    Monthly Rent
                   </span>
-                  <span className="text-xs text-slate-400 font-medium">/ month</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-bold font-mono text-white">
+                      ৳{Number(listing.rent).toLocaleString()}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      / month
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Key Property Specs */}
             <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-[#090a0c] border border-slate-800 text-center">
               <div className="p-2">
-                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Bedrooms</span>
-                <span className="text-base font-bold text-white">{listing.bedroom_count}</span>
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">
+                  Bedrooms
+                </span>
+                <span className="text-base font-bold text-white">
+                  {listing.bedroom_count}
+                </span>
               </div>
               <div className="p-2">
-                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Bathrooms</span>
-                <span className="text-base font-bold text-white">{listing.bathroom_count}</span>
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">
+                  Bathrooms
+                </span>
+                <span className="text-base font-bold text-white">
+                  {listing.bathroom_count}
+                </span>
               </div>
               <div className="p-2 border-t border-slate-800/80">
-                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Floor</span>
-                <span className="text-base font-bold text-white">{listing.on_which_floor}</span>
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">
+                  Floor
+                </span>
+                <span className="text-base font-bold text-white">
+                  {listing.on_which_floor}
+                </span>
               </div>
               <div className="p-2 border-t border-slate-800/80">
-                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">Coordinates</span>
+                <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">
+                  Coordinates
+                </span>
                 <span className="text-xs font-mono text-slate-300 block truncate">
-                  {Number(listing.latitude).toFixed(2)}, {Number(listing.longitude).toFixed(2)}
+                  {Number(listing.latitude).toFixed(2)},{" "}
+                  {Number(listing.longitude).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -912,9 +1140,33 @@ export function ListingDetailPage() {
 
           {/* 2. Actions Card (order-5 on mobile) */}
           <div className="order-5 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
-            {isOwner ? (
+            {user?.is_verifier ? (
               <div>
-                <h3 className="text-sm font-bold text-white mb-2">Owner Controls</h3>
+                <h3 className="text-sm font-bold text-white mb-2">
+                  Verifier Controls
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  Review this listing and confirm its authenticity.
+                </p>
+                {verifyError && (
+                  <div className="p-3 mb-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs">
+                    {verifyError}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleVerify}
+                  disabled={verifying}
+                  className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm"
+                >
+                  {verifying ? "Verifying..." : "Mark as Verified"}
+                </button>
+              </div>
+            ) : isOwner ? (
+              <div>
+                <h3 className="text-sm font-bold text-white mb-2">
+                  Owner Controls
+                </h3>
                 <p className="text-xs text-slate-400 mb-4">
                   Manage this listing or update information.
                 </p>
@@ -937,7 +1189,9 @@ export function ListingDetailPage() {
               </div>
             ) : (
               <div id="apply-section">
-                <h3 className="text-base font-bold text-white mb-1">Apply for this Apartment</h3>
+                <h3 className="text-base font-bold text-white mb-1">
+                  Apply for this Apartment
+                </h3>
                 <p className="text-xs text-slate-400 mb-5">
                   Submit your rental application directly to the owner.
                 </p>
@@ -983,7 +1237,9 @@ export function ListingDetailPage() {
                     </div>
 
                     <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                      You have already submitted an application for this apartment. The property owner will review your credentials and propose a lease agreement.
+                      You have already submitted an application for this
+                      apartment. The property owner will review your credentials
+                      and propose a lease agreement.
                     </p>
 
                     <div className="flex flex-col gap-2 pt-3 border-t border-slate-800 text-xs">
@@ -996,14 +1252,20 @@ export function ListingDetailPage() {
                       <div className="flex items-center justify-between text-slate-400">
                         <span>Applied On</span>
                         <span className="text-white font-medium">
-                          {existingApp?.appliedAt ? new Date(existingApp.appliedAt).toLocaleDateString() : "Recently"}
+                          {existingApp?.appliedAt
+                            ? new Date(
+                                existingApp.appliedAt,
+                              ).toLocaleDateString()
+                            : "Recently"}
                         </span>
                       </div>
                       {existingApp?.monthlyIncome && (
                         <div className="flex items-center justify-between text-slate-400">
                           <span>Reported Income</span>
                           <span className="text-slate-200 font-mono">
-                            ৳{Number(existingApp.monthlyIncome).toLocaleString()} / mo
+                            ৳
+                            {Number(existingApp.monthlyIncome).toLocaleString()}{" "}
+                            / mo
                           </span>
                         </div>
                       )}
@@ -1018,10 +1280,18 @@ export function ListingDetailPage() {
                     </div>
                   </div>
                 ) : showTenantForm ? (
-                  <form onSubmit={handleSubmitTenantForm} className="flex flex-col gap-4">
+                  <form
+                    onSubmit={handleSubmitTenantForm}
+                    className="flex flex-col gap-4"
+                  >
                     <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-200 text-xs flex items-start gap-2">
-                      <span className="material-symbols-outlined text-amber-400 text-base shrink-0 mt-0.5">info</span>
-                      <span>Please enter your tenant profile details to complete your application.</span>
+                      <span className="material-symbols-outlined text-amber-400 text-base shrink-0 mt-0.5">
+                        info
+                      </span>
+                      <span>
+                        Please enter your tenant profile details to complete
+                        your application.
+                      </span>
                     </div>
 
                     <div>
@@ -1075,7 +1345,9 @@ export function ListingDetailPage() {
                       ) : (
                         <>
                           <span>Submit Application</span>
-                          <span className="material-symbols-outlined text-base">arrow_forward</span>
+                          <span className="material-symbols-outlined text-base">
+                            arrow_forward
+                          </span>
                         </>
                       )}
                     </button>
@@ -1084,9 +1356,13 @@ export function ListingDetailPage() {
                   <div className="flex flex-col gap-4">
                     <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="material-symbols-outlined text-emerald-400 text-lg">verified</span>
+                        <span className="material-symbols-outlined text-emerald-400 text-lg">
+                          verified
+                        </span>
                         <span className="text-sm font-semibold text-white">
-                          {isTenant ? "Verified Tenant Profile" : "Rental Application"}
+                          {isTenant
+                            ? "Verified Tenant Profile"
+                            : "Rental Application"}
                         </span>
                       </div>
                       <p className="text-xs text-slate-400 leading-relaxed">
@@ -1098,7 +1374,11 @@ export function ListingDetailPage() {
 
                     <button
                       type="button"
-                      onClick={isTenant ? handleDirectApply : () => setShowTenantForm(true)}
+                      onClick={
+                        isTenant
+                          ? handleDirectApply
+                          : () => setShowTenantForm(true)
+                      }
                       disabled={applying}
                       className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm flex items-center justify-center gap-2 shadow-sm"
                     >
@@ -1110,7 +1390,9 @@ export function ListingDetailPage() {
                       ) : (
                         <>
                           <span>Apply for this Apartment</span>
-                          <span className="material-symbols-outlined text-base">arrow_forward</span>
+                          <span className="material-symbols-outlined text-base">
+                            arrow_forward
+                          </span>
                         </>
                       )}
                     </button>
@@ -1127,9 +1409,13 @@ export function ListingDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
           <div className="bg-[#12151c] border border-slate-700 rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl">
             <div className="w-14 h-14 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-4">
-              <span className="material-symbols-outlined text-3xl">check_circle</span>
+              <span className="material-symbols-outlined text-3xl">
+                check_circle
+              </span>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Applied Successfully</h3>
+            <h3 className="text-xl font-bold text-white mb-2">
+              Applied Successfully
+            </h3>
             <p className="text-xs text-slate-400 mb-6 leading-relaxed">
               Your rental application has been submitted to the property owner.
             </p>
@@ -1172,8 +1458,18 @@ export function ListingDetailPage() {
               className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
               aria-label="Close fullscreen gallery"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -1189,13 +1485,26 @@ export function ListingDetailPage() {
                 alt={`${listing.title} photo ${selectedPhotoIndex + 1}`}
                 className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
                 onError={() =>
-                  setFailedImages((prev) => ({ ...prev, [selectedPhotoIndex]: true }))
+                  setFailedImages((prev) => ({
+                    ...prev,
+                    [selectedPhotoIndex]: true,
+                  }))
                 }
               />
             ) : (
               <div className="flex flex-col items-center justify-center text-slate-400 p-8 rounded-xl bg-slate-900/60 border border-slate-800">
-                <svg className="w-12 h-12 mb-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="w-12 h-12 mb-2 text-slate-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
                 <p className="text-sm font-medium">Image unavailable</p>
               </div>
@@ -1209,8 +1518,18 @@ export function ListingDetailPage() {
                   className="absolute left-2 sm:left-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
                   aria-label="Previous image"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
                 </button>
 
@@ -1220,8 +1539,18 @@ export function ListingDetailPage() {
                   className="absolute right-2 sm:right-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
                   aria-label="Next image"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
               </>
@@ -1239,10 +1568,11 @@ export function ListingDetailPage() {
                   key={photo.id || idx}
                   type="button"
                   onClick={() => setSelectedPhotoIndex(idx)}
-                  className={`w-14 sm:w-16 aspect-[4/3] rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${idx === selectedPhotoIndex
+                  className={`w-14 sm:w-16 aspect-[4/3] rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${
+                    idx === selectedPhotoIndex
                       ? "ring-2 ring-white border-white scale-105 opacity-100"
                       : "border-white/20 opacity-50 hover:opacity-100"
-                    }`}
+                  }`}
                 >
                   <img
                     src={photo.url}

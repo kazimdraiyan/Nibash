@@ -213,3 +213,23 @@ export async function deleteListing(id: string, ownerId: number) {
     id,
   ]);
 }
+
+export async function getUnverifiedListings() {
+  const result = await pool.query(
+    `SELECT l.*, t.rent FROM listings l
+     JOIN initial_terms it ON it.listing_id = l.id
+     JOIN terms t ON t.id = it.terms_id
+     WHERE l.status='waiting'
+     ORDER BY l.id DESC`
+  );
+  return attachMediaToListingResults(result.rows); // reuse the helper from the earlier images work — drop this call if you haven't added it yet
+}
+
+export async function verifyListing(id: string) {
+  const result = await pool.query(
+    "UPDATE listings SET status='approved' WHERE id=$1 AND status='waiting' RETURNING id",
+    [id]
+  );
+  if (result.rows.length === 0) throw new AppError(404, "listing not found or already processed");
+  return result.rows[0];
+}

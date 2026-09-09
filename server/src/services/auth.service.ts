@@ -5,7 +5,9 @@ import { AppError } from "../errors/AppError.js";
 
 export async function getUserById(userId: number): Promise<{ id: number; name: string; email: string; nid: string; phone: string }> {
   const find = await pool.query(
-    "SELECT id,name,email,nid,phone FROM users WHERE id=$1",
+    `SELECT u.id, u.name, u.email, u.nid, u.phone,
+            EXISTS(SELECT 1 FROM verifiers v WHERE v.user_id = u.id) AS is_verifier
+     FROM users u WHERE u.id = $1`,
     [userId],
   );
   if (find.rows.length === 0) throw new AppError(404, "user not found");

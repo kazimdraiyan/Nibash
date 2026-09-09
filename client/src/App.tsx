@@ -20,6 +20,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ActualListings } from "./components/ActualListings";
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { VerifyPortalPage } from "./pages/VerifyPortalPage";
+import { Navigate } from "react-router-dom";
 
 function HomePage() {
   return (
@@ -41,7 +43,7 @@ function HomePage() {
 }
 
 export default function App() {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -50,6 +52,22 @@ export default function App() {
         <span className="text-xs uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm">
           Loading Nibash Apartments...
         </span>
+      </div>
+    );
+  }
+
+
+  if (user?.is_verifier) {
+    return (
+      <div className="antialiased min-h-screen flex flex-col bg-[#090a0c] text-[#f8f9fa]">
+        <ScrollToTop />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/verify" element={<VerifyPortalPage />} />
+            <Route path="/listings/:id" element={<ListingDetailPage />} />
+            <Route path="*" element={<Navigate to="/verify" replace />} />
+          </Routes>
+        </main>
       </div>
     );
   }
@@ -64,6 +82,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify" element={<VerifyPortalPage />} />
           <Route path="/listings" element={<ListingsPage />} />
           <Route
             path="/my-listings"
