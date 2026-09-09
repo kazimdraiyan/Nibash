@@ -26,3 +26,6 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Graphify
+graphify-out/cache/
