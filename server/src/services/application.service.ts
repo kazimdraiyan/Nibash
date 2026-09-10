@@ -37,7 +37,14 @@ export async function getAllApplications(ownerId: number) {
     throw new AppError(404, "you dont have any listings");
 
   const result = await pool.query(
-    "SELECT * FROM applies a JOIN listings l ON a.listing_id=l.id WHERE l.owner_id=$1",
+    `SELECT a.tenant_id, a.listing_id, a.applied_at, a.status,
+       u.name, u.email, u.phone,
+       tn.monthly_income, tn.emergency_contact
+    FROM applies a
+    JOIN listings l ON a.listing_id = l.id
+    JOIN users u ON u.id = a.tenant_id
+    LEFT JOIN tenants tn ON tn.user_id = a.tenant_id
+    WHERE l.owner_id = $1`,
     [ownerId],
   );
   return result.rows;
@@ -61,7 +68,14 @@ export async function getApplicationsForListing(
     throw new AppError(403, "not authorized");
 
   const result = await pool.query(
-    "SELECT * FROM applies a JOIN listings l ON a.listing_id=l.id WHERE l.owner_id=$1 AND l.id=$2",
+    `SELECT a.tenant_id, a.listing_id, a.applied_at, a.status,
+       u.name, u.email, u.phone,
+       tn.monthly_income, tn.emergency_contact
+FROM applies a
+JOIN listings l ON a.listing_id = l.id
+JOIN users u ON u.id = a.tenant_id
+LEFT JOIN tenants tn ON tn.user_id = a.tenant_id
+WHERE l.owner_id = $1 AND l.id = $2`,
     [ownerId, listingId],
   );
   return result.rows;
@@ -105,6 +119,8 @@ export async function getMyApplications(tenantId: number) {
        a.listing_id,
        a.applied_at,
        a.status,
+       c.id AS contract_id,
+       c.status AS contract_status,
        l.title,
        l.description,
        l.bedroom_count,
@@ -113,19 +129,26 @@ export async function getMyApplications(tenantId: number) {
        l.area_id,
        l.owner_id,
        l.status AS listing_status,
-       t.rent,
-       t.electricity_bill,
-       t.water_bill,
-       t.service_charge,
-       t.monthly_due_date,
-       t.pet_allowed,
-       t.security_deposit,
+       COALESCE(ct.rent, t.rent) AS rent,
+       COALESCE(ct.electricity_bill, t.electricity_bill) AS electricity_bill,
+       COALESCE(ct.water_bill, t.water_bill) AS water_bill,
+       COALESCE(ct.service_charge, t.service_charge) AS service_charge,
+       COALESCE(ct.monthly_due_date, t.monthly_due_date) AS monthly_due_date,
+       COALESCE(ct.pet_allowed, t.pet_allowed) AS pet_allowed,
+       COALESCE(ct.security_deposit, t.security_deposit) AS security_deposit,
        tn.monthly_income,
        tn.emergency_contact
      FROM applies a
      JOIN listings l ON a.listing_id = l.id
      LEFT JOIN initial_terms it ON it.listing_id = l.id
      LEFT JOIN terms t ON t.id = it.terms_id
+     LEFT JOIN contracts c ON c.id = (
+       SELECT c2.id FROM contracts c2
+       WHERE c2.listing_id = a.listing_id AND c2.tenant_id = a.tenant_id
+       ORDER BY c2.id DESC LIMIT 1
+     )
+     LEFT JOIN agreements ca ON ca.terms_id = c.agreement_id
+     LEFT JOIN terms ct ON ct.id = ca.terms_id
      LEFT JOIN tenants tn ON tn.user_id = a.tenant_id
      WHERE a.tenant_id = $1
      ORDER BY a.applied_at DESC`,
@@ -133,4 +156,3 @@ export async function getMyApplications(tenantId: number) {
   );
   return result.rows;
 }
-

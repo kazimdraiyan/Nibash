@@ -25,6 +25,8 @@ interface Application {
   name?: string;
   email?: string;
   phone?: string;
+  monthly_income?: number | string | null;
+  emergency_contact?: string | null;
 }
 
 interface OwnerInfo {
@@ -68,11 +70,38 @@ export function ListingDetailPage() {
     if (!user) return false;
     return localStorage.getItem(`nibash_tenant_${user.id}`) === "true";
   });
+  const [myApplication, setMyApplication] = useState<{
+    status: string;
+    applied_at: string;
+    contract_id?: number | null;
+    contract_status?: string | null;
+    monthly_income?: number | string | null;
+    emergency_contact?: string | null;
+  } | null>(null);
   const [appliedRefresh, setAppliedRefresh] = useState(0);
   const isApplied = Boolean(
-    user && id && (hasUserApplied(user.id, id) || appliedRefresh > 0),
+    user && id && (myApplication || hasUserApplied(user.id, id) || appliedRefresh > 0),
   );
   const existingApp = user && id ? getUserApplication(user.id, id) : null;
+  const effectiveApp = myApplication
+    ? {
+        status: myApplication.status,
+        appliedAt: myApplication.applied_at,
+        monthlyIncome: myApplication.monthly_income,
+        emergencyContact: myApplication.emergency_contact,
+        contractId: myApplication.contract_id,
+        contractStatus: myApplication.contract_status,
+      }
+    : existingApp
+      ? {
+          status: existingApp.status,
+          appliedAt: existingApp.appliedAt,
+          monthlyIncome: existingApp.monthlyIncome,
+          emergencyContact: existingApp.emergencyContact,
+          contractId: null as number | null,
+          contractStatus: null as string | null,
+        }
+      : null;
 
   const [showTenantForm, setShowTenantForm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -81,6 +110,7 @@ export function ListingDetailPage() {
   const [applyContact, setApplyContact] = useState("");
   const [applySuccess, setApplySuccess] = useState<string | null>(null);
   const [applyError, setApplyError] = useState<string | null>(null);
+  const [rejectingTenantId, setRejectingTenantId] = useState<number | null>(null);
 
   // Delete state
   const [deleting, setDeleting] = useState(false);
@@ -204,6 +234,33 @@ export function ListingDetailPage() {
           setApplications(appsRes.applications || []);
         } catch {
           setApplications([]);
+        }
+      }
+
+      // 4. If current logged-in user is a prospective tenant, fetch their live application status
+      if (user && listingRes.listing.owner_id !== user.id) {
+        try {
+          const myAppsRes = await apiClient.get<{ applications: any[] }>(
+            "/applications/my",
+          );
+          const matched = myAppsRes.applications?.find(
+            (a: any) => String(a.listing_id) === String(id),
+          );
+          if (matched) {
+            setMyApplication(matched);
+            saveUserApplication(user.id, {
+              listingId: id,
+              listingTitle: listingRes.listing.title || `Apartment #${id}`,
+              appliedAt: matched.applied_at,
+              status: matched.status,
+              monthlyIncome: matched.monthly_income,
+              emergencyContact: matched.emergency_contact,
+            });
+          } else {
+            setMyApplication(null);
+          }
+        } catch {
+          // Fallback gracefully
         }
       }
     } catch (err: any) {
@@ -377,7 +434,9 @@ export function ListingDetailPage() {
   };
 
   const handleRejectApplicant = async (tenantId: number) => {
-    if (!id || !user) return;
+    if (!id || !user || rejectingTenantId !== null) return;
+    if (!window.confirm("Are you sure you want to reject this applicant?")) return;
+    setRejectingTenantId(tenantId);
     try {
       await apiClient.put(`/applications/${id}/${tenantId}`, {
         status: "rejected",
@@ -389,6 +448,8 @@ export function ListingDetailPage() {
       );
     } catch (err: any) {
       alert(err.message || "Failed to reject applicant.");
+    } finally {
+      setRejectingTenantId(null);
     }
   };
 
@@ -935,12 +996,15 @@ export function ListingDetailPage() {
                   {applications.map((app) => (
                     <div
                       key={app.tenant_id}
-                      className="p-4 rounded-xl bg-[#090a0c] border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      className="p-5 rounded-xl bg-[#090a0c] border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-5"
                     >
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-white text-sm">
+                      <div className="space-y-2.5 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold text-white text-base">
                             {app.name || `Tenant #${app.tenant_id}`}
+                          </span>
+                          <span className="text-xs text-slate-500 font-mono">
+                            (ID: #{app.tenant_id})
                           </span>
                           <span
                             className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded ${
@@ -954,39 +1018,58 @@ export function ListingDetailPage() {
                             {app.status}
                           </span>
                         </div>
-                        {app.email && (
-                          <p className="text-xs text-slate-400 font-mono">
-                            {app.email}
-                          </p>
-                        )}
-                        {app.phone && (
-                          <p className="text-xs text-slate-400 font-mono">
-                            {app.phone}
-                          </p>
-                        )}
-                        <p className="text-[11px] text-slate-500 mt-1">
-                          Applied:{" "}
-                          {new Date(app.applied_at).toLocaleDateString()}
+
+                        {/* Tenant Details Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                          {app.email && (
+                            <div className="flex items-center gap-1.5 text-slate-400">
+                              <span className="material-symbols-outlined text-xs text-slate-500">mail</span>
+                              <span className="font-mono text-slate-300">{app.email}</span>
+                            </div>
+                          )}
+                          {app.phone && (
+                            <div className="flex items-center gap-1.5 text-slate-400">
+                              <span className="material-symbols-outlined text-xs text-slate-500">call</span>
+                              <span className="font-mono text-slate-300">{app.phone}</span>
+                            </div>
+                          )}
+                          {app.monthly_income !== undefined && app.monthly_income !== null && app.monthly_income !== "" && !isNaN(Number(app.monthly_income)) && (
+                            <div className="flex items-center gap-1.5 text-slate-400">
+                              <span className="material-symbols-outlined text-xs text-slate-500">payments</span>
+                              <span>Monthly Income: <strong className="text-slate-200 font-mono">৳{Number(app.monthly_income).toLocaleString()}</strong></span>
+                            </div>
+                          )}
+                          {app.emergency_contact && (
+                            <div className="flex items-center gap-1.5 text-slate-400">
+                              <span className="material-symbols-outlined text-xs text-slate-500">contact_phone</span>
+                              <span>Emergency Contact: <strong className="text-slate-200 font-mono">{app.emergency_contact}</strong></span>
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="text-[11px] text-slate-500">
+                          Applied: {new Date(app.applied_at).toLocaleDateString()}
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 self-end sm:self-center">
+                      <div className="flex items-center gap-2.5 self-start md:self-center shrink-0">
                         {app.status === "pending" && (
                           <>
                             <Link
                               to={`/contracts/new?listingId=${id}&tenantId=${app.tenant_id}`}
-                              className="bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold px-3 py-1.5 rounded-lg text-xs transition"
+                              className="bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold px-3.5 py-1.5 rounded-lg text-xs transition"
                             >
                               Propose Contract
                             </Link>
                             <button
                               type="button"
+                              disabled={rejectingTenantId === app.tenant_id}
                               onClick={() =>
                                 handleRejectApplicant(app.tenant_id)
                               }
-                              className="bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
+                              className="bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 px-3.5 py-1.5 rounded-lg text-xs transition cursor-pointer disabled:opacity-50"
                             >
-                              Reject
+                              {rejectingTenantId === app.tenant_id ? "Rejecting..." : "Reject"}
                             </button>
                           </>
                         )}
@@ -1221,59 +1304,138 @@ export function ListingDetailPage() {
                     </Link>
                   </div>
                 ) : isApplied ? (
-                  <div className="p-4 rounded-xl bg-[#090a0c] border border-emerald-800/60 shadow-lg">
+                  <div className={`p-4 rounded-xl bg-[#090a0c] border shadow-lg ${
+                    effectiveApp?.contractStatus === "proposed"
+                      ? "border-[#d4b068]/70"
+                      : effectiveApp?.contractStatus === "signed" || effectiveApp?.status === "approved"
+                      ? "border-emerald-800/60"
+                      : effectiveApp?.status === "rejected"
+                      ? "border-rose-800/60"
+                      : "border-slate-800"
+                  }`}>
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-emerald-400 text-xl">
-                          check_circle
+                        <span className={`material-symbols-outlined text-xl ${
+                          effectiveApp?.contractStatus === "proposed"
+                            ? "text-[#d4b068]"
+                            : effectiveApp?.contractStatus === "signed" || effectiveApp?.status === "approved"
+                            ? "text-emerald-400"
+                            : effectiveApp?.status === "rejected"
+                            ? "text-rose-400"
+                            : "text-amber-400"
+                        }`}>
+                          {effectiveApp?.contractStatus === "proposed"
+                            ? "edit_document"
+                            : effectiveApp?.contractStatus === "signed" || effectiveApp?.status === "approved"
+                            ? "check_circle"
+                            : effectiveApp?.status === "rejected"
+                            ? "cancel"
+                            : "schedule"}
                         </span>
                         <span className="text-sm font-bold text-white">
-                          Application Submitted
+                          {effectiveApp?.contractStatus === "proposed"
+                            ? "Contract Proposed!"
+                            : effectiveApp?.contractStatus === "signed"
+                            ? "Lease Agreement Active"
+                            : effectiveApp?.status === "approved"
+                            ? "Application Approved"
+                            : effectiveApp?.status === "rejected"
+                            ? "Application Declined"
+                            : "Application Submitted"}
                         </span>
                       </div>
-                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
-                        {existingApp?.status || "Pending Review"}
+                      <span className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded ${
+                        effectiveApp?.contractStatus === "proposed"
+                          ? "bg-amber-950 text-amber-300 border border-amber-800"
+                          : effectiveApp?.contractStatus === "signed" || effectiveApp?.status === "approved"
+                          ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                          : effectiveApp?.status === "rejected"
+                          ? "bg-rose-950 text-rose-300 border border-rose-800"
+                          : "bg-slate-800 text-slate-300 border border-slate-700"
+                      }`}>
+                        {effectiveApp?.contractStatus === "proposed"
+                          ? "Action Required"
+                          : effectiveApp?.contractStatus === "signed"
+                          ? "Signed"
+                          : effectiveApp?.status || "Pending"}
                       </span>
                     </div>
 
                     <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                      You have already submitted an application for this
-                      apartment. The property owner will review your credentials
-                      and propose a lease agreement.
+                      {effectiveApp?.contractStatus === "proposed"
+                        ? "Great news! The property owner has reviewed your application and proposed a lease agreement. Please review the terms and sign the digital contract."
+                        : effectiveApp?.contractStatus === "signed"
+                        ? "You have signed the lease contract for this apartment. Your tenancy agreement is active."
+                        : effectiveApp?.status === "approved"
+                        ? "Your application has been approved by the landlord. A lease agreement is being prepared."
+                        : effectiveApp?.status === "rejected"
+                        ? "The property owner was unable to accept your application for this apartment."
+                        : "You have submitted an application for this apartment. The property owner will review your credentials and propose a lease agreement."}
                     </p>
+
+                    {/* Direct Contract Action Button */}
+                    {effectiveApp?.contractId && effectiveApp?.contractStatus === "proposed" && (
+                      <Link
+                        to={`/contracts/${effectiveApp.contractId}`}
+                        className="mb-4 w-full bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold py-2.5 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-sm">draw</span>
+                        <span>Review & Sign Lease Contract</span>
+                      </Link>
+                    )}
+
+                    {effectiveApp?.contractId && effectiveApp?.contractStatus === "signed" && (
+                      <Link
+                        to={`/contracts/${effectiveApp.contractId}`}
+                        className="mb-4 w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-1.5"
+                      >
+                        <span>View Signed Contract</span>
+                        <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                      </Link>
+                    )}
 
                     <div className="flex flex-col gap-2 pt-3 border-t border-slate-800 text-xs">
                       <div className="flex items-center justify-between text-slate-400">
                         <span>Application Status</span>
-                        <span className="text-emerald-400 font-semibold uppercase font-mono text-[11px]">
-                          {existingApp?.status || "Applied (Pending)"}
+                        <span className="text-white font-semibold uppercase font-mono text-[11px]">
+                          {effectiveApp?.status || "Pending"}
                         </span>
                       </div>
+                      {effectiveApp?.contractStatus && (
+                        <div className="flex items-center justify-between text-slate-400">
+                          <span>Contract Status</span>
+                          <span className={`font-semibold uppercase font-mono text-[11px] ${
+                            effectiveApp.contractStatus === "signed" ? "text-emerald-400" : "text-[#d4b068]"
+                          }`}>
+                            {effectiveApp.contractStatus === "signed" ? "Signed" : "Proposed (Pending Signature)"}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between text-slate-400">
                         <span>Applied On</span>
                         <span className="text-white font-medium">
-                          {existingApp?.appliedAt
+                          {effectiveApp?.appliedAt
                             ? new Date(
-                                existingApp.appliedAt,
+                                effectiveApp.appliedAt,
                               ).toLocaleDateString()
                             : "Recently"}
                         </span>
                       </div>
-                      {existingApp?.monthlyIncome && (
+                      {effectiveApp?.monthlyIncome && (
                         <div className="flex items-center justify-between text-slate-400">
                           <span>Reported Income</span>
                           <span className="text-slate-200 font-mono">
                             ৳
-                            {Number(existingApp.monthlyIncome).toLocaleString()}{" "}
+                            {Number(effectiveApp.monthlyIncome).toLocaleString()}{" "}
                             / mo
                           </span>
                         </div>
                       )}
-                      {existingApp?.emergencyContact && (
+                      {effectiveApp?.emergencyContact && (
                         <div className="flex items-center justify-between text-slate-400">
                           <span>Emergency Contact</span>
                           <span className="text-slate-200 font-mono">
-                            {existingApp.emergencyContact}
+                            {effectiveApp.emergencyContact}
                           </span>
                         </div>
                       )}
