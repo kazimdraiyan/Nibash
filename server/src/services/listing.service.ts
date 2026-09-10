@@ -205,13 +205,50 @@ export async function updateListing(
 }
 
 export async function deleteListing(id: string, ownerId: number) {
-  const listing = await pool.query("SELECT * FROM listings WHERE id=$1", [id]);
-  if (listing.rows.length === 0) throw new AppError(404, "listing not found");
-  if (listing.rows[0].owner_id !== ownerId)
-    throw new AppError(403, "not authorized");
-  await pool.query("UPDATE listings SET status='unavailable' WHERE id=$1", [
-    id,
-  ]);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const listing = await client.query(
+      "SELECT * FROM listings WHERE id=$1 FOR UPDATE",
+      [id],
+    );
+    if (listing.rows.length === 0) {
+      throw new AppError(404, "listing not found");
+    }
+    if (listing.rows[0].owner_id !== ownerId) {
+      throw new AppError(403, "not authorized");
+    }
+
+    if (listing.rows[0].status === "occupied") {
+      throw new AppError(
+        409,
+        "Cannot delete listing: this property is currently occupied.",
+      );
+    }
+
+    const activeContract = await client.query(
+      "SELECT 1 FROM contracts WHERE listing_id=$1 AND status IN ('signed', 'proposed')",
+      [id],
+    );
+    if (activeContract.rows.length > 0) {
+      throw new AppError(
+        409,
+        "Cannot delete listing: an active or proposed lease contract exists.",
+      );
+    }
+
+    await client.query(
+      "UPDATE listings SET status='unavailable' WHERE id=$1",
+      [id],
+    );
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function getUnverifiedListings() {

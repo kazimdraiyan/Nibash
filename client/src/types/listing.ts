@@ -6,6 +6,8 @@ export interface ListingImage {
 export interface Listing {
   id: string | number;
   title?: string;
+  imageUrl?: string;
+  imageAlt?: string;
   images?: ListingImage[];
   beds: number;
   baths: number;

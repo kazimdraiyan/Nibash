@@ -483,6 +483,7 @@ export function ListingDetailPage() {
     } catch (err: any) {
       alert(err.message || "Failed to delete listing.");
       setDeleting(false);
+      fetchDetails();
     }
   };
 
@@ -1260,14 +1261,16 @@ export function ListingDetailPage() {
                   >
                     Edit Listing Details
                   </Link>
-                  <button
-                    type="button"
-                    onClick={handleDeleteListing}
-                    disabled={deleting}
-                    className="w-full bg-red-950/60 hover:bg-red-900 border border-red-800 text-red-200 py-2.5 px-4 rounded-xl text-xs transition cursor-pointer disabled:opacity-50"
-                  >
-                    {deleting ? "Deleting..." : "Delete Listing"}
-                  </button>
+                  {listing.status !== "occupied" && (
+                    <button
+                      type="button"
+                      onClick={handleDeleteListing}
+                      disabled={deleting}
+                      className="w-full bg-red-950/60 hover:bg-red-900 border border-red-800 text-red-200 py-2.5 px-4 rounded-xl text-xs transition cursor-pointer disabled:opacity-50"
+                    >
+                      {deleting ? "Deleting..." : "Delete Listing"}
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
