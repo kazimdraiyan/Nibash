@@ -10,6 +10,10 @@ cron.schedule("0 0 * * *", async () => {
       "UPDATE contracts SET status='completed' WHERE end_date < NOW() AND status='signed' RETURNING id",
     ); // TODO: send email notification to tenant and owner for each completed contract
     console.log(`Updated ${result.rowCount} contracts to completed`);
+
+    await pool.query(
+      "DELETE FROM revoked_tokens WHERE expires_at < NOW()",
+    );
   } catch (err) {
     console.log(err);
   }

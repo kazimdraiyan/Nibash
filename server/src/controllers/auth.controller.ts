@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import {
   registerSchema,
   loginSchema,
@@ -66,4 +67,22 @@ export async function becomeTenant(req: Request, res: Response) {
     emergency_contact,
   );
   res.json({ message: "successfully became a tenant" });
+}
+
+export async function logout(req: Request, res: Response) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const token = authHeader.split(" ")[1];
+  const decoded = jwt.decode(token);
+  if (!decoded || typeof decoded === "string" || !decoded.exp) {
+    // jwt.deocde returns string/ jwtPAYLOAD/NULL, the typeof guard hanlde the case where the  token isnt an object and the !decoded.exp guard handles the case where the token is an object but doesnt have an exp property
+    res.status(400).json({ error: "invalid token" });
+    return;
+  }
+  const expiresAt = new Date(decoded.exp * 1000);
+  await authService.revokeToken(token, expiresAt);
+  res.json({ message: "logged out successfully" });
 }

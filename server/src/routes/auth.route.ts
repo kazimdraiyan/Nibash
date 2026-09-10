@@ -1,4 +1,4 @@
-import { Router } from "express";  
+import { Router } from "express";
 import authMiddleware from "../middleware/auth.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import * as authController from "../controllers/auth.controller.js";
@@ -18,5 +18,6 @@ router.post(
   authMiddleware,
   asyncHandler(authController.becomeTenant),
 );
+router.post("/logout", authMiddleware, asyncHandler(authController.logout));
 
 export default router;

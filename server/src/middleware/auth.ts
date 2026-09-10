@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { isTokenRevoked } from "../services/auth.service.js";
 
-const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  // asynch because now it needs a db call
   // when frontend calls a protected route, it sends the jwt in a header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -18,6 +24,13 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       id: number;
       email: string;
     }; // decoding the token
+
+    const revoked = await isTokenRevoked(token);
+    if (revoked) {
+      res.status(401).json({ error: "token has been revoked" });
+      return;
+    }
+
     req.user = isValid; // attaching the decoded value with  the request
     // only possible because we opened express Request interface and added a new optional property to it
     next(); // passing the decoded value to the whatever route handler comes after this middleware
@@ -27,11 +40,14 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-
-export const optionalAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const optionalAuthMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    next();  // no token — just continue, req.user stays undefined
+    next(); // no token — just continue, req.user stays undefined
     return;
   }
   const token = authHeader.split(" ")[1];

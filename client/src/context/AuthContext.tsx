@@ -5,6 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { apiClient } from "../api/client";
 
 export interface User {
   email: string;
@@ -21,7 +22,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   login: (token: string, initialUserData?: User) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -109,7 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiClient.post("/auth/logout");
+    } catch {
+      // still clear local authentication state
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);

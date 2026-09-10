@@ -3,7 +3,15 @@ import jwt from "jsonwebtoken";
 import { pool } from "../db/pool.js";
 import { AppError } from "../errors/AppError.js";
 
-export async function getUserById(userId: number): Promise<{ id: number; name: string; email: string; nid: string; phone: string }> {
+export async function getUserById(
+  userId: number,
+): Promise<{
+  id: number;
+  name: string;
+  email: string;
+  nid: string;
+  phone: string;
+}> {
   const find = await pool.query(
     `SELECT u.id, u.name, u.email, u.nid, u.phone,
             EXISTS(SELECT 1 FROM verifiers v WHERE v.user_id = u.id) AS is_verifier
@@ -83,4 +91,22 @@ export async function becomeTenant(
     "INSERT INTO tenants (user_id,monthly_income,emergency_contact) VALUES ($1,$2,$3)",
     [userId, monthly_income, emergency_contact],
   );
+}
+
+export async function revokeToken(
+  token: string,
+  expiresAt: Date,
+): Promise<void> {
+  await pool.query(
+    "INSERT INTO revoked_tokens (token, expires_at) VALUES ($1, $2)",
+    [token, expiresAt],
+  );
+}
+
+export async function isTokenRevoked(token: string): Promise<boolean> {
+  const result = await pool.query(
+    "SELECT 1 FROM revoked_tokens WHERE token = $1",
+    [token],
+  );
+  return result.rows.length > 0;
 }
