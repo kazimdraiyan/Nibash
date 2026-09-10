@@ -14,10 +14,10 @@ router.get(
   asyncHandler(applicationController.getForListing),
 );
 router.put(
+  // rejects an application , the accept is in contract creation route
   "/:listingId/:tenantId",
   authMiddleware,
   asyncHandler(applicationController.reject),
 );
-
 
 export default router;
