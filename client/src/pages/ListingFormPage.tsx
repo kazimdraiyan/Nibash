@@ -4,6 +4,7 @@ import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { DHAKA_AREAS } from "../utils/areaLookup";
 import { uploadListingImages } from "../api/uploadImages";
+import { LocationPicker } from "../components/LocationPicker";
 
 export function ListingFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,7 +23,9 @@ export function ListingFormPage() {
   const [onWhichFloor, setOnWhichFloor] = useState("4");
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [existingImages, setExistingImages] = useState<{ id: number; url: string }[]>([]);
+  const [existingImages, setExistingImages] = useState<
+    { id: number; url: string }[]
+  >([]);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,7 +68,9 @@ export function ListingFormPage() {
     if (!incoming) return;
     const fileArray = Array.from(incoming);
     const validFiles = fileArray.filter((file) =>
-      ["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)
+      ["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
+        file.type,
+      ),
     );
 
     if (validFiles.length === 0) return;
@@ -327,39 +332,36 @@ export function ListingFormPage() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label
-                      htmlFor="listing-lat"
-                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                    >
-                      Latitude
-                    </label>
-                    <input
-                      id="listing-lat"
-                      type="number"
-                      step="0.0001"
-                      value={latitude}
-                      onChange={(e) => setLatitude(parseFloat(e.target.value))}
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="listing-lng"
-                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                    >
-                      Longitude
-                    </label>
-                    <input
-                      id="listing-lng"
-                      type="number"
-                      step="0.0001"
-                      value={longitude}
-                      onChange={(e) => setLongitude(parseFloat(e.target.value))}
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                    />
-                  </div>
+                <div>
+                  <label
+                    htmlFor="listing-title"
+                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                  >
+                    Listing Title *
+                  </label>
+                  <input
+                    id="listing-title"
+                    type="text"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g. The Imperial Apartment, Road 79"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs uppercase font-medium text-slate-300 mb-1">
+                    Location *
+                  </label>
+                  <LocationPicker
+                    latitude={latitude}
+                    longitude={longitude}
+                    onChange={(lat, lng) => {
+                      setLatitude(lat);
+                      setLongitude(lng);
+                    }}
+                  />
                 </div>
               </div>
 
@@ -686,7 +688,11 @@ export function ListingFormPage() {
                       >
                         <img
                           src={url}
-                          alt={file?.name ? `Preview ${file.name}` : `Preview ${i + 1}`}
+                          alt={
+                            file?.name
+                              ? `Preview ${file.name}`
+                              : `Preview ${i + 1}`
+                          }
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
 
@@ -729,7 +735,9 @@ export function ListingFormPage() {
                         {/* Bottom file metadata */}
                         {file && (
                           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-2 text-[10px] text-slate-300 flex items-center justify-between pointer-events-none font-mono">
-                            <span className="truncate max-w-[70%]">{file.name}</span>
+                            <span className="truncate max-w-[70%]">
+                              {file.name}
+                            </span>
                             <span className="text-slate-400 ml-1 shrink-0">
                               {(file.size / (1024 * 1024)).toFixed(1)} MB
                             </span>
@@ -774,7 +782,8 @@ export function ListingFormPage() {
             <p className="mt-3 text-[11px] text-slate-400 leading-relaxed flex items-center gap-1.5">
               <span className="text-amber-400">💡</span>
               <span>
-                Tip: Clean, well-lit photos of the interior and view make your listing stand out to prospective tenants.
+                Tip: Clean, well-lit photos of the interior and view make your
+                listing stand out to prospective tenants.
               </span>
             </p>
           </div>
