@@ -306,51 +306,31 @@ export function ListingFormPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="listing-area"
-                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                  >
-                    Neighborhood / Area *
-                  </label>
-                  <select
-                    id="listing-area"
-                    value={areaId}
-                    onChange={(e) => handleAreaChange(Number(e.target.value))}
-                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                  >
-                    {DHAKA_AREAS.map((area) => (
-                      <option
-                        key={area.id}
-                        value={area.id}
-                        className="bg-[#12151c] text-white"
-                      >
-                        {area.name} (Area #{area.id})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label
+                  htmlFor="listing-area"
+                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                >
+                  Neighborhood / Area *
+                </label>
+                <select
+                  id="listing-area"
+                  value={areaId}
+                  onChange={(e) => handleAreaChange(Number(e.target.value))}
+                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
+                >
+                  {DHAKA_AREAS.map((area) => (
+                    <option
+                      key={area.id}
+                      value={area.id}
+                      className="bg-[#12151c] text-white"
+                    >
+                      {area.name} (Area #{area.id})
+                    </option>
+                  ))}
+                </select>
 
-                <div>
-                  <label
-                    htmlFor="listing-title"
-                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                  >
-                    Listing Title *
-                  </label>
-                  <input
-                    id="listing-title"
-                    type="text"
-                    required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. The Imperial Apartment, Road 79"
-                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 mt-6">
                   <label className="block text-xs uppercase font-medium text-slate-300 mb-1">
                     Location *
                   </label>
