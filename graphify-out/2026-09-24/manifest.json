@@ -330,9 +330,9 @@
     "semantic_hash": "befd887d48c16aaed7bf6cf0cc0c3f5f"
   },
   "client/src/components/Hero.tsx": {
-    "mtime": 1790237580.9547422,
-    "seen": 1790237644.874538,
-    "ast_hash": "3a67294e28c023e88cca76cdb8786030",
+    "mtime": 1790237154.2321477,
+    "seen": 1790237245.868607,
+    "ast_hash": "5c2463ab08dbf185eb228917cccb7563",
     "semantic_hash": ""
   },
   "client/src/components/HowItWorks.tsx": {
@@ -444,9 +444,9 @@
     "semantic_hash": ""
   },
   "client/src/pages/ListingsPage.tsx": {
-    "mtime": 1790237612.0631788,
-    "seen": 1790237644.874538,
-    "ast_hash": "d87afff62f936c9f5b341386910e2c57",
+    "mtime": 1790237095.8659081,
+    "seen": 1790237245.868607,
+    "ast_hash": "4e08caa4ea5203694ce120a55c890aeb",
     "semantic_hash": ""
   },
   "client/src/pages/MyApplicationsPage.tsx": {
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "client/src/utils/areaLookup.ts": {
-    "mtime": 1790237531.4084067,
-    "seen": 1790237644.874538,
-    "ast_hash": "e87dabff378372df389a15debef4bad1",
+    "mtime": 1790178751.4394348,
+    "seen": 1790236167.129977,
+    "ast_hash": "29583360850a201b22cfc3442b119fd7",
     "semantic_hash": ""
   },
   "client/tailwind.config.ts": {

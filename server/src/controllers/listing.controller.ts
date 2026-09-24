@@ -22,6 +22,22 @@ export async function getMy(req: Request, res: Response) {
   res.json({ listings });
 }
 
+export async function search(req : Request , res : Response){
+  const q = (req.query.q as string) ?? null;
+
+  const bedroom_raw = parseInt(req.query.bedrooms as string ,10);
+  const bedrooms = isNaN(bedroom_raw) ? null : bedroom_raw ;
+
+  const areaId_raw = parseInt(req.query.areaId as string ,10);
+  const areaId = isNaN(areaId_raw) ? null : areaId_raw ;
+
+  const maxRent_raw = parseInt(req.query.maxRent as string ,10);
+  const maxRent = isNaN(maxRent_raw) ? null : maxRent_raw ;
+  const listings = await listingService.searchListings(q , bedrooms , areaId , maxRent);
+  res.json({ listings });
+
+}
+
 export async function getById(req: Request, res: Response) {
   const listing = await listingService.getListingById(
     req.params.id as string,

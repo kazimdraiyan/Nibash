@@ -12,7 +12,66 @@ export async function getAllListings() {
   );
   return attachMediaToListingResults(result.rows);
 }
+export async function searchListings(
+  // Optional free-text query for a listing's title or description.
+  q: string | null,
+  // Optional exact number of bedrooms to match.
+  bedrooms: number | null,
+  // Optional area ID to match.
+  areaId: number | null,
+  // Optional upper limit for the monthly rent.
+  maxRent: number | null,
+) {
+  // Every search is limited to publicly approved listings.
+  const conditions = ["l.status = 'approved'"];
+  // Store values separately so PostgreSQL can bind them safely to placeholders.
+  const params: Array<string | number> = [];
 
+  // Add a value to the parameters array and return its numbered SQL placeholder.
+  const addParam = (value: string | number) => {
+    // Append the value that will be bound by the database driver.
+    params.push(value);
+    // PostgreSQL placeholders are one-based, so use the new array length.
+    return `$${params.length}`;
+  };
+
+  // Ignore a missing or whitespace-only text query.
+  const searchTerm = q?.trim();
+  if (searchTerm) {
+    // Bind the search text with wildcards for a partial match.
+    const placeholder = addParam(`%${searchTerm}%`);
+    // Match the text in either searchable listing field, without case sensitivity.
+    conditions.push(
+      `(l.title ILIKE ${placeholder} OR l.description ILIKE ${placeholder})`,
+    );
+  }
+  if (bedrooms !== null) {
+    // Require the listing to have the requested number of bedrooms.
+    conditions.push(`l.bedroom_count = ${addParam(bedrooms)}`);
+  }
+  if (areaId !== null) {
+    // Require the listing to belong to the requested area.
+    conditions.push(`l.area_id = ${addParam(areaId)}`);
+  }
+  if (maxRent !== null) {
+    // Exclude listings whose rent is above the requested maximum.
+    conditions.push(`t.rent <= ${addParam(maxRent)}`);
+  }
+
+  // Select listing data and rent after joining each listing to its initial terms.
+  const query = `
+    SELECT l.*, t.rent
+    FROM listings l
+    JOIN initial_terms it ON it.listing_id = l.id
+    JOIN terms t ON t.id = it.terms_id
+    -- Combine the approval condition with any supplied filters.
+    WHERE ${conditions.join(" AND ")}
+  `;
+  // Execute the parameterized query using the generated placeholders and values.
+  const result = await pool.query(query, params);
+  // Add public media URLs before returning the matching listings.
+  return attachMediaToListingResults(result.rows);
+}
 export async function getMylistings(owner : number) {
   const result= await pool.query("select l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id where l.owner_id=$1",[owner]);
   return attachMediaToListingResults(result.rows);
@@ -68,6 +127,49 @@ export async function getListingById(
   return withMedia;
 }
 
+type Area = {
+  id: number;
+  latitude: number | string;
+  longitude: number | string;
+  radius: number | string;
+};
+
+const EARTH_RADIUS_METERS = 6_371_000;
+
+// Areas are stored as circular regions centered on their saved coordinates.
+export function findAreaIdForCoordinates(
+  latitude: number,
+  longitude: number,
+  areas: Area[],
+): number | null {
+  const latitudeRadians = (latitude * Math.PI) / 180;
+  let closestAreaId: number | null = null;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  for (const area of areas) {
+    const areaLatitudeRadians = (Number(area.latitude) * Math.PI) / 180;
+    const latitudeDelta = areaLatitudeRadians - latitudeRadians;
+    const longitudeDelta =
+      ((Number(area.longitude) - longitude) * Math.PI) / 180;
+    const haversine =
+      Math.sin(latitudeDelta / 2) ** 2 +
+      Math.cos(latitudeRadians) *
+        Math.cos(areaLatitudeRadians) *
+        Math.sin(longitudeDelta / 2) ** 2;
+    const distance =
+      2 *
+      EARTH_RADIUS_METERS *
+      Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+
+    if (distance <= Number(area.radius) && distance < closestDistance) {
+      closestAreaId = area.id;
+      closestDistance = distance;
+    }
+  }
+
+  return closestAreaId;
+}
+
 export async function createListing(ownerId: number, data: CreateListingInput) {
   const {
     title,
@@ -77,7 +179,6 @@ export async function createListing(ownerId: number, data: CreateListingInput) {
     bedroom_count,
     bathroom_count,
     on_which_floor,
-    area_id,
     rent,
     electricity_bill,
     water_bill,
@@ -87,8 +188,17 @@ export async function createListing(ownerId: number, data: CreateListingInput) {
     security_deposit,
   } = data;
 
-  const area = await pool.query("SELECT 1 FROM areas WHERE id=$1", [area_id]);
-  if (area.rows.length === 0) throw new AppError(400, "area_id does not exist");
+  const areaResult = await pool.query<Area>(
+    "SELECT id, latitude, longitude, radius FROM areas",
+  );
+  const areaId = findAreaIdForCoordinates(
+    latitude,
+    longitude,
+    areaResult.rows,
+  );
+  if (areaId === null) {
+    throw new AppError(400, "selected location is outside supported areas");
+  }
 
   const client = await pool.connect();
   try {
@@ -103,7 +213,7 @@ export async function createListing(ownerId: number, data: CreateListingInput) {
         bedroom_count,
         bathroom_count,
         on_which_floor,
-        area_id,
+        areaId,
         ownerId,
       ],
     );

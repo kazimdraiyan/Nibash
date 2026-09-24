@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { mockListings } from "../data/mockListings";
+import { DHAKA_AREAS } from "../utils/areaLookup";
 
 export function Hero() {
+  const navigate = useNavigate();
   // Search filter states
-  const [location, setLocation] = useState("Gulshan, Dhaka");
-  const [propertyType, setPropertyType] = useState("All Types");
-  const [priceRange, setPriceRange] = useState("৳60,000 - ৳120,000");
+  const [query, setQuery] = useState("");
+  const [areaName, setAreaName] = useState("All Areas");
+  const [bedrooms, setBedrooms] = useState("all");
+  const [maxRent, setMaxRent] = useState("all");
 
   // The 3 showcase properties
   const showcaseItems = mockListings.slice(0, 3);
@@ -76,10 +80,20 @@ export function Hero() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const element = document.getElementById("featured-properties");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    const params = new URLSearchParams();
+    if (query.trim()) {
+      params.set("q", query.trim());
     }
+    if (areaName && areaName !== "All Areas") {
+      params.set("area", areaName);
+    }
+    if (bedrooms && bedrooms !== "all") {
+      params.set("bedrooms", bedrooms);
+    }
+    if (maxRent && maxRent !== "all") {
+      params.set("maxRent", maxRent);
+    }
+    navigate(`/listings?${params.toString()}`);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -141,99 +155,123 @@ export function Hero() {
             {/* Subtle silver top border highlight */}
             <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Location input */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Query Text Input */}
+              <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="material-symbols-outlined text-sm text-[#cbd5e1]">
+                    search
+                  </span>
+                  <span className="font-label-sm text-[11px] uppercase tracking-wider text-[#94a3b8]">
+                    Keywords
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="e.g. South facing, spacious..."
+                  className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none placeholder:text-slate-500"
+                />
+              </div>
+
+              {/* Area / Location Selector */}
               <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="material-symbols-outlined text-sm text-[#cbd5e1]">
                     location_on
                   </span>
                   <span className="font-label-sm text-[11px] uppercase tracking-wider text-[#94a3b8]">
-                    Location
+                    Area
                   </span>
                 </div>
                 <select
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                  value={areaName}
+                  onChange={(e) => setAreaName(e.target.value)}
                   className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none cursor-pointer"
                 >
-                  <option value="Gulshan, Dhaka" className="bg-[#12151c] text-white">
-                    Gulshan, Dhaka
+                  <option value="All Areas" className="bg-[#12151c] text-white">
+                    All Areas
                   </option>
-                  <option value="Banani, Dhaka" className="bg-[#12151c] text-white">
-                    Banani, Dhaka
-                  </option>
-                  <option value="Dhanmondi, Dhaka" className="bg-[#12151c] text-white">
-                    Dhanmondi, Dhaka
-                  </option>
-                  <option value="Baridhara, Dhaka" className="bg-[#12151c] text-white">
-                    Baridhara DOHS
-                  </option>
-                  <option value="Uttara, Dhaka" className="bg-[#12151c] text-white">
-                    Uttara, Dhaka
-                  </option>
-                  <option value="Bashundhara R/A" className="bg-[#12151c] text-white">
-                    Bashundhara R/A
-                  </option>
+                  {DHAKA_AREAS.map((area) => (
+                    <option key={area.id} value={area.name} className="bg-[#12151c] text-white">
+                      {area.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              {/* Property type selector */}
+              {/* Bedrooms selector */}
               <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="material-symbols-outlined text-sm text-[#cbd5e1]">
-                    apartment
+                    bed
                   </span>
                   <span className="font-label-sm text-[11px] uppercase tracking-wider text-[#94a3b8]">
-                    Property Type
+                    Bedrooms
                   </span>
                 </div>
                 <select
-                  value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
+                  value={bedrooms}
+                  onChange={(e) => setBedrooms(e.target.value)}
                   className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none cursor-pointer"
                 >
-                  <option value="All Types" className="bg-[#12151c] text-white">
-                    All Apartments
+                  <option value="all" className="bg-[#12151c] text-white">
+                    Any Bedrooms
                   </option>
-                  <option value="Penthouse" className="bg-[#12151c] text-white">
-                    Sky Penthouse
+                  <option value="1" className="bg-[#12151c] text-white">
+                    1 Bedroom
                   </option>
-                  <option value="Apartment" className="bg-[#12151c] text-white">
-                    Luxury Apartment
+                  <option value="2" className="bg-[#12151c] text-white">
+                    2 Bedrooms
                   </option>
-                  <option value="Duplex" className="bg-[#12151c] text-white">
-                    Sovereign Duplex
+                  <option value="3" className="bg-[#12151c] text-white">
+                    3 Bedrooms
                   </option>
-                  <option value="Studio" className="bg-[#12151c] text-white">
-                    Studio Loft
+                  <option value="4" className="bg-[#12151c] text-white">
+                    4 Bedrooms
+                  </option>
+                  <option value="5" className="bg-[#12151c] text-white">
+                    5+ Bedrooms
                   </option>
                 </select>
               </div>
 
-              {/* Price range selector */}
+              {/* Max Budget selector */}
               <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="material-symbols-outlined text-sm text-[#cbd5e1]">
                     payments
                   </span>
                   <span className="font-label-sm text-[11px] uppercase tracking-wider text-[#94a3b8]">
-                    Price Range
+                    Max Budget
                   </span>
                 </div>
                 <select
-                  value={priceRange}
-                  onChange={(e) => setPriceRange(e.target.value)}
+                  value={maxRent}
+                  onChange={(e) => setMaxRent(e.target.value)}
                   className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none cursor-pointer"
                 >
-                  <option value="৳30,000 - ৳60,000" className="bg-[#12151c] text-white">
-                    ৳30k - ৳60k /mo
+                  <option value="all" className="bg-[#12151c] text-white">
+                    Any Budget
                   </option>
-                  <option value="৳60,000 - ৳120,000" className="bg-[#12151c] text-white">
-                    ৳60k - ৳120k /mo
+                  <option value="30000" className="bg-[#12151c] text-white">
+                    Up to ৳30,000 /mo
                   </option>
-                  <option value="৳120,000+" className="bg-[#12151c] text-white">
-                    ৳120,000+ /mo
+                  <option value="50000" className="bg-[#12151c] text-white">
+                    Up to ৳50,000 /mo
+                  </option>
+                  <option value="75000" className="bg-[#12151c] text-white">
+                    Up to ৳75,000 /mo
+                  </option>
+                  <option value="100000" className="bg-[#12151c] text-white">
+                    Up to ৳100,000 /mo
+                  </option>
+                  <option value="150000" className="bg-[#12151c] text-white">
+                    Up to ৳150,000 /mo
+                  </option>
+                  <option value="200000" className="bg-[#12151c] text-white">
+                    Up to ৳200,000 /mo
                   </option>
                 </select>
               </div>
@@ -242,18 +280,18 @@ export function Hero() {
             {/* Bottom row: Search CTA and Quick Trending Chips */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
               <div className="flex items-center gap-2 text-xs text-[#94a3b8] overflow-x-auto w-full sm:w-auto">
-                <span className="text-[#cbd5e1] font-medium">Trending:</span>
+                <span className="text-[#cbd5e1] font-medium">Trending Areas:</span>
                 <button
                   type="button"
-                  onClick={() => setLocation("Gulshan, Dhaka")}
+                  onClick={() => navigate("/listings?area=Gulshan")}
                   className="hover:text-white transition-colors underline cursor-pointer"
                 >
-                  Gulshan 2
+                  Gulshan
                 </button>
                 <span>•</span>
                 <button
                   type="button"
-                  onClick={() => setLocation("Banani, Dhaka")}
+                  onClick={() => navigate("/listings?area=Banani")}
                   className="hover:text-white transition-colors underline cursor-pointer"
                 >
                   Banani
@@ -261,10 +299,10 @@ export function Hero() {
                 <span>•</span>
                 <button
                   type="button"
-                  onClick={() => setLocation("Baridhara, Dhaka")}
+                  onClick={() => navigate("/listings?area=Dhanmondi")}
                   className="hover:text-white transition-colors underline cursor-pointer"
                 >
-                  Baridhara
+                  Dhanmondi
                 </button>
               </div>
 

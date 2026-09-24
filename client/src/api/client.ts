@@ -46,7 +46,7 @@ export const makeOwner = async (
 export const makeowner = makeOwner;
 
 export const apiClient = {
-  get: <T>(endpoint: string) => request<T>(endpoint, { method: "GET" }),
+  get: <T>(endpoint: string, options?: RequestInit) => request<T>(endpoint, { method: "GET", ...options }),
   post: <T>(endpoint: string, body?: any) =>
     request<T>(endpoint, {
       method: "POST",

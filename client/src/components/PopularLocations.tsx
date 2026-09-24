@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export function PopularLocations() {
+  const navigate = useNavigate();
   const locations = [
     {
       name: "Gulshan 1 & 2",
@@ -82,13 +85,14 @@ export function PopularLocations() {
             </p>
           </div>
 
-          <a
-            href="#featured-properties"
-            className="hidden md:inline-flex items-center gap-2 font-label-sm text-xs uppercase tracking-widest text-[#cbd5e1] hover:text-white transition-colors"
+          <button
+            type="button"
+            onClick={() => navigate("/listings")}
+            className="hidden md:inline-flex items-center gap-2 font-label-sm text-xs uppercase tracking-widest text-[#cbd5e1] hover:text-white transition-colors cursor-pointer"
           >
             <span>View All Neighborhoods</span>
             <span className="material-symbols-outlined text-sm">arrow_forward</span>
-          </a>
+          </button>
         </div>
 
         {/* Locations Grid */}
@@ -96,6 +100,7 @@ export function PopularLocations() {
           {locations.map((loc) => (
             <div
               key={loc.name}
+              onClick={() => navigate(`/listings?q=${encodeURIComponent(loc.name.split(" ")[0])}`)}
               className="group relative rounded-3xl overflow-hidden glass-panel border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.85)] cursor-pointer h-96 flex flex-col justify-end p-6"
             >
               {/* Background Image with Zoom */}

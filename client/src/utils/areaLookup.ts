@@ -49,3 +49,24 @@ export function getAreaName(areaId?: number | string | null): string {
   }
   return AREA_MAP[numericId] || `Area #${numericId}`;
 }
+
+/**
+ * Resolves an area name to its database numeric area ID.
+ * Handles case-insensitive and partial name matches (e.g. "Gulshan, Dhaka" -> 4).
+ */
+export function getAreaIdByName(name?: string | null): number | null {
+  if (!name) return null;
+  const clean = name.trim().toLowerCase();
+  for (const area of DHAKA_AREAS) {
+    if (area.name.toLowerCase() === clean) {
+      return area.id;
+    }
+  }
+  for (const area of DHAKA_AREAS) {
+    const areaLower = area.name.toLowerCase();
+    if (clean.includes(areaLower) || areaLower.includes(clean)) {
+      return area.id;
+    }
+  }
+  return null;
+}

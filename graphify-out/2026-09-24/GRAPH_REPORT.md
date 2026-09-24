@@ -1,12 +1,12 @@
 # Graph Report - Nibash  (2026-09-24)
 
 ## Corpus Check
-- 277 files · ~373,002 words
+- 277 files · ~372,731 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 107 file(s) not represented in the graph (top: .ttf 54, .csv 45, (none) 4)
 
 ## Summary
-- 3383 nodes · 4581 edges · 289 communities (234 shown, 55 thin omitted)
+- 3382 nodes · 4574 edges · 277 communities (224 shown, 53 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 53 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
@@ -27,7 +27,7 @@
 - html-token-validator.py
 - TestTailwindConfigGenerator
 - search
-- _normalize
+- core.py
 - server/package.json
 - TailwindConfigGenerator
 - index.ts
@@ -44,15 +44,15 @@
 - TestThresholdGate
 - persist_design_system
 - CatalogRefreshTest
-- DesignSystemGenerator
+- read_rows
 - compilerOptions
 - fontSize
 - ShadcnInstaller
-- .generate
+- DesignSystemGenerator
 - TestGeneratedConfigIsValidJs
 - design-tokens-starter.json
-- contract.service.ts
-- payment.controller.ts
+- contract.controller.ts
+- payment.service.ts
 - validate-tokens.cjs
 - card
 - Tailwind CSS Utility Reference
@@ -61,26 +61,26 @@
 - _select_palette_for_mode
 - test_design_system_mode.py
 - embed-tokens.cjs
-- duration
-- core.py
+- primitive
+- design_system.py
 - _palette_is_dark
 - Canvas Design System
 - TestTextLayoutDataContracts
 - generate-tokens.cjs
 - button
 - ._base_config
-- test_validate_tokens.py
+- _run
 - Form & Input Components
-- test_core_data_quality.py
+- review.service.ts
 - input
 - radius
 - Tailwind CSS Responsive Design
 - generate_design_system
 - Subagent-Driven Development
-- test_catalog_summary_line_endings.py
+- CatalogSummaryLineEndingsTest
 - split_values
 - Subagent-Driven Development
-- sm
+- shadow
 - Test-Driven Development (TDD)
 - .oxlintrc.json
 - $type
@@ -116,7 +116,7 @@
 - .test_add_plugins_no_duplicates
 - .test_recommend_plugins_nextjs
 - .test_init_default_typescript
-- _domain_keywords
+- md
 - Color Semantics
 - .test_write_config
 - Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)
@@ -161,7 +161,7 @@
 - Defense-in-Depth Validation
 - Writing Plans
 - [Analysis Title]
-- MyApplicationsPage.tsx
+- MyListingsPage.tsx
 - Nibash
 - Returns: "OK" or lists conflicts
 - Returns: "OK" or lists conflicts
@@ -220,7 +220,7 @@
 - Pressure Test 1: Emergency Production Fix
 - Pressure Test 2: Sunk Cost + Exhaustion
 - Pressure Test 3: Authority + Social Pressure
-- parse_decision_rules
+- TestMetricMath
 - .agents/skills/writing-skills/anthropic-best-practices.md
 - Anti-Patterns
 - Testing All Skill Types
@@ -254,14 +254,10 @@
 - Skill Types
 - Example: TDD Skill Bulletproofing
 - React + TypeScript + Vite
-- ListingsPage.tsx
+- Hero.tsx
 - VerifyPortalPage
 - Superpowers Development Methodology
 - .agents/skills/brainstorming/scripts/start-server.sh
-- application.controller.ts
-- dependencies
-- createVerifier.ts
-- _row_identities
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - Antigravity CLI (`agy`) Tool Mapping
@@ -294,14 +290,6 @@
 - .claude/skills/systematic-debugging/test-academic.md
 - .claude/skills/writing-plans/plan-document-reviewer-prompt.md
 - 006_revoked_tokens.sql
-- TestGeneratedCatalogContract
-- TestLandingAndStackContract
-- 16
-- 1
-- 3
-- 8
-- TestDiagnosticsContracts
-- TestTextLayoutRetrieval
 
 ## God Nodes (most connected - your core abstractions)
 1. `TailwindConfigGenerator` - 58 edges
@@ -324,13 +312,13 @@
   .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
 - `TestTailwindConfigGenerator` --uses--> `TailwindConfigGenerator`  [INFERRED]
   .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
-- `TestEndToEndCoherence` --uses--> `DesignSystemGenerator`  [INFERRED]
-  .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py → .agents/skills/ui-ux-pro-max/scripts/design_system.py
+- `TestReasoningContract` --uses--> `DesignSystemGenerator`  [INFERRED]
+  .agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py → .agents/skills/ui-ux-pro-max/scripts/design_system.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (289 total, 55 thin omitted)
+## Communities (277 total, 53 thin omitted)
 
 ### Community 0 - "App.tsx"
 Cohesion: 0.16
@@ -341,8 +329,8 @@ Cohesion: 0.08
 Nodes (39): format_context(), format_result(), main(), Format a single search result for display, Slide Search CLI - Search slide design databases for strategies, layouts, copy,…, Format contextual recommendations for display., BM25, calculate_pattern_break() (+31 more)
 
 ### Community 2 - "validate_data.py"
-Cohesion: 0.10
-Nodes (37): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_color_contract(), _check_core_data_contract(), _check_file(), _check_font_catalog() (+29 more)
+Cohesion: 0.07
+Nodes (50): Semantic quality contracts for the core UI/UX datasets., read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _catalog_date(), _check_app_interface_contract() (+42 more)
 
 ### Community 3 - "gray"
 Cohesion: 0.05
@@ -353,8 +341,8 @@ Cohesion: 0.05
 Nodes (40): dependencies, @googlemaps/js-api-loader, gsap, react, react-dom, react-router-dom, @types/gsap, devDependencies (+32 more)
 
 ### Community 5 - "spacing"
-Cohesion: 0.09
-Nodes (22): $type, $value, $type, $value, $type, $value, $type, $value (+14 more)
+Cohesion: 0.06
+Nodes (34): $type, $value, $type, $value, $type, $value, $type, $value (+26 more)
 
 ### Community 6 - "search_stack"
 Cohesion: 0.10
@@ -373,28 +361,28 @@ Cohesion: 0.07
 Nodes (15): Test adding colors multiple times., Test adding full color palette., Test adding custom spacing., Test TailwindConfigGenerator class., Test generating JavaScript configuration., Test generating config with custom colors., Test generating config with plugins., Test validating config with no content paths. (+7 more)
 
 ### Community 10 - "search"
-Cohesion: 0.12
-Nodes (7): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestSearchDomains, read_rows(), TestStyleTaxonomy
+Cohesion: 0.09
+Nodes (9): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestDiagnosticsContracts, TestSearchDomains, read_rows(), TestStyleTaxonomy (+1 more)
 
-### Community 11 - "_normalize"
-Cohesion: 0.12
-Nodes (18): _contains_phrase(), _exact_match_diagnostic(), _legacy_successor_guidance(), _normalize(), Apply longest-first synonym substitution at token boundaries., Calibrated search returning results, index, and internal diagnostics., Backward-compatible internal search tuple used by existing callers/tests., Apply only explicit, semantic rewrites for routing-only vocabulary. (+10 more)
+### Community 11 - "core.py"
+Cohesion: 0.07
+Nodes (42): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _get_bm25(), _legacy_successor_guidance(), _load_csv() (+34 more)
 
 ### Community 12 - "server/package.json"
 Cohesion: 0.07
-Nodes (25): multer, node-cron, pg, tsx, @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken (+17 more)
+Nodes (30): bcrypt, dotenv, node-cron, ref_node_process, ref_node_readline_promises, pg, tsx, @types/bcrypt (+22 more)
 
 ### Community 13 - "TailwindConfigGenerator"
 Cohesion: 0.09
 Nodes (13): main(), Add custom font families. Args: fonts: Dict of font_type: [font_names] e.g.,…, Add custom spacing values. Args: spacing: Dict of name: value e.g., {'18':…, Add custom breakpoints. Args: breakpoints: Dict of name: width e.g., {'3xl':…, Add plugin requirements. Args: plugins: List of plugin names e.g.,…, Get plugin recommendations based on configuration. Returns: List of recommended…, Generate Tailwind CSS configuration files., Validate configuration. Returns: Tuple of (valid, message) (+5 more)
 
 ### Community 14 - "index.ts"
-Cohesion: 0.20
-Nodes (17): cors, dotenv, express, app, authMiddleware(), optionalAuthMiddleware(), requireVerifier(), router (+9 more)
+Cohesion: 0.17
+Nodes (18): cors, express, multer, app, authMiddleware(), optionalAuthMiddleware(), upload, requireVerifier() (+10 more)
 
 ### Community 15 - "AppError"
-Cohesion: 0.13
-Nodes (22): ref_crypto, apply(), uploadMedia(), create(), getForListing(), pool, AppError, CreateReviewInput (+14 more)
+Cohesion: 0.12
+Nodes (24): apply(), getAll(), getForListing(), getMy(), reject(), uploadMedia(), pool, AppError (+16 more)
 
 ### Community 16 - "generate-slide.py"
 Cohesion: 0.12
@@ -425,20 +413,20 @@ Cohesion: 0.12
 Nodes (19): jsonwebtoken, becomeOwner(), becomeTenant(), login(), logout(), me(), register(), BecomeOwnerInput (+11 more)
 
 ### Community 23 - "devDependencies"
-Cohesion: 0.18
-Nodes (11): devDependencies, tsx, @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken, @types/multer, @types/node (+3 more)
+Cohesion: 0.09
+Nodes (21): dependencies, bcrypt, cors, dotenv, express, jsonwebtoken, multer, node-cron (+13 more)
 
 ### Community 24 - ".claude/skills/brainstorming/scripts/server.cjs"
 Cohesion: 0.05
-Nodes (58): bootstrapPage(), brandMarkup(), broadcast(), browserLauncherForPlatform(), chmodOwnerOnly(), RFC-6455, clients, companionUrl() (+50 more)
+Nodes (59): bootstrapPage(), brandMarkup(), broadcast(), browserLauncherForPlatform(), chmodOwnerOnly(), RFC-6455, clients, companionUrl() (+51 more)
 
 ### Community 26 - "persist_design_system"
 Cohesion: 0.13
 Nodes (15): _detect_page_type(), format_master_md(), format_page_override_md(), _generate_intelligent_overrides(), persist_design_system(), Path, Format design system as MASTER.md with hierarchical override logic., Format a page-specific override file with intelligent AI-generated content. (+7 more)
 
-### Community 28 - "DesignSystemGenerator"
-Cohesion: 0.16
-Nodes (6): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., TestReasoningMatch, read_rows(), TestReasoningContract
+### Community 28 - "read_rows"
+Cohesion: 0.09
+Nodes (9): _object_without_duplicates(), parse_decision_rules(), Parse the canonical condition -> action-array representation., _validate_action(), read_rows(), TestGeneratedCatalogContract, TestLandingAndStackContract, TestReasoningContract (+1 more)
 
 ### Community 29 - "compilerOptions"
 Cohesion: 0.12
@@ -452,9 +440,9 @@ Nodes (16): $type, $value, $type, $value, $type, $value, $type, $value (+8 more)
 Cohesion: 0.04
 Nodes (38): main(), Path, Add all available shadcn/ui components. Args: overwrite: If True, overwrite…, Handle shadcn/ui component installation., List installed components. Returns: Tuple of (success, message with component…, Initialize installer. Args: project_root: Project root directory (default:…, Check if shadcn is initialized in project. Returns: True if components.json…, Get list of already installed components. Returns: List of installed component… (+30 more)
 
-### Community 32 - ".generate"
-Cohesion: 0.14
-Nodes (8): Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation. variance/motion/density are…, Bucket a 1-10 dial value into its tier config. Returns None if value is None., _resolve_dial()
+### Community 32 - "DesignSystemGenerator"
+Cohesion: 0.12
+Nodes (12): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+4 more)
 
 ### Community 33 - "TestGeneratedConfigIsValidJs"
 Cohesion: 0.25
@@ -464,13 +452,13 @@ Nodes (7): Reduce a generated TS/JS config to a bare assignable object so it can
 Cohesion: 0.15
 Nodes (12): component, $type, $value, dark, semantic, $schema, $type, $value (+4 more)
 
-### Community 35 - "contract.service.ts"
+### Community 35 - "contract.controller.ts"
 Cohesion: 0.24
-Nodes (10): create(), getById(), sign(), CreateContractInput, createContractSchema, UpdateContractInput, updateContractSchema, createContract() (+2 more)
+Nodes (8): zod, create(), getById(), sign(), CreateContractInput, createContractSchema, UpdateContractInput, updateContractSchema
 
-### Community 36 - "payment.controller.ts"
+### Community 36 - "payment.service.ts"
 Cohesion: 0.24
-Nodes (8): zod, create(), getForContract(), resolve(), CreatePaymentInput, createPaymentSchema, UpdatePaymentInput, updatePaymentSchema
+Nodes (10): create(), getForContract(), resolve(), CreatePaymentInput, createPaymentSchema, UpdatePaymentInput, updatePaymentSchema, createPayment() (+2 more)
 
 ### Community 37 - "validate-tokens.cjs"
 Cohesion: 0.24
@@ -504,13 +492,13 @@ Nodes (11): _filter_anti_patterns_for_mode(), _query_wants_dark(), True when a s
 Cohesion: 0.18
 Nodes (8): args, fs, minimal, MINIMAL_TOKENS, path, projectRoot, tokensPath, wrapStyle
 
-### Community 45 - "duration"
-Cohesion: 0.20
-Nodes (10): fast, normal, slow, $type, $value, $type, $value, duration (+2 more)
+### Community 45 - "primitive"
+Cohesion: 0.18
+Nodes (11): fast, normal, slow, $type, $value, $type, $value, primitive (+3 more)
 
-### Community 46 - "core.py"
+### Community 46 - "design_system.py"
 Cohesion: 0.08
-Nodes (40): main(), Slide Token Validator (Legacy Wrapper) Now delegates to html-token-validator.py…, Delegate to unified html-token-validator.py with --type slides., shadcn/ui Component Installer Add shadcn/ui components to project with…, Tailwind CSS Configuration Generator Generate tailwind.config.js/ts with custom…, Tests for shadcn_add.py, Tests for tailwind_config_gen.py, _passes_threshold() (+32 more)
+Nodes (42): main(), Slide Token Validator (Legacy Wrapper) Now delegates to html-token-validator.py…, Delegate to unified html-token-validator.py with --type slides., Regression tests for validate-tokens.cjs. The validator used to skip any line…, shadcn/ui Component Installer Add shadcn/ui components to project with…, Tailwind CSS Configuration Generator Generate tailwind.config.js/ts with custom…, Tests for shadcn_add.py, Tests for tailwind_config_gen.py (+34 more)
 
 ### Community 47 - "_palette_is_dark"
 Cohesion: 0.18
@@ -532,25 +520,25 @@ Nodes (10): fg, font-size, hover-bg, button, $type, $value, $type, $value (+2 mo
 Cohesion: 0.22
 Nodes (6): Path, Initialize generator. Args: typescript: If True, generate .ts config, else .js…, Determine default output path., Create base configuration structure., Get default content paths for framework., Any
 
-### Community 53 - "test_validate_tokens.py"
-Cohesion: 0.24
-Nodes (9): Path, Regression tests for validate-tokens.cjs. The validator used to skip any line…, A hardcoded hex on the same line as a var() token is still a violation., A line that references only tokens produces no false positives., _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation(), CompletedProcess (+1 more)
+### Community 53 - "_run"
+Cohesion: 0.29
+Nodes (7): Path, A hardcoded hex on the same line as a var() token is still a violation., A line that references only tokens produces no false positives., _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation(), CompletedProcess
 
 ### Community 54 - "Form & Input Components"
 Cohesion: 0.06
 Nodes (32): Accordion, Alert, Alert Dialog, Avatar, Badge, Button, Card, Checkbox (+24 more)
 
-### Community 55 - "test_core_data_quality.py"
-Cohesion: 0.14
-Nodes (13): Semantic quality contracts for the core UI/UX datasets., read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_chart_contract(), _check_icon_contract() (+5 more)
+### Community 55 - "review.service.ts"
+Cohesion: 0.36
+Nodes (6): create(), getForListing(), CreateReviewInput, createReviewSchema, createReview(), getReviewsForListing()
 
 ### Community 56 - "input"
 Cohesion: 0.29
 Nodes (8): padding-x, input, $type, $value, focus-ring, padding-x, $type, $value
 
 ### Community 57 - "radius"
-Cohesion: 0.19
-Nodes (14): $type, $value, $type, $value, $type, $value, primitive, radius (+6 more)
+Cohesion: 0.29
+Nodes (8): $type, $value, $type, $value, radius, default, full, default
 
 ### Community 58 - "Tailwind CSS Responsive Design"
 Cohesion: 0.06
@@ -564,9 +552,9 @@ Nodes (13): ansi_ljust(), format_ascii_box(), format_markdown(), generate_design
 Cohesion: 0.06
 Nodes (26): Code Reviewer Prompt Template, Example Output, Common Rationalizations, Example, How to Request, Red Flags, Requesting Code Review, When to Request Review (+18 more)
 
-### Community 61 - "test_catalog_summary_line_endings.py"
-Cohesion: 0.13
-Nodes (8): CatalogSummaryLineEndingsTest, _load_generator(), The catalog snapshot must not depend on the checkout's line endings. Regression…, Simulate a Windows checkout: the recorded hashes must still validate., Unit tests for metric math and relevance fixture validation., TestMetricMath, hashlib, importlib_util
+### Community 61 - "CatalogSummaryLineEndingsTest"
+Cohesion: 0.40
+Nodes (3): CatalogSummaryLineEndingsTest, _load_generator(), Simulate a Windows checkout: the recorded hashes must still validate.
 
 ### Community 62 - "split_values"
 Cohesion: 0.47
@@ -576,9 +564,9 @@ Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
 Cohesion: 0.06
 Nodes (26): Code Reviewer Prompt Template, Example Output, Common Rationalizations, Example, How to Request, Red Flags, Requesting Code Review, When to Request Review (+18 more)
 
-### Community 64 - "sm"
-Cohesion: 0.60
-Nodes (5): sm, sm, sm, $type, $value
+### Community 64 - "shadow"
+Cohesion: 0.47
+Nodes (6): sm, shadow, sm, sm, $type, $value
 
 ### Community 65 - "Test-Driven Development (TDD)"
 Cohesion: 0.06
@@ -700,9 +688,9 @@ Nodes (19): Browser Events Format, Cards (visual designs), Cleaning Up, CSS Clas
 Cohesion: 0.10
 Nodes (19): Bulletproofing Elements, Creation Log: Systematic Debugging Skill, Enhancement 1: TDD Reference, Extraction Decisions, Final Outcome, Initial Version, Iterations, Key Insight (+11 more)
 
-### Community 100 - "_domain_keywords"
-Cohesion: 0.18
-Nodes (12): _domain_keywords(), _file_signature(), _get_bm25(), _load_csv(), _load_csv_snapshot(), _load_product_keywords(), _load_rows_or_empty(), Return rows and the verified signature of the bytes they came from. (+4 more)
+### Community 100 - "md"
+Cohesion: 0.67
+Nodes (4): $type, $value, md, md
 
 ### Community 101 - "Color Semantics"
 Cohesion: 0.11
@@ -737,8 +725,8 @@ Cohesion: 0.12
 Nodes (16): Documentation Variants to Test, Expected Results, Next Steps, NULL (Baseline - no skills doc), Scenario 1: Time Pressure + Confidence, Scenario 2: Sunk Cost + Works Already, Scenario 3: Authority + Speed Bias, Scenario 4: Familiarity + Efficiency (+8 more)
 
 ### Community 116 - "ListingDetailPage.tsx"
-Cohesion: 0.20
-Nodes (13): ActualListings(), Application, formatDueDate(), ListingDetailPage(), OwnerInfo, Review, ListingsPage(), getApplicationsKey() (+5 more)
+Cohesion: 0.16
+Nodes (21): ActualListings(), ApplicationInfoModal(), ApplicationInfoModalProps, PropertyCard(), PropertyCardItem, PropertyCardProps, Application, formatDueDate() (+13 more)
 
 ### Community 117 - "Root Cause Tracing"
 Cohesion: 0.12
@@ -864,9 +852,9 @@ Nodes (11): Bite-Sized Task Granularity, Execution Handoff, File Structure, No P
 Cohesion: 0.17
 Nodes (12): Advanced: Skills with executable code, [Analysis Title], Anti-patterns to avoid, Avoid offering too many options, Avoid Windows-style paths, Conditional workflow pattern, Examples pattern, Executive summary (+4 more)
 
-### Community 148 - "MyApplicationsPage.tsx"
-Cohesion: 0.17
-Nodes (11): Hero(), mockListings, ApplicationDetailModal(), ApplicationModalProps, MyApplicationsPage(), TenantApplication, MyListingCard(), AREA_MAP (+3 more)
+### Community 148 - "MyListingsPage.tsx"
+Cohesion: 0.15
+Nodes (12): StatusBadge(), ApplicationDetailModal(), ApplicationModalProps, MyApplicationsPage(), TenantApplication, ListingWithApplications, MyListingCard(), MyListingsPage() (+4 more)
 
 ### Community 149 - "Nibash"
 Cohesion: 0.17
@@ -1096,10 +1084,6 @@ Nodes (4): Choose A, B, or C, Pressure Test 2: Sunk Cost + Exhaustion, Scenario,
 Cohesion: 0.40
 Nodes (4): Choose A, B, or C, Pressure Test 3: Authority + Social Pressure, Scenario, Your Options
 
-### Community 207 - "parse_decision_rules"
-Cohesion: 0.24
-Nodes (7): apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), Return deterministic mutations and an audit trail; never execute data., Closed, non-executable grammar for design-system decision rules., Parse the canonical condition -> action-array representation., _validate_action()
-
 ### Community 208 - ".agents/skills/writing-skills/anthropic-best-practices.md"
 Cohesion: 0.40
 Nodes (4): [Analysis Title], Executive summary, Key findings, Recommendations
@@ -1228,60 +1212,24 @@ Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1
 Cohesion: 0.50
 Nodes (3): Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
-### Community 241 - "ListingsPage.tsx"
-Cohesion: 0.22
-Nodes (12): StatusBadge(), ApplicationInfoModal(), ApplicationInfoModalProps, PropertyCard(), PropertyCardItem, PropertyCardProps, BackendListing, ListingWithApplications (+4 more)
-
 ### Community 242 - "VerifyPortalPage"
 Cohesion: 0.67
 Nodes (3): VerifyPortalPage(), handleVerify(), loadListings()
 
-### Community 245 - "application.controller.ts"
-Cohesion: 0.22
-Nodes (9): getAll(), getForListing(), getMy(), reject(), ApplyInput, applySchema, UpdateApplicationInput, updateApplicationSchema (+1 more)
-
-### Community 246 - "dependencies"
-Cohesion: 0.20
-Nodes (10): dependencies, bcrypt, cors, dotenv, express, jsonwebtoken, multer, node-cron (+2 more)
-
-### Community 247 - "createVerifier.ts"
-Cohesion: 0.33
-Nodes (6): bcrypt, ref_node_process, ref_node_readline_promises, main(), prompt(), rl
-
-### Community 248 - "_row_identities"
-Cohesion: 0.33
-Nodes (6): _exact_row_identity(), Suggest complete public identities so a retry can bypass score thresholds., Return non-empty public identities from ordinary and alias fields., Return one row whose stable public identity exactly matches the query., _row_identities(), _suggest_identities()
-
-### Community 283 - "16"
-Cohesion: 0.67
-Nodes (3): $type, $value, 16
-
-### Community 284 - "1"
-Cohesion: 0.67
-Nodes (3): $type, $value, 1
-
-### Community 285 - "3"
-Cohesion: 0.67
-Nodes (3): $type, $value, 3
-
-### Community 286 - "8"
-Cohesion: 0.67
-Nodes (3): $type, $value, 8
-
 ## Knowledge Gaps
 - **1565 isolated node(s):** `crypto`, `http`, `fs`, `path`, `OPCODES` (+1560 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1982 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **55 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **53 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `prompt()` connect `createVerifier.ts` to `Gemini CLI Tool Mapping`, `Gemini CLI Tool Mapping`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `TailwindConfigGenerator` connect `TailwindConfigGenerator` to `.test_add_fonts`, `.test_add_breakpoints`, `.test_recommend_plugins`, `TestTailwindConfigGenerator`, `.test_generate_typescript_config`, `.test_validate_config_empty_theme`, `.test_validate_config_valid`, `.test_full_configuration_javascript`, `.test_add_colors`, `.test_write_config_invalid_path`, `TestGeneratedConfigIsValidJs`, `.generate_config_string`, `core.py`, `._base_config`, `.test_add_plugins_no_duplicates`, `.test_recommend_plugins_nextjs`, `.test_init_default_typescript`, `.test_write_config`, `.test_init_framework`, `.test_default_output_path_javascript`, `.test_default_content_paths_nextjs`?**
+- **Why does `prompt()` connect `server/package.json` to `Gemini CLI Tool Mapping`, `Gemini CLI Tool Mapping`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `TailwindConfigGenerator` connect `TailwindConfigGenerator` to `.test_add_fonts`, `.test_add_breakpoints`, `.test_recommend_plugins`, `TestTailwindConfigGenerator`, `.test_generate_typescript_config`, `.test_validate_config_empty_theme`, `.test_validate_config_valid`, `.test_full_configuration_javascript`, `.test_add_colors`, `.test_write_config_invalid_path`, `TestGeneratedConfigIsValidJs`, `.generate_config_string`, `design_system.py`, `._base_config`, `.test_add_plugins_no_duplicates`, `.test_recommend_plugins_nextjs`, `.test_init_default_typescript`, `.test_write_config`, `.test_init_framework`, `.test_default_output_path_javascript`, `.test_default_content_paths_nextjs`?**
   _High betweenness centrality (0.011) - this node is a cross-community bridge._
-- **Why does `Subagent support` connect `Gemini CLI Tool Mapping` to `createVerifier.ts`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `Subagent support` connect `Gemini CLI Tool Mapping` to `server/package.json`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `crypto`, `http`, `fs` to the rest of the system?**
@@ -1289,4 +1237,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `slide_search_core.py` be split into smaller, more focused modules?**
   _Cohesion score 0.07676767676767676 - nodes in this community are weakly interconnected._
 - **Should `validate_data.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.1039136302294197 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06861239119303636 - nodes in this community are weakly interconnected._
