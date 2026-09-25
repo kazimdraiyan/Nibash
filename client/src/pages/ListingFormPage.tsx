@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { DHAKA_AREAS } from "../utils/areaLookup";
 import { uploadListingImages } from "../api/uploadImages";
 import { LocationPicker } from "../components/LocationPicker";
+import { uploadListingDocuments } from "../api/uploadDocuments";
 
 export function ListingFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,9 @@ export function ListingFormPage() {
     { id: number; url: string }[]
   >([]);
   const [uploading, setUploading] = useState(false);
+  const [docType, setDocType] = useState("electricity_bill_receipt");
+  const [docFiles, setDocFiles] = useState<File[]>([]);
+  const [docUploading, setDocUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -767,6 +771,66 @@ export function ListingFormPage() {
               </span>
             </p>
           </div>
+
+          {(
+            <div>
+              <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 border-b border-slate-800 pb-1">
+                4. Verification Documents
+              </h2>
+              <p className="text-xs text-slate-400 mb-3">
+                Upload proof documents (utility receipts, trade license, NID,
+                etc.) for the verifier to review.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                <select
+                  value={docType}
+                  onChange={(e) => setDocType(e.target.value)}
+                  className="bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="electricity_bill_receipt">
+                    Electricity Bill
+                  </option>
+                  <option value="holding_tax_receipt">
+                    Holding Tax Receipt
+                  </option>
+                  <option value="water_bill_receipt">Water Bill</option>
+                  <option value="trade_license">Trade License</option>
+                  <option value="nid">NID</option>
+                  <option value="passport">Passport</option>
+                  <option value="driving_license">Driving License</option>
+                </select>
+
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
+                  multiple
+                  onChange={(e) =>
+                    setDocFiles(Array.from(e.target.files ?? []))
+                  }
+                />
+
+                <button
+                  type="button"
+                  disabled={docFiles.length === 0 || docUploading}
+                  onClick={async () => {
+                    setDocUploading(true);
+                    try {
+                      await uploadListingDocuments(id!, docType, docFiles);
+                      setDocFiles([]);
+                    } catch (err: any) {
+                      setError(err.message || "Document upload failed.");
+                    } finally {
+                      setDocUploading(false);
+                    }
+                  }}
+                  className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm border border-slate-700 hover:bg-slate-700 disabled:opacity-50"
+                >
+                  {docUploading ? "Uploading..." : "Upload Document"}
+                </button>
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"

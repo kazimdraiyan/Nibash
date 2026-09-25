@@ -6,7 +6,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const BUCKET = "listing-images";
 
-async function uploadToSupabase(path: string, buffer: Buffer, contentType: string) {
+export async function uploadToSupabase(path: string, buffer: Buffer, contentType: string) {
   const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
     method: "POST",
     headers: {
