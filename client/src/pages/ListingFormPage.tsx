@@ -7,6 +7,65 @@ import { uploadListingImages } from "../api/uploadImages";
 import { LocationPicker } from "../components/LocationPicker";
 import { uploadListingDocuments } from "../api/uploadDocuments";
 
+const DOCUMENT_TYPES = [
+  {
+    id: "electricity_bill_receipt",
+    label: "Electricity Bill Receipt",
+    shortLabel: "Electricity Bill",
+    icon: "⚡",
+    hint: "Recent DPDC, DESCO, or NESCO bill receipt",
+  },
+  {
+    id: "holding_tax_receipt",
+    label: "Holding Tax Receipt",
+    shortLabel: "Holding Tax",
+    icon: "🏛",
+    hint: "City Corporation holding tax payment challan",
+  },
+  {
+    id: "water_bill_receipt",
+    label: "Water Bill (WASA)",
+    shortLabel: "Water Bill",
+    icon: "💧",
+    hint: "Recent DWASA bill receipt or bank stamp",
+  },
+  {
+    id: "trade_license",
+    label: "Trade License",
+    shortLabel: "Trade License",
+    icon: "📋",
+    hint: "Valid business or municipal trade license copy",
+  },
+  {
+    id: "nid",
+    label: "National ID (NID)",
+    shortLabel: "NID Card",
+    icon: "🪪",
+    hint: "Clear photo or scan of front and back of NID",
+  },
+  {
+    id: "passport",
+    label: "Passport",
+    shortLabel: "Passport",
+    icon: "🛂",
+    hint: "Information page and validity stamp",
+  },
+  {
+    id: "driving_license",
+    label: "Driving License",
+    shortLabel: "Driving License",
+    icon: "🚗",
+    hint: "BRTA smart driving license front and back",
+  },
+] as const;
+
+interface StagedDocument {
+  id: string;
+  type: string;
+  file: File;
+  previewUrl: string;
+}
+
 export function ListingFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
@@ -28,11 +87,15 @@ export function ListingFormPage() {
     { id: number; url: string }[]
   >([]);
   const [uploading, setUploading] = useState(false);
-  const [docType, setDocType] = useState("electricity_bill_receipt");
-  const [docFiles, setDocFiles] = useState<File[]>([]);
+  const [selectedDocType, setSelectedDocType] = useState<string>(
+    "electricity_bill_receipt",
+  );
+  const [stagedDocs, setStagedDocs] = useState<StagedDocument[]>([]);
+  const [isDocDragging, setIsDocDragging] = useState(false);
   const [docUploading, setDocUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docFileInputRef = useRef<HTMLInputElement>(null);
 
   // Synchronize preview URLs with images single source of truth
   useEffect(() => {
@@ -43,6 +106,13 @@ export function ListingFormPage() {
       urls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [images]);
+
+  // Clean up object URLs for staged documents on unmount
+  useEffect(() => {
+    return () => {
+      stagedDocs.forEach((d) => URL.revokeObjectURL(d.previewUrl));
+    };
+  }, []);
 
   // Initial Terms State
   const [rent, setRent] = useState("65000");
@@ -114,6 +184,80 @@ export function ListingFormPage() {
 
   function removeImage(index: number) {
     setImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function handleDocFiles(
+    incoming: FileList | File[] | null,
+    targetDocType: string,
+  ) {
+    if (!incoming) return;
+    const fileArray = Array.from(incoming);
+    const validFiles = fileArray.filter(
+      (file) =>
+        [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/jpg",
+          "application/pdf",
+        ].includes(file.type) && file.size <= 5 * 1024 * 1024,
+    );
+
+    if (validFiles.length === 0) return;
+
+    // Check count for targetDocType (max 5 per type)
+    const existingCount = stagedDocs.filter((d) => d.type === targetDocType).length;
+    const remainingSlots = 5 - existingCount;
+    if (remainingSlots <= 0) return;
+
+    const filesToAdd = validFiles.slice(0, remainingSlots);
+    const newItems: StagedDocument[] = filesToAdd.map((file) => ({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      type: targetDocType,
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
+    setStagedDocs((prev) => [...prev, ...newItems]);
+  }
+
+  function handleDocSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    handleDocFiles(e.target.files, selectedDocType);
+    if (e.target) e.target.value = "";
+  }
+
+  function handleDocDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDocDragging(true);
+  }
+
+  function handleDocDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDocDragging(false);
+  }
+
+  function handleDocDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDocDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleDocFiles(e.dataTransfer.files, selectedDocType);
+    }
+  }
+
+  function removeStagedDoc(docId: string) {
+    setStagedDocs((prev) => {
+      const item = prev.find((d) => d.id === docId);
+      if (item?.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      return prev.filter((d) => d.id !== docId);
+    });
+  }
+
+  function clearAllDocs() {
+    stagedDocs.forEach((d) => URL.revokeObjectURL(d.previewUrl));
+    setStagedDocs([]);
   }
 
   // If edit mode, load existing data
@@ -199,6 +343,30 @@ export function ListingFormPage() {
           return;
         }
         setUploading(false);
+      }
+
+      if (!isEdit && stagedDocs.length > 0) {
+        setDocUploading(true);
+        try {
+          const grouped = stagedDocs.reduce<Record<string, File[]>>(
+            (acc, item) => {
+              if (!acc[item.type]) acc[item.type] = [];
+              acc[item.type].push(item.file);
+              return acc;
+            },
+            {},
+          );
+
+          for (const [type, files] of Object.entries(grouped)) {
+            await uploadListingDocuments(targetId, type, files);
+          }
+        } catch (err: any) {
+          setError(`Document upload failed: ${err.message || "unknown error"}`);
+          setDocUploading(false);
+          setLoading(false);
+          return;
+        }
+        setDocUploading(false);
       }
 
       navigate(`/listings/${targetId}`);
@@ -772,72 +940,354 @@ export function ListingFormPage() {
             </p>
           </div>
 
-          {(
+          {!isEdit && (
             <div>
-              <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 border-b border-slate-800 pb-1">
-                4. Verification Documents
-              </h2>
-              <p className="text-xs text-slate-400 mb-3">
-                Upload proof documents (utility receipts, trade license, NID,
-                etc.) for the verifier to review.
+              <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
+                    4. Verification Documents
+                  </h2>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                    Optional
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono text-slate-500">
+                  {stagedDocs.length}{" "}
+                  {stagedDocs.length === 1 ? "document" : "documents"} staged
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mb-4">
+                Attach proof documents (utility receipts, holding tax, trade
+                license, NID) for the verification team. Verified listings gain
+                trust and rank higher.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-3">
-                <select
-                  value={docType}
-                  onChange={(e) => setDocType(e.target.value)}
-                  className="bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm"
-                >
-                  <option value="electricity_bill_receipt">
-                    Electricity Bill
-                  </option>
-                  <option value="holding_tax_receipt">
-                    Holding Tax Receipt
-                  </option>
-                  <option value="water_bill_receipt">Water Bill</option>
-                  <option value="trade_license">Trade License</option>
-                  <option value="nid">NID</option>
-                  <option value="passport">Passport</option>
-                  <option value="driving_license">Driving License</option>
-                </select>
-
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,application/pdf"
-                  multiple
-                  onChange={(e) =>
-                    setDocFiles(Array.from(e.target.files ?? []))
-                  }
-                />
-
-                <button
-                  type="button"
-                  disabled={docFiles.length === 0 || docUploading}
-                  onClick={async () => {
-                    setDocUploading(true);
-                    try {
-                      await uploadListingDocuments(id!, docType, docFiles);
-                      setDocFiles([]);
-                    } catch (err: any) {
-                      setError(err.message || "Document upload failed.");
-                    } finally {
-                      setDocUploading(false);
-                    }
-                  }}
-                  className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm border border-slate-700 hover:bg-slate-700 disabled:opacity-50"
-                >
-                  {docUploading ? "Uploading..." : "Upload Document"}
-                </button>
+              {/* Quick Type Selection Pills */}
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {DOCUMENT_TYPES.map((dt) => {
+                  const count = stagedDocs.filter(
+                    (d) => d.type === dt.id,
+                  ).length;
+                  const isSelected = selectedDocType === dt.id;
+                  return (
+                    <button
+                      key={dt.id}
+                      type="button"
+                      onClick={() => setSelectedDocType(dt.id)}
+                      className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+                        isSelected
+                          ? "bg-slate-700/80 border-slate-500 text-white shadow-sm font-medium"
+                          : "bg-[#0d1017] border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
+                      }`}
+                    >
+                      <span>{dt.icon}</span>
+                      <span>{dt.shortLabel}</span>
+                      {count > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
+
+              {/* Active Document Category Bar */}
+              {(() => {
+                const currentTypeInfo =
+                  DOCUMENT_TYPES.find((d) => d.id === selectedDocType) ||
+                  DOCUMENT_TYPES[0];
+                const countForCurrentType = stagedDocs.filter(
+                  (d) => d.type === selectedDocType,
+                ).length;
+                return (
+                  <div className="bg-[#0d1017] border border-slate-800 rounded-xl p-3.5 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{currentTypeInfo.icon}</span>
+                        <span className="text-xs font-semibold text-white">
+                          {currentTypeInfo.label}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-mono text-slate-400">
+                        {countForCurrentType} / 5 photos added
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                      <span className="text-amber-400">💡</span>
+                      <span>{currentTypeInfo.hint}</span>
+                    </p>
+                  </div>
+                );
+              })()}
+
+              {/* Hidden Document File Input */}
+              <input
+                ref={docFileInputRef}
+                id="doc-files"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                multiple
+                onChange={handleDocSelect}
+                className="hidden"
+              />
+
+              {/* Drag & Drop Area */}
+              <div
+                onClick={() => docFileInputRef.current?.click()}
+                onDragOver={handleDocDragOver}
+                onDragLeave={handleDocDragLeave}
+                onDrop={handleDocDrop}
+                className={`relative border-2 border-dashed rounded-xl p-6 sm:p-7 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
+                  isDocDragging
+                    ? "border-amber-400/80 bg-amber-500/5 scale-[0.99]"
+                    : "border-slate-700/80 bg-[#0d1017] hover:border-slate-500 hover:bg-[#10141d]"
+                }`}
+              >
+                <div className="w-11 h-11 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mb-2.5 text-slate-300 transition-transform group-hover:scale-110">
+                  <svg
+                    className="w-5 h-5 text-slate-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.75}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+
+                <p className="text-sm font-medium text-white mb-0.5">
+                  {isDocDragging
+                    ? "Drop document files here"
+                    : `Click to browse or drop ${
+                        DOCUMENT_TYPES.find((d) => d.id === selectedDocType)
+                          ?.shortLabel || "document"
+                      } files (PDF or Images)`}
+                </p>
+                <p className="text-xs text-slate-400 mb-3">
+                  PDF, JPG, PNG, or WebP &bull; Up to 5MB per file &bull; Max 5 files
+                </p>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition">
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Select Document Files
+                </span>
+              </div>
+
+              {/* Staged Documents Previews Grouped by Type */}
+              {stagedDocs.length > 0 && (
+                <div className="mt-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-slate-300 uppercase tracking-wide">
+                      Staged Verification Documents ({stagedDocs.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={clearAllDocs}
+                      className="text-[11px] text-slate-400 hover:text-red-400 transition cursor-pointer"
+                    >
+                      Clear all documents
+                    </button>
+                  </div>
+
+                  {DOCUMENT_TYPES.map((dt) => {
+                    const docsForType = stagedDocs.filter(
+                      (d) => d.type === dt.id,
+                    );
+                    if (docsForType.length === 0) return null;
+
+                    return (
+                      <div
+                        key={dt.id}
+                        className="bg-[#0d1017] border border-slate-800 rounded-xl p-3 sm:p-4"
+                      >
+                        <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800/80">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{dt.icon}</span>
+                            <span className="text-xs font-semibold text-white">
+                              {dt.label}
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                              {docsForType.length}{" "}
+                              {docsForType.length === 1 ? "file" : "files"}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              docsForType.forEach((d) => removeStagedDoc(d.id));
+                            }}
+                            className="text-[11px] text-slate-500 hover:text-red-400 transition cursor-pointer"
+                          >
+                            Remove category
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {docsForType.map((doc, idx) => {
+                            const isPdf =
+                              doc.file.type === "application/pdf" ||
+                              doc.file.name.toLowerCase().endsWith(".pdf");
+
+                            return (
+                              <div
+                                key={doc.id}
+                                onClick={
+                                  isPdf
+                                    ? () => window.open(doc.previewUrl, "_blank")
+                                    : undefined
+                                }
+                                title={
+                                  isPdf
+                                    ? "Click to open and preview PDF"
+                                    : undefined
+                                }
+                                className={`aspect-[4/3] rounded-xl overflow-hidden relative border border-slate-700/70 bg-[#12151c] group shadow-sm flex flex-col justify-between ${
+                                  isPdf
+                                    ? "cursor-pointer hover:border-slate-500 transition-colors"
+                                    : ""
+                                }`}
+                              >
+                                {isPdf ? (
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-red-950/20 via-[#0d1017] to-[#12151c] transition-colors group-hover:bg-red-950/30">
+                                    <div className="w-10 h-10 rounded-xl bg-red-900/30 border border-red-500/30 flex items-center justify-center text-red-400 transition-transform group-hover:scale-110 shadow-sm mb-1">
+                                      <svg
+                                        className="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                        />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M9 13h6m-6 4h4"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="text-[10px] font-mono font-semibold text-red-400 uppercase tracking-wider">
+                                      PDF
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={doc.previewUrl}
+                                    alt={`${dt.shortLabel} ${idx + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                )}
+
+                                <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+
+                                <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-slate-300 border border-white/10 text-[10px] font-mono px-2 py-0.5 rounded-md">
+                                  {dt.shortLabel} #{idx + 1}
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeStagedDoc(doc.id);
+                                  }}
+                                  aria-label={`Remove ${dt.shortLabel} document ${idx + 1}`}
+                                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/75 hover:bg-red-600 text-slate-200 hover:text-white flex items-center justify-center backdrop-blur-sm transition-colors border border-white/10 shadow cursor-pointer z-10"
+                                >
+                                  <svg
+                                    className="w-3.5 h-3.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
+                                </button>
+
+                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-2 text-[10px] text-slate-300 flex items-center justify-between pointer-events-none font-mono">
+                                  <span className="truncate max-w-[70%]">
+                                    {doc.file.name}
+                                  </span>
+                                  <span className="text-slate-400 ml-1 shrink-0">
+                                    {(doc.file.size / (1024 * 1024)).toFixed(1)}{" "}
+                                    MB
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                          {docsForType.length < 5 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedDocType(dt.id);
+                                docFileInputRef.current?.click();
+                              }}
+                              className="aspect-[4/3] rounded-xl border border-dashed border-slate-700/80 hover:border-slate-400 bg-[#12151c]/50 hover:bg-[#12151c] flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white transition cursor-pointer p-3"
+                            >
+                              <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 4v16m8-8H4"
+                                  />
+                                </svg>
+                              </div>
+                              <span className="text-xs font-medium">
+                                Add more
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-mono">
+                                {5 - docsForType.length} left
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loading || uploading}
+            disabled={loading || uploading || docUploading}
             className="mt-2 w-full bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm shadow-md flex items-center justify-center gap-2"
           >
-            {(loading || uploading) && (
+            {(loading || uploading || docUploading) && (
               <svg
                 className="animate-spin h-4 w-4 text-slate-900"
                 viewBox="0 0 24 24"
@@ -859,14 +1309,16 @@ export function ListingFormPage() {
               </svg>
             )}
             {uploading
-              ? "Uploading Images..."
-              : loading
-                ? isEdit
-                  ? "Updating Apartment..."
-                  : "Saving Apartment..."
-                : isEdit
-                  ? "Update Apartment"
-                  : "Publish Apartment Listing"}
+              ? "Uploading Photos..."
+              : docUploading
+                ? "Uploading Verification Documents..."
+                : loading
+                  ? isEdit
+                    ? "Updating Apartment..."
+                    : "Saving Apartment..."
+                  : isEdit
+                    ? "Update Apartment"
+                    : "Publish Apartment Listing"}
           </button>
         </form>
       </div>

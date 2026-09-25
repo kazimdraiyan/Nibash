@@ -10,7 +10,7 @@ export async function uploadListingDocuments(
   files.forEach((file) => formData.append("files", file));
 
   return apiClient.postForm<{ documentId: number; mediaIds: number[] }>(
-    `/listings/${listingId}/documents`,
+    `/documents/listings/${listingId}`,
     formData,
   );
 }
@@ -23,5 +23,5 @@ export async function fetchListingDocuments(listingId: string) {
       is_verified: boolean;
       media: { id: number; url: string }[];
     }[];
-  }>(`/listings/${listingId}/documents`);
+  }>(`/documents/listings/${listingId}`);
 }
