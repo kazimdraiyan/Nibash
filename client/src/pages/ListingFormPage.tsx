@@ -6,6 +6,7 @@ import { DHAKA_AREAS } from "../utils/areaLookup";
 import { uploadListingImages } from "../api/uploadImages";
 import { LocationPicker } from "../components/LocationPicker";
 import { uploadListingDocuments } from "../api/uploadDocuments";
+import { getAmenityIcon } from "../utils/amenities";
 
 const DOCUMENT_TYPES = [
   {
@@ -123,10 +124,40 @@ export function ListingFormPage() {
   const [securityDeposit, setSecurityDeposit] = useState("130000");
   const [petAllowed, setPetAllowed] = useState(false);
 
+  // Amenities State
+  const [availableAmenities, setAvailableAmenities] = useState<
+    { id: number; name: string; description?: string }[]
+  >([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [amenitiesLoading, setAmenitiesLoading] = useState(true);
+
   // Status
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEdit);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch all allowed amenities from server
+  useEffect(() => {
+    async function fetchAmenities() {
+      try {
+        const res = await apiClient.get<{
+          amenities: { id: number; name: string; description?: string }[];
+        }>("/listings/amenities");
+        setAvailableAmenities(res.amenities || []);
+      } catch (err) {
+        console.error("Failed to load amenities:", err);
+      } finally {
+        setAmenitiesLoading(false);
+      }
+    }
+    fetchAmenities();
+  }, []);
+
+  const toggleAmenity = (name: string) => {
+    setSelectedAmenities((prev) =>
+      prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name],
+    );
+  };
 
   // Handle Area Change to automatically update lat/lng coordinates
   const handleAreaChange = (newAreaId: number) => {
@@ -282,6 +313,13 @@ export function ListingFormPage() {
         setMonthlyDueDate(String(data.monthly_due_date || "1"));
         setSecurityDeposit(String(data.security_deposit || ""));
         setPetAllowed(Boolean(data.pet_allowed));
+        if (Array.isArray(data.amenities) && data.amenities.length > 0) {
+          setSelectedAmenities(
+            data.amenities.map((a: any) =>
+              typeof a === "string" ? a : a.name,
+            ),
+          );
+        }
         if (Array.isArray(data.images) && data.images.length > 0) {
           setExistingImages(data.images);
         }
@@ -315,6 +353,7 @@ export function ListingFormPage() {
       monthly_due_date: parseInt(monthlyDueDate, 10),
       pet_allowed: petAllowed,
       security_deposit: parseFloat(securityDeposit),
+      amenities: selectedAmenities,
     };
 
     try {
@@ -709,11 +748,75 @@ export function ListingFormPage() {
             </div>
           </div>
 
-          {/* Section 3: Property Photos */}
+          {/* Section 3: Amenities & Facilities */}
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
               <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
-                3. Property Media & Photos
+                3. Amenities & Facilities
+              </h2>
+              <span className="text-[11px] font-mono text-slate-500">
+                {selectedAmenities.length} selected
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-400 mb-3.5">
+              Select building features and living conveniences offered with this residence.
+            </p>
+
+            {amenitiesLoading ? (
+              <div className="flex items-center gap-2 text-xs text-slate-400 py-3">
+                <div className="w-4 h-4 border-2 border-slate-600 border-t-amber-400 rounded-full animate-spin" />
+                <span>Loading available amenities...</span>
+              </div>
+            ) : availableAmenities.length > 0 ? (
+              <div className="flex flex-wrap gap-2.5">
+                {availableAmenities.map((amenity) => {
+                  const isSelected = selectedAmenities.includes(amenity.name);
+                  const iconName = getAmenityIcon(amenity.name);
+
+                  return (
+                    <button
+                      key={amenity.id || amenity.name}
+                      type="button"
+                      onClick={() => toggleAmenity(amenity.name)}
+                      title={amenity.description || amenity.name}
+                      className={`group relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border transition-all duration-150 active:scale-95 cursor-pointer ${
+                        isSelected
+                          ? "bg-[#d4b068]/15 border-[#d4b068] text-[#f4d38c] shadow-[0_0_12px_rgba(212,176,104,0.18)]"
+                          : "bg-[#12151c] border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200 hover:bg-[#181c25]"
+                      }`}
+                    >
+                      <span
+                        className={`material-symbols-outlined text-base transition-colors ${
+                          isSelected
+                            ? "text-[#d4b068]"
+                            : "text-slate-500 group-hover:text-slate-300"
+                        }`}
+                      >
+                        {iconName}
+                      </span>
+                      <span>{amenity.name}</span>
+                      {isSelected && (
+                        <span className="material-symbols-outlined text-xs text-[#d4b068] ml-0.5">
+                          check
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 italic py-2">
+                No standard amenities available to configure.
+              </p>
+            )}
+          </div>
+
+          {/* Section 4: Property Photos */}
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
+              <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
+                4. Property Media & Photos
               </h2>
               <span className="text-[11px] font-mono text-slate-500">
                 {images.length} / 10 selected
@@ -945,7 +1048,7 @@ export function ListingFormPage() {
               <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
-                    4. Verification Documents
+                    5. Verification Documents
                   </h2>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
                     Optional
