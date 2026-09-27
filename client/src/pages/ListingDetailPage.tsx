@@ -10,6 +10,7 @@ import {
 } from "../utils/applicationStorage";
 import { getAreaName } from "../utils/areaLookup";
 import { ListingMapPreview } from "../components/ListingMapPreview";
+import { getAmenityIcon, getAmenityMeta } from "../utils/amenities";
 import { DocumentViewerModal } from "../components/DocumentViewerModal";
 
 interface OwnerPhoneListing extends BackendListing {
@@ -929,7 +930,47 @@ export function ListingDetailPage() {
             </p>
           </div>
 
-          {/* 3. Detailed Lease Terms & Financial Information (order-4 on mobile) */}
+          {/* 3. Amenities & Facilities (order-4 on mobile) */}
+          <div className="order-4 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+            <h2 className="text-base font-bold text-white flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                hotel_class
+              </span>
+              <span>Amenities & Facilities</span>
+            </h2>
+
+            {listing.amenities && listing.amenities.length > 0 ? (
+              <div className="flex flex-wrap gap-2.5">
+                {listing.amenities.map((amenity) => {
+                  const iconName = getAmenityIcon(amenity.name);
+                  const meta = getAmenityMeta(amenity.name);
+                  const tooltipText = amenity.description || meta.category || amenity.name;
+
+                  return (
+                    <div
+                      key={amenity.id || amenity.name}
+                      title={tooltipText}
+                      className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border border-slate-800 bg-[#090a0c] text-slate-200 hover:border-[#d4b068]/40 hover:bg-[#151922] transition-all cursor-default select-none shadow-xs"
+                    >
+                      <span className="material-symbols-outlined text-base text-[#d4b068] group-hover:scale-110 transition-transform">
+                        {iconName}
+                      </span>
+                      <span>{amenity.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-[#090a0c] border border-slate-800/80 text-center sm:text-left flex items-center gap-3 text-slate-400 text-xs">
+                <span className="material-symbols-outlined text-slate-500 text-lg">
+                  info
+                </span>
+                <span>No specific building amenities or facilities listed for this residence.</span>
+              </div>
+            )}
+          </div>
+
+          {/* 4. Detailed Lease Terms & Financial Information (order-5 on mobile) */}
           {((listing.rent !== undefined &&
             listing.rent !== null &&
             listing.rent !== "") ||
@@ -950,7 +991,7 @@ export function ListingDetailPage() {
               listing.monthly_due_date !== "") ||
             (listing.pet_allowed !== undefined &&
               listing.pet_allowed !== null)) && (
-            <div className="order-4 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+            <div className="order-5 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
               <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-lg text-[#d4b068]">
                   receipt_long

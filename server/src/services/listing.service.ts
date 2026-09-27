@@ -72,8 +72,8 @@ export async function searchListings(
   // Add public media URLs before returning the matching listings.
   return attachMediaToListingResults(result.rows);
 }
-export async function getMylistings(owner : number) {
-  const result= await pool.query("select l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id where l.owner_id=$1",[owner]);
+export async function getMylistings(owner: number) {
+  const result = await pool.query("select l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id where l.owner_id=$1", [owner]);
   return attachMediaToListingResults(result.rows);
 }
 
@@ -96,6 +96,27 @@ async function attachMediaToListingResults(listings: any[]) {
     byListing.set(row.listing_id, arr);
   }
   return listings.map((l) => ({ ...l, images: byListing.get(l.id) ?? [] }));
+}
+
+// Attach amenities to listings
+async function attachAmenitiesToListingResults(listings: any[]) {
+  if (listings.length === 0) return listings;
+  const ids = listings.map((l) => l.id);
+  const amenitiesRes = await pool.query(
+    `SELECT la.listing_id, a.id, a.name, a.description
+     FROM listing_amenities la
+     JOIN amenities a ON a.id = la.amenity_id
+     WHERE la.listing_id = ANY($1)
+     ORDER BY a.name ASC`,
+    [ids]
+  );
+  const byListing = new Map<number, any[]>();
+  for (const row of amenitiesRes.rows) {
+    const arr = byListing.get(row.listing_id) ?? [];
+    arr.push({ id: row.id, name: row.name, description: row.description });
+    byListing.set(row.listing_id, arr);
+  }
+  return listings.map((l) => ({ ...l, amenities: byListing.get(l.id) ?? [] }));
 }
 
 export async function getListingById(
@@ -136,7 +157,8 @@ export async function getListingById(
   }
 
   const [withMedia] = await attachMediaToListingResults([result.rows[0]]);
-  return withMedia;
+  const [withAmenities] = await attachAmenitiesToListingResults([withMedia]);
+  return withAmenities;
 }
 
 type Area = {
@@ -166,8 +188,8 @@ export function findAreaIdForCoordinates(
     const haversine =
       Math.sin(latitudeDelta / 2) ** 2 +
       Math.cos(latitudeRadians) *
-        Math.cos(areaLatitudeRadians) *
-        Math.sin(longitudeDelta / 2) ** 2;
+      Math.cos(areaLatitudeRadians) *
+      Math.sin(longitudeDelta / 2) ** 2;
     const distance =
       2 *
       EARTH_RADIUS_METERS *
@@ -247,6 +269,25 @@ export async function createListing(ownerId: number, data: CreateListingInput) {
       "INSERT INTO initial_terms (listing_id,terms_id) VALUES ($1,$2)",
       [listingId, termsId],
     );
+
+    // Insert valid amenities into listing_amenities table
+    if (data.amenities && data.amenities.length > 0) {
+      const validAmenities = await client.query<{ id: number }>(
+        "SELECT id FROM amenities WHERE name = ANY($1)",
+        [data.amenities],
+      );
+      if (validAmenities.rows.length > 0) {
+        const values = validAmenities.rows
+          .map((_, i) => `($1, $${i + 2})`)
+          .join(", ");
+        const params = [listingId, ...validAmenities.rows.map((r) => r.id)];
+        await client.query(
+          `INSERT INTO listing_amenities (listing_id, amenity_id) VALUES ${values} ON CONFLICT DO NOTHING`,
+          params,
+        );
+      }
+    }
+
     await client.query("COMMIT");
     return listingId;
   } catch (err) {
@@ -317,6 +358,30 @@ export async function updateListing(
         id,
       ],
     );
+
+    if (data.amenities !== undefined) {
+      await client.query(
+        "DELETE FROM listing_amenities WHERE listing_id = $1",
+        [id],
+      );
+      if (data.amenities.length > 0) {
+        const validAmenities = await client.query<{ id: number }>(
+          "SELECT id FROM amenities WHERE name = ANY($1)",
+          [data.amenities],
+        );
+        if (validAmenities.rows.length > 0) {
+          const values = validAmenities.rows
+            .map((_, i) => `($1, $${i + 2})`)
+            .join(", ");
+          const params = [id, ...validAmenities.rows.map((r) => r.id)];
+          await client.query(
+            `INSERT INTO listing_amenities (listing_id, amenity_id) VALUES ${values} ON CONFLICT DO NOTHING`,
+            params,
+          );
+        }
+      }
+    }
+
     await client.query("COMMIT");
   } catch (err) {
     await client.query("ROLLBACK");
@@ -392,3 +457,11 @@ export async function verifyListing(id: string) {
   if (result.rows.length === 0) throw new AppError(404, "listing not found or already processed");
   return result.rows[0];
 }
+
+export async function getAllAmenities() {
+  const result = await pool.query(
+    "SELECT id, name, description FROM amenities ORDER BY name ASC"
+  );
+  return result.rows;
+}
+

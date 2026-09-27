@@ -7,9 +7,10 @@ import { upload } from "../middleware/upload.js";
 const router = Router();
 
 router.get("/", asyncHandler(listingController.getAll));
-router.get("/my",optionalAuthMiddleware,authMiddleware,asyncHandler(listingController.getMy));
+router.get("/my", optionalAuthMiddleware, authMiddleware, asyncHandler(listingController.getMy));
 router.get("/search", asyncHandler(listingController.search));
-router.get("/:id",optionalAuthMiddleware ,asyncHandler(listingController.getById));
+router.get("/amenities", asyncHandler(listingController.getAmenities));
+router.get("/:id", optionalAuthMiddleware, asyncHandler(listingController.getById));
 router.post("/", authMiddleware, asyncHandler(listingController.create));
 router.patch("/:id", authMiddleware, asyncHandler(listingController.update));
 router.delete("/:id", authMiddleware, asyncHandler(listingController.remove));

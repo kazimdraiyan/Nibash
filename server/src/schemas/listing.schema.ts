@@ -38,6 +38,7 @@ export const createListingSchema = z.object({
   security_deposit: z
     .number()
     .nonnegative("security deposit must be a non-negative number"),
+  amenities: z.array(z.string()).optional(),
 });
 
 export type CreateListingInput = z.infer<typeof createListingSchema>;
