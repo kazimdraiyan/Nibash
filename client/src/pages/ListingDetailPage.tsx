@@ -12,6 +12,10 @@ import { getAreaName } from "../utils/areaLookup";
 import { ListingMapPreview } from "../components/ListingMapPreview";
 import { DocumentViewerModal } from "../components/DocumentViewerModal";
 
+interface OwnerPhoneListing extends BackendListing {
+  owner_phone?: string | null;
+}
+
 export interface ListingDocument {
   id: number;
   document_type: string;
@@ -43,6 +47,17 @@ function formatDocumentType(type: string): string {
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(" ");
   }
+}
+
+function formatPhoneForWhatsApp(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+
+  if (!digits) return "";
+  if (digits.startsWith("880") && digits.length >= 12) return digits;
+  if (digits.startsWith("0") && digits.length === 11) return `880${digits.slice(1)}`;
+  if (digits.length >= 10) return digits;
+
+  return "";
 }
 
 interface Review {
@@ -90,7 +105,7 @@ export function ListingDetailPage() {
   const { user } = useAuth();
   const autoAppliedRef = useRef(false);
 
-  const [listing, setListing] = useState<BackendListing | null>(null);
+  const [listing, setListing] = useState<OwnerPhoneListing | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -237,9 +252,9 @@ export function ListingDetailPage() {
     setError(null);
     try {
       // 1. Fetch listing details
-      let currentListing: BackendListing | null = null;
+      let currentListing: OwnerPhoneListing | null = null;
       try {
-        const listingRes = await apiClient.get<{ listing: BackendListing }>(
+        const listingRes = await apiClient.get<{ listing: OwnerPhoneListing }>(
           `/listings/${id}`,
         );
         currentListing = listingRes.listing;
@@ -247,7 +262,7 @@ export function ListingDetailPage() {
         // If 404 and current user is a verifier, query unverified queue
         if (user?.is_verifier) {
           try {
-            const unverifiedRes = await apiClient.get<{ listings: BackendListing[] }>(
+            const unverifiedRes = await apiClient.get<{ listings: OwnerPhoneListing[] }>(
               `/verify/listings`,
             );
             const found = (unverifiedRes.listings || []).find(
@@ -429,6 +444,7 @@ export function ListingDetailPage() {
         });
         setIsTenant(true);
         setAppliedRefresh((prev) => prev + 1);
+        fetchDetails();
       }
       setShowSuccessModal(true);
     } catch (err: any) {
@@ -447,6 +463,7 @@ export function ListingDetailPage() {
             applicantPhone: user.phone,
           });
           setAppliedRefresh((prev) => prev + 1);
+          fetchDetails();
         }
       } else {
         setApplyError(msg || "Failed to submit application.");
@@ -514,6 +531,7 @@ export function ListingDetailPage() {
         });
         setIsTenant(true);
         setAppliedRefresh((prev) => prev + 1);
+        fetchDetails();
       }
       setShowSuccessModal(true);
     } catch (err: any) {
@@ -530,6 +548,7 @@ export function ListingDetailPage() {
             applicantPhone: user.phone,
           });
           setAppliedRefresh((prev) => prev + 1);
+          fetchDetails();
         }
       } else {
         setApplyError(msg || "Failed to submit application.");
@@ -663,6 +682,15 @@ export function ListingDetailPage() {
   };
 
   const isOwner = Boolean(user && Number(user.id) === Number(listing.owner_id));
+  const whatsAppPhone = listing.owner_phone
+    ? formatPhoneForWhatsApp(listing.owner_phone)
+    : "";
+  const whatsAppHref = whatsAppPhone
+    ? `https://wa.me/${whatsAppPhone}?text=${encodeURIComponent(
+        `Hello, I'm interested in your listing "${listing.title}".`,
+      )}`
+    : null;
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Back Link */}
@@ -1694,6 +1722,18 @@ export function ListingDetailPage() {
 
           {/* 2. Actions Card (order-5 on mobile) */}
           <div className="order-5 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
+            {user && !isOwner && isApplied && whatsAppHref && (
+              <a
+                href={whatsAppHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-xs font-semibold text-slate-950 shadow-sm transition hover:bg-[#1ebe5d]"
+              >
+                <span className="material-symbols-outlined text-base">chat</span>
+                <span>Contact Owner via WhatsApp</span>
+              </a>
+            )}
+
             {user?.is_verifier ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-white/5">

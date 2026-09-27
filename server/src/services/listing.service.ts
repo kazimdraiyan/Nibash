@@ -100,23 +100,35 @@ async function attachMediaToListingResults(listings: any[]) {
 
 export async function getListingById(
   id: string,
-  ownerId?: number | null
+  viewerUserId?: number | null
 ) {
   const result = await pool.query(
     `SELECT l.*, 
             t.rent, 
             t.electricity_bill, 
-            t.water_bill, 
-            t.service_charge, 
-            t.monthly_due_date, 
-            t.pet_allowed, 
-            t.security_deposit
+             t.water_bill,
+             t.service_charge,
+             t.monthly_due_date,
+             t.pet_allowed,
+             t.security_deposit,
+             CASE
+               WHEN $2::integer IS NOT NULL 
+                    AND l.owner_id <> $2::integer
+                    AND EXISTS (
+                      SELECT 1 FROM applies a
+                      WHERE a.listing_id = l.id
+                        AND a.tenant_id = $2::integer
+                        AND a.status <> 'rejected'
+                    )
+               THEN u.phone
+             END AS owner_phone
      FROM listings l
      JOIN initial_terms it ON it.listing_id = l.id
      JOIN terms t ON t.id = it.terms_id
+     LEFT JOIN users u ON u.id = l.owner_id
      WHERE l.id = $1 
        AND (l.status = 'approved' OR l.owner_id = $2)`,
-    [id, ownerId]
+    [id, viewerUserId]
   );
 
   if (result.rows.length === 0) {

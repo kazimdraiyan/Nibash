@@ -2,6 +2,25 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { isTokenRevoked } from "../services/auth.service.js";
 
+type AuthenticatedUser = {
+  id: number;
+  email: string;
+};
+
+type RevocationCheck = (token: string) => Promise<boolean>;
+
+export async function getOptionalUser(
+  token: string,
+  checkRevocation: RevocationCheck = isTokenRevoked,
+): Promise<AuthenticatedUser | undefined> {
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET as string) as AuthenticatedUser;
+    return (await checkRevocation(token)) ? undefined : user;
+  } catch {
+    return undefined;
+  }
+}
+
 const authMiddleware = async (
   req: Request,
   res: Response,
@@ -40,7 +59,7 @@ const authMiddleware = async (
   }
 };
 
-export const optionalAuthMiddleware = (
+export const optionalAuthMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -51,15 +70,8 @@ export const optionalAuthMiddleware = (
     return;
   }
   const token = authHeader.split(" ")[1];
-  try {
-    const isValid = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: number;
-      email: string;
-    };
-    req.user = isValid;
-  } catch {
-    // invalid token — ignore it, treat as unauthenticated
-  }
+  const user = await getOptionalUser(token);
+  if (user) req.user = user;
   next();
 };
 
