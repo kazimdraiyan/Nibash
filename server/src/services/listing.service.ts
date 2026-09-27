@@ -148,7 +148,7 @@ export async function getListingById(
      JOIN terms t ON t.id = it.terms_id
      LEFT JOIN users u ON u.id = l.owner_id
      WHERE l.id = $1 
-       AND (l.status = 'approved' OR l.owner_id = $2)`,
+       AND (l.status = 'approved' OR l.owner_id = $2 OR EXISTS (SELECT 1 FROM verifiers v WHERE v.user_id = $2))`,
     [id, viewerUserId]
   );
 
@@ -452,6 +452,15 @@ export async function getUnverifiedListings() {
 export async function verifyListing(id: string) {
   const result = await pool.query(
     "UPDATE listings SET status='approved' WHERE id=$1 AND status='waiting' RETURNING id",
+    [id]
+  );
+  if (result.rows.length === 0) throw new AppError(404, "listing not found or already processed");
+  return result.rows[0];
+}
+
+export async function rejectListing(id: string) {
+  const result = await pool.query(
+    "UPDATE listings SET status='rejected' WHERE id=$1 AND status IN ('waiting', 'approved') RETURNING id, status",
     [id]
   );
   if (result.rows.length === 0) throw new AppError(404, "listing not found or already processed");

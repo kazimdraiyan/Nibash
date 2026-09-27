@@ -85,3 +85,82 @@ test("does not include owner's phone when viewer is unauthenticated or not an ap
   assert.equal(listing.owner_phone, null);
   assert.deepEqual(calls[0].values, ["12", null]);
 });
+
+test("rejectListing updates status to rejected for waiting or approved listing", async (t) => {
+  type QueryCall = { query: string; values?: readonly unknown[] };
+  type MockablePool = {
+    query: (query: string, values?: readonly unknown[]) => Promise<{ rows: any[] }>;
+  };
+  const mockablePool = pool as unknown as MockablePool;
+  const originalQuery = mockablePool.query;
+  const calls: QueryCall[] = [];
+
+  mockablePool.query = async (query, values) => {
+    calls.push({ query, values });
+    return { rows: [{ id: 45, status: "rejected" }] };
+  };
+  t.after(() => {
+    mockablePool.query = originalQuery;
+  });
+
+  const rejected = await listingService.rejectListing("45");
+
+  assert.deepEqual(rejected, { id: 45, status: "rejected" });
+  assert.match(
+    calls[0].query,
+    /UPDATE listings SET status='rejected' WHERE id=\$1 AND status IN \('waiting', 'approved'\)/i,
+  );
+  assert.deepEqual(calls[0].values, ["45"]);
+});
+
+test("rejectListing throws 404 when listing does not exist or cannot be rejected", async (t) => {
+  type MockablePool = {
+    query: (query: string, values?: readonly unknown[]) => Promise<{ rows: any[] }>;
+  };
+  const mockablePool = pool as unknown as MockablePool;
+  const originalQuery = mockablePool.query;
+
+  mockablePool.query = async () => ({ rows: [] });
+  t.after(() => {
+    mockablePool.query = originalQuery;
+  });
+
+  await assert.rejects(
+    async () => {
+      await listingService.rejectListing("999");
+    },
+    {
+      name: "AppError",
+      message: "listing not found or already processed",
+      statusCode: 404,
+    },
+  );
+});
+
+test("getListingById query allows verifier access regardless of listing approval status", async (t) => {
+  type QueryCall = { query: string; values?: readonly unknown[] };
+  type MockablePool = {
+    query: (query: string, values?: readonly unknown[]) => Promise<{ rows: any[] }>;
+  };
+  const mockablePool = pool as unknown as MockablePool;
+  const originalQuery = mockablePool.query;
+  const calls: QueryCall[] = [];
+
+  mockablePool.query = async (query, values) => {
+    calls.push({ query, values });
+    return calls.length === 1
+      ? { rows: [{ id: 12, status: "rejected" }] }
+      : { rows: [] };
+  };
+  t.after(() => {
+    mockablePool.query = originalQuery;
+  });
+
+  await listingService.getListingById("12", 5);
+
+  assert.match(
+    calls[0].query,
+    /WHERE l\.id = \$1\s+AND \(l\.status = 'approved' OR l\.owner_id = \$2 OR EXISTS \(SELECT 1 FROM verifiers v WHERE v\.user_id = \$2\)\)/i,
+  );
+});
+

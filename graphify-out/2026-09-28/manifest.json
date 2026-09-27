@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "client/src/pages/ListingDetailPage.tsx": {
-    "mtime": 1790536022.6157818,
-    "seen": 1790536057.286533,
-    "ast_hash": "e92da114cd4828f975c7878db61d10fb",
+    "mtime": 1790526721.3895993,
+    "seen": 1790526769.466055,
+    "ast_hash": "7e3f18f45174cb3dea265c31004dd811",
     "semantic_hash": ""
   },
   "client/src/pages/ListingFormPage.tsx": {
@@ -672,9 +672,9 @@
     "semantic_hash": "9abe3b8b88de3e268b6f73f8366378dd"
   },
   "server/src/services/listing.service.ts": {
-    "mtime": 1790535885.0475996,
-    "seen": 1790536057.2876794,
-    "ast_hash": "48249dc76a43dfb88b606e2eb8988d36",
+    "mtime": 1790526630.5851626,
+    "seen": 1790526769.466055,
+    "ast_hash": "548e3d9134fb9c0702102bb8defcafe3",
     "semantic_hash": ""
   },
   "server/src/services/payment.service.ts": {
@@ -918,9 +918,9 @@
     "semantic_hash": ""
   },
   "server/src/controllers/verify.controller.ts": {
-    "mtime": 1790535893.1862602,
-    "seen": 1790536057.286533,
-    "ast_hash": "ec24076025043bc0744d4b4cc410760b",
+    "mtime": 1790481852.9342642,
+    "seen": 1790514329.4607232,
+    "ast_hash": "68d7b89051eab1762ecd7c226616ffde",
     "semantic_hash": ""
   },
   "server/src/middleware/upload.ts": {
@@ -936,9 +936,9 @@
     "semantic_hash": ""
   },
   "server/src/routes/verify.route.ts": {
-    "mtime": 1790535899.3239882,
-    "seen": 1790536057.2876794,
-    "ast_hash": "beb777c33c643e3bb97b570dd72e1607",
+    "mtime": 1790481852.9402268,
+    "seen": 1790514329.4607232,
+    "ast_hash": "4500c7600205926d4fd6d2bc86fa1c03",
     "semantic_hash": ""
   },
   "server/src/scripts/createVerifier.ts": {
@@ -1938,15 +1938,33 @@
     "semantic_hash": ""
   },
   "server/src/services/listing.service.test.ts": {
-    "mtime": 1790535611.8457098,
-    "seen": 1790536057.2876794,
-    "ast_hash": "af17a2771a711ebd40400abe43bcf822",
+    "mtime": 1790526742.4728656,
+    "seen": 1790526769.466055,
+    "ast_hash": "88cad088b2d00974d4026018b81f142c",
+    "semantic_hash": ""
+  },
+  "docs/VERIFIER_DASHBOARD_PROMPT.md": {
+    "mtime": 1790513548.6907694,
+    "seen": 1790514329.4607232,
+    "ast_hash": "ae55635120508510343ac79e507aeecc",
+    "semantic_hash": ""
+  },
+  "docs/features/02-verifier-listing-review.md": {
+    "mtime": 1790493961.419303,
+    "seen": 1790514329.4607232,
+    "ast_hash": "e54a9b9cac01bc9133f2492d88bda6eb",
     "semantic_hash": ""
   },
   "db/migrations/009_contract_created_at.sql": {
     "mtime": 1790521304.6970997,
     "seen": 1790521554.8464286,
     "ast_hash": "0c68019bf585f4b65d2fbd30e20a91e5",
+    "semantic_hash": ""
+  },
+  "docs/VERIFIER_WORKFLOW_FIXES_PROMPT.md": {
+    "mtime": 1790521227.6029665,
+    "seen": 1790521554.8464286,
+    "ast_hash": "99590aceefa4c27cd12ba19e19345335",
     "semantic_hash": ""
   },
   "server/src/middleware/auth.test.ts": {
