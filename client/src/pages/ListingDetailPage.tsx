@@ -181,6 +181,8 @@ export function ListingDetailPage() {
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [verifySuccessMsg, setVerifySuccessMsg] = useState<string | null>(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+  const [rejectError, setRejectError] = useState<string | null>(null);
 
   // Active document viewer state
   const [activeViewerDoc, setActiveViewerDoc] = useState<{
@@ -628,6 +630,23 @@ export function ListingDetailPage() {
       setVerifyError(err.message || "Failed to approve listing.");
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleRejectListing = async () => {
+    if (!id || rejecting || listing?.status?.toLowerCase() === "rejected") return;
+    setRejecting(true);
+    setRejectError(null);
+    try {
+      await apiClient.post(`/verify/listings/${id}/reject`);
+      setListing((prev) => (prev ? { ...prev, status: "rejected" } : null));
+      setShowRejectModal(false);
+      setVerifySuccessMsg(null);
+      setVerifyError(null);
+    } catch (err: any) {
+      setRejectError(err.message || "Failed to reject listing.");
+    } finally {
+      setRejecting(false);
     }
   };
 
@@ -1798,7 +1817,7 @@ export function ListingDetailPage() {
                   <button
                     type="button"
                     onClick={handleApproveListing}
-                    disabled={verifying || listing.status?.toLowerCase() === "approved"}
+                    disabled={verifying || listing.status?.toLowerCase() === "approved" || listing.status?.toLowerCase() === "rejected"}
                     className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-semibold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-base">
@@ -1816,11 +1835,11 @@ export function ListingDetailPage() {
                   <button
                     type="button"
                     onClick={() => setShowRejectModal(true)}
-                    disabled={verifying}
-                    className="w-full bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-medium py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                    disabled={verifying || rejecting || listing.status?.toLowerCase() === "rejected"}
+                    className="w-full bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-medium py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <span className="material-symbols-outlined text-base">cancel</span>
-                    <span>Reject Listing</span>
+                    <span>{listing.status?.toLowerCase() === "rejected" ? "Listing Rejected" : "Reject Listing"}</span>
                   </button>
                 </div>
               </div>
@@ -2371,7 +2390,7 @@ export function ListingDetailPage() {
       {showRejectModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={() => setShowRejectModal(false)}
+          onClick={() => !rejecting && setShowRejectModal(false)}
         >
           <div
             className="w-full max-w-md bg-[#12151c] border border-rose-900/60 rounded-2xl p-6 shadow-2xl space-y-4"
@@ -2379,31 +2398,43 @@ export function ListingDetailPage() {
           >
             <div className="flex items-start gap-3">
               <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-400">
-                <span className="material-symbols-outlined text-2xl">error</span>
+                <span className="material-symbols-outlined text-2xl">cancel</span>
               </div>
               <div className="flex-1">
-                <h3 className="text-base font-bold text-white">
-                  Listing Rejection Not Supported
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  API Limitation Notice
-                </p>
+                <h3 className="text-base font-bold text-white">Reject this listing?</h3>
+                <p className="text-xs text-slate-400 mt-1">This action cannot be undone.</p>
               </div>
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed bg-[#090a0c] p-3.5 rounded-xl border border-white/5">
-              The backend API currently does not implement a listing rejection endpoint
-              or store rejection reasons for verifiers. To request changes or flag this listing,
-              please contact the administrator or leave the listing unverified in the queue.
+              The listing will be marked as <span className="text-rose-400 font-semibold">rejected</span> and
+              immediately removed from all public listings. Tenants will no longer be able to find or apply to it.
             </p>
+
+            {rejectError && (
+              <div className="p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">error</span>
+                <span>{rejectError}</span>
+              </div>
+            )}
 
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setShowRejectModal(false)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-medium transition cursor-pointer"
+                disabled={rejecting}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-medium transition cursor-pointer disabled:opacity-50"
               >
-                Close
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleRejectListing}
+                disabled={rejecting}
+                className="px-4 py-2 bg-rose-700 hover:bg-rose-600 text-white rounded-xl text-xs font-semibold transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {rejecting && <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>}
+                {rejecting ? "Rejecting..." : "Confirm Rejection"}
               </button>
             </div>
           </div>

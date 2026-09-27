@@ -7,5 +7,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const router = Router();
 router.get("/listings", authMiddleware, requireVerifier, asyncHandler(verifyController.getUnverified));
 router.post("/listings/:id/verify", authMiddleware, requireVerifier, asyncHandler(verifyController.verify));
+router.post("/listings/:id/reject", authMiddleware, requireVerifier, asyncHandler(verifyController.reject));
 
 export default router;

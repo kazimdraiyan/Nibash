@@ -23,6 +23,7 @@ interface GrowthTrends {
   signups_per_week: GrowthTrendItem[];
   listings_per_week: GrowthTrendItem[];
   contracts_per_week: GrowthTrendItem[];
+  applications_per_week: GrowthTrendItem[];
 }
 
 interface OwnerListingCount {
@@ -161,20 +162,25 @@ export function VerifierDashboardPage() {
 
   const { overview, growth, fraud } = data;
 
-  // Prepare merged weekly data for the growth chart (Signups, Listings, Contracts)
-  const weekMap = new Map<string, { signups: number; listings: number; contracts: number }>();
+  // Prepare merged weekly data for the growth chart (Signups, Listings, Contracts, Applications)
+  const weekMap = new Map<string, { signups: number; listings: number; contracts: number; applications: number }>();
 
   growth.signups_per_week.forEach((item) => {
-    weekMap.set(item.week, { signups: item.count, listings: 0, contracts: 0 });
+    weekMap.set(item.week, { signups: item.count, listings: 0, contracts: 0, applications: 0 });
   });
   growth.listings_per_week.forEach((item) => {
-    const existing = weekMap.get(item.week) || { signups: 0, listings: 0, contracts: 0 };
+    const existing = weekMap.get(item.week) || { signups: 0, listings: 0, contracts: 0, applications: 0 };
     existing.listings = item.count;
     weekMap.set(item.week, existing);
   });
   (growth.contracts_per_week || []).forEach((item) => {
-    const existing = weekMap.get(item.week) || { signups: 0, listings: 0, contracts: 0 };
+    const existing = weekMap.get(item.week) || { signups: 0, listings: 0, contracts: 0, applications: 0 };
     existing.contracts = item.count;
+    weekMap.set(item.week, existing);
+  });
+  (growth.applications_per_week || []).forEach((item) => {
+    const existing = weekMap.get(item.week) || { signups: 0, listings: 0, contracts: 0, applications: 0 };
+    existing.applications = item.count;
     weekMap.set(item.week, existing);
   });
 
@@ -184,10 +190,11 @@ export function VerifierDashboardPage() {
     signups: weekMap.get(week)?.signups || 0,
     listings: weekMap.get(week)?.listings || 0,
     contracts: weekMap.get(week)?.contracts || 0,
+    applications: weekMap.get(week)?.applications || 0,
   }));
 
   const maxVal = Math.max(
-    ...chartPoints.map((p) => Math.max(p.signups, p.listings, p.contracts)),
+    ...chartPoints.map((p) => Math.max(p.signups, p.listings, p.contracts, p.applications)),
     5
   );
 
@@ -342,7 +349,7 @@ export function VerifierDashboardPage() {
             </p>
           </div>
 
-          {/* Chart Legend — 3 Data Series */}
+          {/* Chart Legend — 4 Data Series */}
           <div className="flex flex-wrap items-center gap-4 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6] inline-block shadow-sm shadow-blue-500/50" />
@@ -355,6 +362,10 @@ export function VerifierDashboardPage() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] inline-block shadow-sm shadow-emerald-400/50" />
               <span className="text-slate-300 font-label-sm">Signed Leases</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#a78bfa] inline-block shadow-sm shadow-violet-400/50" />
+              <span className="text-slate-300 font-label-sm">Applications</span>
             </div>
           </div>
         </div>
@@ -385,6 +396,10 @@ export function VerifierDashboardPage() {
                     <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
                       <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                    </linearGradient>
+                    <linearGradient id="violetGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.22" />
+                      <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
 
@@ -443,6 +458,13 @@ export function VerifierDashboardPage() {
                       week: pt.week,
                     }));
 
+                    const applicationCoords = chartPoints.map((pt, idx) => ({
+                      x: 70 + idx * stepX,
+                      y: 290 - (pt.applications / maxVal) * 230,
+                      val: pt.applications,
+                      week: pt.week,
+                    }));
+
                     const signupPath = signupCoords
                       .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x} ${c.y}`)
                       .join(" ");
@@ -455,12 +477,17 @@ export function VerifierDashboardPage() {
                       .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x} ${c.y}`)
                       .join(" ");
 
+                    const applicationPath = applicationCoords
+                      .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x} ${c.y}`)
+                      .join(" ");
+
                     const lastX = signupCoords[signupCoords.length - 1].x;
                     const firstX = signupCoords[0].x;
 
                     const signupArea = `${signupPath} L ${lastX} 290 L ${firstX} 290 Z`;
                     const listingArea = `${listingPath} L ${lastX} 290 L ${firstX} 290 Z`;
                     const contractArea = `${contractPath} L ${lastX} 290 L ${firstX} 290 Z`;
+                    const applicationArea = `${applicationPath} L ${lastX} 290 L ${firstX} 290 Z`;
 
                     return (
                       <>
@@ -468,6 +495,7 @@ export function VerifierDashboardPage() {
                         <path d={signupArea} fill="url(#blueGradient)" />
                         <path d={listingArea} fill="url(#amberGradient)" />
                         <path d={contractArea} fill="url(#emeraldGradient)" />
+                        <path d={applicationArea} fill="url(#violetGradient)" />
 
                         {/* Trend lines */}
                         <path
@@ -490,6 +518,14 @@ export function VerifierDashboardPage() {
                           d={contractPath}
                           fill="none"
                           stroke="#10b981"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d={applicationPath}
+                          fill="none"
+                          stroke="#a78bfa"
                           strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -561,6 +597,31 @@ export function VerifierDashboardPage() {
                               y={c.y - 10}
                               textAnchor="middle"
                               fill="#a7f3d0"
+                              fontSize="10"
+                              fontWeight="bold"
+                              fontFamily="monospace"
+                            >
+                              {c.val}
+                            </text>
+                          </g>
+                        ))}
+
+                        {/* Applications Markers */}
+                        {applicationCoords.map((c, i) => (
+                          <g key={`a-${i}`} className="cursor-pointer group">
+                            <circle
+                              cx={c.x}
+                              cy={c.y}
+                              r="4.5"
+                              fill="#090a0c"
+                              stroke="#a78bfa"
+                              strokeWidth="2.5"
+                            />
+                            <text
+                              x={c.x}
+                              y={c.y + 16}
+                              textAnchor="middle"
+                              fill="#ddd6fe"
                               fontSize="10"
                               fontWeight="bold"
                               fontFamily="monospace"

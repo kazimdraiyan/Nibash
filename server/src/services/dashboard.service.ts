@@ -20,6 +20,7 @@ export interface GrowthTrends {
   signups_per_week: GrowthTrendItem[];
   listings_per_week: GrowthTrendItem[];
   contracts_per_week: GrowthTrendItem[];
+  applications_per_week: GrowthTrendItem[];
 }
 
 export interface OwnerListingCount {
@@ -117,10 +118,21 @@ export async function getGrowthTrends(): Promise<GrowthTrends> {
     ORDER BY DATE_TRUNC('week', COALESCE(created_at, start_date::timestamp)) ASC
   `);
 
+  const newApplications = await pool.query(`
+    SELECT
+      TO_CHAR(DATE_TRUNC('week', applied_at), 'YYYY-MM-DD') AS week,
+      COUNT(*)::int                                          AS count
+    FROM applies
+    WHERE applied_at >= NOW() - INTERVAL '8 weeks'
+    GROUP BY DATE_TRUNC('week', applied_at)
+    ORDER BY DATE_TRUNC('week', applied_at) ASC
+  `);
+
   return {
     signups_per_week: signups.rows,
     listings_per_week: newListings.rows,
     contracts_per_week: newContracts.rows,
+    applications_per_week: newApplications.rows,
   };
 }
 
