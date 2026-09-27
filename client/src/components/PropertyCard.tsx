@@ -181,6 +181,12 @@ export function PropertyCard({
                 </span>
               </>
             )}
+            {!isOwner && user?.is_verifier && isWaiting && (
+              <span className="glass-panel-subtle px-3 py-1 rounded-full text-[11px] font-label-sm uppercase tracking-wider shadow-md flex items-center gap-1.5 border text-amber-300 border-amber-500/40 bg-amber-950/50">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                Pending Verification
+              </span>
+            )}
             {isUserApplied && (
               <span className="glass-panel-subtle px-3 py-1 rounded-full text-[11px] font-label-sm uppercase tracking-wider text-emerald-300 border border-emerald-500/40 shadow-md flex items-center gap-1">
                 <span className="material-symbols-outlined text-[13px]">done_all</span>
@@ -329,6 +335,11 @@ export function PropertyCard({
                 <span>View</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
+            ) : user?.is_verifier ? (
+              <span className="inline-flex items-center gap-1 text-xs font-label-sm uppercase tracking-wider text-amber-400 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all font-semibold">
+                <span>Review</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </span>
             ) : (
               <Link
                 to={`/listings/${id}`}

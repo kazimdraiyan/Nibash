@@ -11,6 +11,7 @@ import paymentRoutes from "./routes/payment.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import verifyRouter from "./routes/verify.route.js";
 import documentRoutes from "./routes/document.route.js";
+import dashboardRoutes from "./routes/dashboard.route.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/verify", verifyRouter);
 app.use("/api/documents", documentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // health chcek
 app.get("/health", async (_req, res) => {

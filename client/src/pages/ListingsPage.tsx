@@ -61,6 +61,49 @@ export function ListingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Verifier review queue states
+  const isVerifier = Boolean(user?.is_verifier);
+  const viewParam = searchParams.get("view");
+  const [verifierView, setVerifierView] = useState<"pending" | "approved">(() => {
+    if (viewParam === "approved") return "approved";
+    if (viewParam === "pending") return "pending";
+    return isVerifier ? "pending" : "approved";
+  });
+
+  useEffect(() => {
+    if (viewParam === "approved" || viewParam === "pending") {
+      setVerifierView(viewParam);
+    } else if (isVerifier) {
+      setVerifierView("pending");
+    } else {
+      setVerifierView("approved");
+    }
+  }, [viewParam, isVerifier]);
+
+  const [unverifiedListings, setUnverifiedListings] = useState<BackendListing[]>([]);
+  const [unverifiedLoading, setUnverifiedLoading] = useState(false);
+  const [unverifiedError, setUnverifiedError] = useState<string | null>(null);
+
+  const fetchUnverified = useCallback(async () => {
+    if (!token || !user?.is_verifier) return;
+    setUnverifiedLoading(true);
+    setUnverifiedError(null);
+    try {
+      const data = await apiClient.get<{ listings: BackendListing[] }>("/verify/listings");
+      setUnverifiedListings(data.listings || []);
+    } catch (err: any) {
+      setUnverifiedError(err.message || "Failed to load unverified listings.");
+    } finally {
+      setUnverifiedLoading(false);
+    }
+  }, [token, user?.is_verifier]);
+
+  useEffect(() => {
+    if (isVerifier) {
+      fetchUnverified();
+    }
+  }, [isVerifier, fetchUnverified]);
+
   // Search execution states
   const [searchResults, setSearchResults] = useState<BackendListing[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -80,9 +123,10 @@ export function ListingsPage() {
       if (area.trim()) next.set("area", area.trim());
       if (beds !== null && !isNaN(beds)) next.set("bedrooms", beds.toString());
       if (rent !== null && !isNaN(rent)) next.set("maxRent", rent.toString());
+      if (isVerifier) next.set("view", verifierView);
       setSearchParams(next, { replace: true });
     },
-    [setSearchParams]
+    [setSearchParams, isVerifier, verifierView]
   );
 
   // Sync state if URL changes externally (e.g. navigation or browser back/forward)
@@ -273,6 +317,20 @@ export function ListingsPage() {
     ? basePublicListings.filter((l) => Number(l.owner_id) !== Number(user.id))
     : basePublicListings;
 
+  // Filter unverified listings locally for verifiers
+  const displayedPendingListings = unverifiedListings.filter((item) => {
+    const matchesText =
+      !searchTerm.trim() ||
+      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const targetAreaId = getAreaIdByName(areaName);
+    const matchesArea =
+      !areaName.trim() || targetAreaId === null || Number(item.area_id) === targetAreaId;
+    const matchesBed = bedrooms === null || Number(item.bedroom_count) === bedrooms;
+    const matchesRent = maxRent === null || (item.rent != null && Number(item.rent) <= maxRent);
+    return matchesText && matchesArea && matchesBed && matchesRent;
+  });
+
   const handleOpenAppInfo = (item: BackendListing) => {
     const app = user ? getUserApplication(user.id, item.id) : null;
     setSelectedApp({ listing: item, application: app });
@@ -288,12 +346,14 @@ export function ListingsPage() {
             Real approved properties stored in PostgreSQL database.
           </p>
         </div>
-        <Link
-          to="/listings/new"
-          className="w-full sm:w-auto bg-white text-slate-900 font-medium px-4 py-2.5 rounded-lg text-sm hover:bg-slate-200 transition text-center"
-        >
-          + Post a Listing
-        </Link>
+        {!isVerifier && (
+          <Link
+            to="/listings/new"
+            className="w-full sm:w-auto bg-white text-slate-900 font-medium px-4 py-2.5 rounded-lg text-sm hover:bg-slate-200 transition text-center"
+          >
+            + Post a Listing
+          </Link>
+        )}
       </div>
 
       {/* Comprehensive Search & Filter Widget */}
@@ -459,30 +519,159 @@ export function ListingsPage() {
         )}
       </form>
 
-      {/* Initial Database Loading State */}
-      {loading && (
-        <div className="py-20 text-center text-slate-400">
-          <div className="w-8 h-8 rounded-full border-2 border-white/40 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-sm">Fetching properties from database...</p>
-        </div>
-      )}
+      {/* Verifier Review Queue Switcher */}
+      {isVerifier && (
+        <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#12151c] border border-amber-500/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <span className="material-symbols-outlined text-2xl">verified_user</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase font-label-sm tracking-wider font-semibold text-amber-400">
+                  Verifier Review Mode
+                </span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-medium">
+                  {unverifiedListings.length} awaiting review
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Browse listings using standard luxury cards and review authentic verification documents.
+              </p>
+            </div>
+          </div>
 
-      {/* Initial Database Error State */}
-      {error && !loading && (
-        <div className="p-4 bg-red-950/50 border border-red-800 text-red-300 rounded-lg flex flex-col items-center justify-center gap-3 my-8 text-center">
-          <p className="text-sm">{error}</p>
-          <button
-            onClick={fetchListings}
-            className="px-4 py-1.5 bg-red-800 hover:bg-red-700 text-white rounded text-xs font-medium cursor-pointer"
-          >
-            Retry Fetch
-          </button>
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#090a0c] border border-white/10 self-start sm:self-center shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setVerifierView("pending");
+                const next = new URLSearchParams(searchParams);
+                next.set("view", "pending");
+                setSearchParams(next, { replace: true });
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-label-sm uppercase tracking-wider font-medium transition cursor-pointer flex items-center gap-1.5 ${
+                verifierView === "pending"
+                  ? "bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <span>Pending Review</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/10 font-mono">
+                {unverifiedListings.length}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setVerifierView("approved");
+                const next = new URLSearchParams(searchParams);
+                next.set("view", "approved");
+                setSearchParams(next, { replace: true });
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-label-sm uppercase tracking-wider font-medium transition cursor-pointer flex items-center gap-1.5 ${
+                verifierView === "approved"
+                  ? "bg-white/15 text-white border border-white/20 shadow-sm"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <span>All Approved</span>
+            </button>
+          </div>
         </div>
       )}
 
       {/* Main Content Area */}
-      {!loading && !error && (
+      {isVerifier && verifierView === "pending" ? (
+        <div>
+          {unverifiedLoading ? (
+            <div className="py-20 text-center text-slate-400 border border-dashed border-slate-800 rounded-xl my-4">
+              <div className="w-8 h-8 rounded-full border-2 border-amber-400/40 border-t-transparent animate-spin mx-auto mb-3" />
+              <p className="text-sm">Fetching unverified listings...</p>
+            </div>
+          ) : unverifiedError ? (
+            <div className="p-6 bg-red-950/40 border border-red-800 text-red-300 rounded-xl my-4 text-center flex flex-col items-center gap-3">
+              <span className="material-symbols-outlined text-3xl text-red-400">error</span>
+              <p className="text-sm">{unverifiedError}</p>
+              <button
+                type="button"
+                onClick={fetchUnverified}
+                className="px-4 py-1.5 bg-red-800 hover:bg-red-700 text-white rounded text-xs font-medium cursor-pointer"
+              >
+                Retry Fetch
+              </button>
+            </div>
+          ) : displayedPendingListings.length > 0 ? (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-400">
+                    Listings Pending Verification
+                  </h2>
+                  <span className="text-xs text-amber-300 bg-amber-950/70 border border-amber-800/60 px-2 py-0.5 rounded font-mono">
+                    {displayedPendingListings.length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayedPendingListings.map((item) => (
+                  <PropertyCard
+                    key={item.id}
+                    listing={item}
+                    isOwn={false}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="py-20 text-center border border-dashed border-slate-800 rounded-2xl p-8 my-4">
+              <span className="material-symbols-outlined text-4xl text-amber-400 mb-2">
+                task_alt
+              </span>
+              <h3 className="text-lg font-medium text-white mb-1">No Pending Listings</h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto mb-4">
+                {isFilterActive
+                  ? "No unverified listings match your active filters."
+                  : "All listings have been reviewed! There are currently no listings awaiting verification."}
+              </p>
+              {isFilterActive && (
+                <button
+                  type="button"
+                  onClick={handleClearAll}
+                  className="inline-block bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded text-xs cursor-pointer transition"
+                >
+                  Reset All Filters
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
         <>
+          {/* Initial Database Loading State */}
+          {loading && (
+            <div className="py-20 text-center text-slate-400">
+              <div className="w-8 h-8 rounded-full border-2 border-white/40 border-t-transparent animate-spin mx-auto mb-3" />
+              <p className="text-sm">Fetching properties from database...</p>
+            </div>
+          )}
+
+          {/* Initial Database Error State */}
+          {error && !loading && (
+            <div className="p-4 bg-red-950/50 border border-red-800 text-red-300 rounded-lg flex flex-col items-center justify-center gap-3 my-8 text-center">
+              <p className="text-sm">{error}</p>
+              <button
+                onClick={fetchListings}
+                className="px-4 py-1.5 bg-red-800 hover:bg-red-700 text-white rounded text-xs font-medium cursor-pointer"
+              >
+                Retry Fetch
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <>
           {/* User's Personal Listings Section (if logged in) */}
           {Boolean(token && user) && (
             <div className="mb-10">
@@ -603,19 +792,21 @@ export function ListingsPage() {
                   >
                     Reset All Filters
                   </button>
-                ) : (
+                ) : !isVerifier ? (
                   <Link
                     to="/listings/new"
                     className="inline-block bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded text-xs"
                   >
                     Post a Listing
                   </Link>
-                )}
+                ) : null}
               </div>
             )}
           </div>
         </>
       )}
+    </>
+  )}
 
       {/* Application Details Modal */}
       {selectedApp && (

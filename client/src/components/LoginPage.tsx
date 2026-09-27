@@ -38,8 +38,12 @@ export function LoginPage() {
         throw new Error(data.error || "Login failed. Please check your credentials.");
       }
 
-      await login(data.token);
-      navigate(destination, { replace: true });
+      const loggedUser = await login(data.token);
+      if (loggedUser?.is_verifier) {
+        navigate("/verify/dashboard", { replace: true });
+      } else {
+        navigate(destination, { replace: true });
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred during login.");
     } finally {

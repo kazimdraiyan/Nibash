@@ -10,6 +10,40 @@ import {
 } from "../utils/applicationStorage";
 import { getAreaName } from "../utils/areaLookup";
 import { ListingMapPreview } from "../components/ListingMapPreview";
+import { DocumentViewerModal } from "../components/DocumentViewerModal";
+
+export interface ListingDocument {
+  id: number;
+  document_type: string;
+  is_verified: boolean;
+  verification_type?: string | null;
+  uploaded_at: string;
+  media: { id: number; url: string }[];
+}
+
+function formatDocumentType(type: string): string {
+  switch (type) {
+    case "electricity_bill_receipt":
+      return "Electricity Bill Receipt";
+    case "holding_tax_receipt":
+      return "Holding Tax Receipt";
+    case "water_bill_receipt":
+      return "Water Bill Receipt";
+    case "trade_license":
+      return "Trade License";
+    case "nid":
+      return "National ID (NID)";
+    case "passport":
+      return "Passport";
+    case "driving_license":
+      return "Driving License";
+    default:
+      return type
+        .split("_")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+  }
+}
 
 interface Review {
   rating: number;
@@ -120,6 +154,29 @@ export function ListingDetailPage() {
   // Delete state
   const [deleting, setDeleting] = useState(false);
 
+  // Documents state for verifiers and owner
+  const [documents, setDocuments] = useState<ListingDocument[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [documentsError, setDocumentsError] = useState<string | null>(null);
+
+  // Verifier actions state
+  const [verifyingDocId, setVerifyingDocId] = useState<number | null>(null);
+  const [docVerifyError, setDocVerifyError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [verifySuccessMsg, setVerifySuccessMsg] = useState<string | null>(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+
+  // Active document viewer state
+  const [activeViewerDoc, setActiveViewerDoc] = useState<{
+    title: string;
+    type: string;
+    isVerified: boolean;
+    uploadedAt?: string;
+    media: { id: number; url: string }[];
+    initialIndex: number;
+  } | null>(null);
+
   // Photo gallery state
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<Record<number, boolean>>({});
@@ -180,13 +237,41 @@ export function ListingDetailPage() {
     setError(null);
     try {
       // 1. Fetch listing details
-      const listingRes = await apiClient.get<{ listing: BackendListing }>(
-        `/listings/${id}`,
-      );
-      setListing(listingRes.listing);
+      let currentListing: BackendListing | null = null;
+      try {
+        const listingRes = await apiClient.get<{ listing: BackendListing }>(
+          `/listings/${id}`,
+        );
+        currentListing = listingRes.listing;
+      } catch (err: any) {
+        // If 404 and current user is a verifier, query unverified queue
+        if (user?.is_verifier) {
+          try {
+            const unverifiedRes = await apiClient.get<{ listings: BackendListing[] }>(
+              `/verify/listings`,
+            );
+            const found = (unverifiedRes.listings || []).find(
+              (l) => String(l.id) === String(id),
+            );
+            if (found) {
+              currentListing = found;
+            } else {
+              throw err;
+            }
+          } catch {
+            throw err;
+          }
+        } else {
+          throw err;
+        }
+      }
+      if (!currentListing) {
+        throw new Error("Apartment not found.");
+      }
+      setListing(currentListing);
 
       // Fetch owner details
-      const ownerId = listingRes.listing.owner_id;
+      const ownerId = currentListing.owner_id;
       setOwnerLoading(true);
       if (user && user.id === ownerId) {
         setOwner({
@@ -231,7 +316,7 @@ export function ListingDetailPage() {
       }
 
       // 3. If current logged-in user is the owner, fetch applicants
-      if (user && listingRes.listing.owner_id === user.id) {
+      if (user && currentListing.owner_id === user.id) {
         try {
           const appsRes = await apiClient.get<{ applications: Application[] }>(
             `/applications/${id}`,
@@ -243,7 +328,7 @@ export function ListingDetailPage() {
       }
 
       // 4. If current logged-in user is a prospective tenant, fetch their live application status
-      if (user && listingRes.listing.owner_id !== user.id) {
+      if (user && currentListing.owner_id !== user.id) {
         try {
           const myAppsRes = await apiClient.get<{ applications: any[] }>(
             "/applications/my",
@@ -255,7 +340,7 @@ export function ListingDetailPage() {
             setMyApplication(matched);
             saveUserApplication(user.id, {
               listingId: id,
-              listingTitle: listingRes.listing.title || `Apartment #${id}`,
+              listingTitle: currentListing.title || `Apartment #${id}`,
               appliedAt: matched.applied_at,
               status: matched.status,
               monthlyIncome: matched.monthly_income,
@@ -266,6 +351,22 @@ export function ListingDetailPage() {
           }
         } catch {
           // Fallback gracefully
+        }
+      }
+
+      // 5. Fetch documents for verifiers or property owner
+      if (user?.is_verifier || (user && currentListing.owner_id === user.id)) {
+        setDocumentsLoading(true);
+        setDocumentsError(null);
+        try {
+          const docRes = await apiClient.get<{ documents: ListingDocument[] }>(
+            `/documents/listings/${id}`,
+          );
+          setDocuments(docRes.documents || []);
+        } catch (docErr: any) {
+          setDocumentsError(docErr.message || "Failed to load documents.");
+        } finally {
+          setDocumentsLoading(false);
         }
       }
     } catch (err: any) {
@@ -459,18 +560,54 @@ export function ListingDetailPage() {
     }
   };
 
-  const [verifying, setVerifying] = useState(false);
-  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const loadDocuments = useCallback(async () => {
+    if (!id || !user) return;
+    setDocumentsLoading(true);
+    setDocumentsError(null);
+    try {
+      const docRes = await apiClient.get<{ documents: ListingDocument[] }>(
+        `/documents/listings/${id}`,
+      );
+      setDocuments(docRes.documents || []);
+    } catch (docErr: any) {
+      setDocumentsError(docErr.message || "Failed to load documents.");
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }, [id, user]);
 
-  const handleVerify = async () => {
-    if (!id) return;
+  const handleVerifyDocument = async (documentId: number) => {
+    if (verifyingDocId !== null) return;
+    setVerifyingDocId(documentId);
+    setDocVerifyError(null);
+    try {
+      await apiClient.post(`/documents/${documentId}/verify`);
+      setDocuments((prev) =>
+        prev.map((d) =>
+          d.id === documentId
+            ? { ...d, is_verified: true, verification_type: "manual" }
+            : d,
+        ),
+      );
+    } catch (err: any) {
+      setDocVerifyError(err.message || "Failed to verify document.");
+    } finally {
+      setVerifyingDocId(null);
+    }
+  };
+
+  const handleApproveListing = async () => {
+    if (!id || verifying || listing?.status?.toLowerCase() === "approved") return;
     setVerifying(true);
     setVerifyError(null);
+    setVerifySuccessMsg(null);
     try {
       await apiClient.post(`/verify/listings/${id}/verify`);
-      navigate("/verify");
+      setListing((prev) => (prev ? { ...prev, status: "approved" } : null));
+      setVerifySuccessMsg("Listing approved successfully and is now active on Nibash.");
     } catch (err: any) {
-      setVerifyError(err.message || "Failed to verify listing.");
+      setVerifyError(err.message || "Failed to approve listing.");
+    } finally {
       setVerifying(false);
     }
   };
@@ -1126,7 +1263,250 @@ export function ListingDetailPage() {
             </div>
           )}
 
-          {/* 6. Tenant Reviews (order-8 on mobile) */}
+          {/* 6. Verification Documents Section (order-7 on mobile) */}
+          {(user?.is_verifier || isOwner) && (
+            <div className="order-7 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-white/10">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-xl text-amber-400">
+                      folder_shared
+                    </span>
+                    <h2 className="text-lg font-serif font-bold text-white tracking-wide">
+                      Verification Documents
+                    </h2>
+                    <span className="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
+                      {documents.length}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Official documents uploaded to substantiate ownership, utilities, and property legitimacy.
+                  </p>
+                </div>
+
+                {user?.is_verifier && (
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-label-sm uppercase tracking-wider text-amber-300 self-start sm:self-center">
+                    <span className="material-symbols-outlined text-sm text-amber-400">verified_user</span>
+                    <span>Review Flow</span>
+                  </div>
+                )}
+              </div>
+
+              {docVerifyError && (
+                <div className="p-3 mb-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center justify-between">
+                  <span>{docVerifyError}</span>
+                  <button
+                    type="button"
+                    onClick={() => setDocVerifyError(null)}
+                    className="text-red-400 hover:text-white text-xs ml-2"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              {documentsLoading ? (
+                <div className="py-12 text-center text-slate-400">
+                  <div className="w-7 h-7 rounded-full border-2 border-amber-400/40 border-t-transparent animate-spin mx-auto mb-2" />
+                  <p className="text-xs">Loading verification documents...</p>
+                </div>
+              ) : documentsError ? (
+                <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-300 text-xs flex items-center justify-between">
+                  <span>{documentsError}</span>
+                  <button
+                    type="button"
+                    onClick={loadDocuments}
+                    className="px-3 py-1 bg-red-800 hover:bg-red-700 text-white rounded text-xs transition cursor-pointer"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : documents.length === 0 ? (
+                <div className="py-10 text-center border border-dashed border-slate-800 rounded-xl p-6 bg-[#090a0c]/60">
+                  <span className="material-symbols-outlined text-3xl text-slate-600 mb-2">
+                    description
+                  </span>
+                  <h4 className="text-sm font-medium text-slate-300 mb-1">
+                    No Documents Uploaded
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    The owner has not uploaded any verification documents (utility bills, holding tax, or trade license) for this property yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {documents.map((doc) => {
+                    const docTitle = formatDocumentType(doc.document_type);
+                    const isDocVerified = Boolean(doc.is_verified);
+                    const uploadedDate = doc.uploaded_at
+                      ? new Date(doc.uploaded_at).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "Recently";
+
+                    return (
+                      <div
+                        key={doc.id}
+                        className={`p-4 sm:p-5 rounded-xl border bg-[#090a0c] transition-all flex flex-col gap-4 ${
+                          isDocVerified
+                            ? "border-emerald-800/40 shadow-[0_0_15px_rgba(16,185,129,0.05)]"
+                            : "border-slate-800 hover:border-slate-700"
+                        }`}
+                      >
+                        {/* Document Top Row: Title, Badges, Actions */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+                                isDocVerified
+                                  ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-400"
+                                  : "bg-white/5 border-white/10 text-slate-400"
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-xl">
+                                {isDocVerified ? "verified" : "article"}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="text-sm font-semibold text-white">
+                                  {docTitle}
+                                </h4>
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] uppercase font-label-sm tracking-wider font-semibold border ${
+                                    isDocVerified
+                                      ? "text-emerald-300 bg-emerald-950/70 border-emerald-500/40"
+                                      : "text-amber-300 bg-amber-950/70 border-amber-500/40"
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      isDocVerified
+                                        ? "bg-emerald-400"
+                                        : "bg-amber-400 animate-pulse"
+                                    }`}
+                                  />
+                                  {isDocVerified ? "Verified" : "Pending Review"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                                <span className="font-mono text-slate-500">
+                                  ID: #{doc.id}
+                                </span>
+                                <span>•</span>
+                                <span>Uploaded: {uploadedDate}</span>
+                                {doc.verification_type && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="capitalize text-slate-400">
+                                      Type: {doc.verification_type}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Quick Verify Document Button (for verifiers) */}
+                          {user?.is_verifier && !isDocVerified && (
+                            <button
+                              type="button"
+                              disabled={verifyingDocId === doc.id}
+                              onClick={() => handleVerifyDocument(doc.id)}
+                              className="self-start sm:self-center px-3.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-600/50 hover:bg-emerald-900 text-emerald-300 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                            >
+                              <span className="material-symbols-outlined text-sm">
+                                check
+                              </span>
+                              <span>
+                                {verifyingDocId === doc.id
+                                  ? "Verifying..."
+                                  : "Verify Document"}
+                              </span>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Media Attachments Preview Grid */}
+                        {doc.media && doc.media.length > 0 && (
+                          <div className="pt-3 border-t border-white/5">
+                            <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                              <span>Attached Files ({doc.media.length})</span>
+                              <span className="text-[10px] text-slate-500">
+                                Click file to inspect
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                              {doc.media.map((file, idx) => {
+                                const isPdf = file.url.toLowerCase().includes(".pdf");
+                                return (
+                                  <div
+                                    key={file.id}
+                                    onClick={() =>
+                                      setActiveViewerDoc({
+                                        title: docTitle,
+                                        type: doc.document_type,
+                                        isVerified: isDocVerified,
+                                        uploadedAt: doc.uploaded_at,
+                                        media: doc.media,
+                                        initialIndex: idx,
+                                      })
+                                    }
+                                    className="group/file relative rounded-xl overflow-hidden border border-white/10 hover:border-[#d4b068]/50 bg-[#12151c] aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition shadow-sm hover:scale-[1.02]"
+                                  >
+                                    {isPdf ? (
+                                      <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-slate-900/60">
+                                        <span className="material-symbols-outlined text-3xl text-red-400 mb-1 group-hover/file:scale-110 transition-transform">
+                                          picture_as_pdf
+                                        </span>
+                                        <span className="text-[10px] text-slate-300 font-mono line-clamp-1">
+                                          PDF Document #{idx + 1}
+                                        </span>
+                                        <span className="text-[9px] uppercase tracking-wider text-slate-500 mt-0.5">
+                                          Click to view
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div className="w-full h-full relative">
+                                        <img
+                                          src={file.url}
+                                          alt={`${docTitle} preview`}
+                                          className="w-full h-full object-cover group-hover/file:scale-105 transition-transform duration-300"
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 group-hover/file:bg-black/10 transition-colors flex items-center justify-center">
+                                          <span className="material-symbols-outlined text-white text-xl opacity-0 group-hover/file:opacity-100 transition-opacity bg-black/60 rounded-full p-1.5">
+                                            zoom_in
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Pill Badge */}
+                                    <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between pointer-events-none">
+                                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/75 text-white backdrop-blur-sm">
+                                        {isPdf ? "PDF" : "IMG"}
+                                      </span>
+                                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/75 text-slate-300 backdrop-blur-sm">
+                                        #{idx + 1}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 7. Tenant Reviews (order-8 on mobile) */}
           <div className="order-8 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
@@ -1315,26 +1695,94 @@ export function ListingDetailPage() {
           {/* 2. Actions Card (order-5 on mobile) */}
           <div className="order-5 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
             {user?.is_verifier ? (
-              <div>
-                <h3 className="text-sm font-bold text-white mb-2">
-                  Verifier Controls
-                </h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Review this listing and confirm its authenticity.
-                </p>
-                {verifyError && (
-                  <div className="p-3 mb-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs">
-                    {verifyError}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                  <div>
+                    <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
+                      Verification Status
+                    </span>
+                    <span className="text-xs font-semibold text-white">Listing Review</span>
+                  </div>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium border flex items-center gap-1.5 ${
+                      listing.status?.toLowerCase() === "approved"
+                        ? "bg-emerald-950/60 text-emerald-300 border-emerald-800/60"
+                        : "bg-amber-950/60 text-amber-300 border-amber-800/60"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-sm">
+                      {listing.status?.toLowerCase() === "approved" ? "verified" : "pending"}
+                    </span>
+                    {listing.status?.toLowerCase() === "approved" ? "Approved" : "Pending Verification"}
+                  </span>
+                </div>
+
+                {/* Document Checklist / Stats */}
+                <div className="p-3 rounded-xl bg-[#090a0c] border border-white/5">
+                  <div className="text-[11px] text-slate-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span>Documents Verified</span>
+                    <span className="text-white font-bold">
+                      {documents.filter((d) => d.is_verified).length} / {documents.length}
+                    </span>
+                  </div>
+                  <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="bg-emerald-500 h-full transition-all duration-300"
+                      style={{
+                        width: `${
+                          documents.length > 0
+                            ? (documents.filter((d) => d.is_verified).length / documents.length) * 100
+                            : 0
+                        }%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {verifySuccessMsg && (
+                  <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base">check_circle</span>
+                    <span>{verifySuccessMsg}</span>
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={handleVerify}
-                  disabled={verifying}
-                  className="w-full bg-white text-slate-900 font-semibold py-3 px-4 rounded-xl hover:bg-slate-200 transition disabled:opacity-50 cursor-pointer text-sm"
-                >
-                  {verifying ? "Verifying..." : "Mark as Verified"}
-                </button>
+
+                {verifyError && (
+                  <div className="p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base">error</span>
+                    <span>{verifyError}</span>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleApproveListing}
+                    disabled={verifying || listing.status?.toLowerCase() === "approved"}
+                    className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-semibold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-base">
+                      {listing.status?.toLowerCase() === "approved" ? "check_circle" : "verified"}
+                    </span>
+                    <span>
+                      {verifying
+                        ? "Approving Listing..."
+                        : listing.status?.toLowerCase() === "approved"
+                        ? "Listing Approved"
+                        : "Approve Listing"}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowRejectModal(true)}
+                    disabled={verifying}
+                    className="w-full bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-medium py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-base">cancel</span>
+                    <span>Reject Listing</span>
+                  </button>
+                </div>
               </div>
             ) : isOwner ? (
               <div>
@@ -1862,6 +2310,63 @@ export function ListingDetailPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Verification Document Viewer Modal */}
+      {activeViewerDoc && (
+        <DocumentViewerModal
+          isOpen={Boolean(activeViewerDoc)}
+          onClose={() => setActiveViewerDoc(null)}
+          documentTitle={activeViewerDoc.title}
+          documentType={activeViewerDoc.type}
+          isVerified={activeViewerDoc.isVerified}
+          uploadedAt={activeViewerDoc.uploadedAt}
+          media={activeViewerDoc.media}
+          initialIndex={activeViewerDoc.initialIndex}
+        />
+      )}
+
+      {/* Rejection Advisory Modal */}
+      {showRejectModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowRejectModal(false)}
+        >
+          <div
+            className="w-full max-w-md bg-[#12151c] border border-rose-900/60 rounded-2xl p-6 shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-400">
+                <span className="material-symbols-outlined text-2xl">error</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-white">
+                  Listing Rejection Not Supported
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  API Limitation Notice
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed bg-[#090a0c] p-3.5 rounded-xl border border-white/5">
+              The backend API currently does not implement a listing rejection endpoint
+              or store rejection reasons for verifiers. To request changes or flag this listing,
+              please contact the administrator or leave the listing unverified in the queue.
+            </p>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowRejectModal(false)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-medium transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -18,12 +18,18 @@ import { ContractDetailPage } from "./pages/ContractDetailPage";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ActualListings } from "./components/ActualListings";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { VerifyPortalPage } from "./pages/VerifyPortalPage";
-import { Navigate } from "react-router-dom";
+import { VerifierDashboardPage } from "./pages/VerifierDashboardPage";
 
 function HomePage() {
+  const { user } = useAuth();
+
+  if (user?.is_verifier) {
+    return <Navigate to="/verify/dashboard" replace />;
+  }
+
   return (
     <>
       <Hero />
@@ -43,7 +49,7 @@ function HomePage() {
 }
 
 export default function App() {
-  const { loading, user } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -57,20 +63,6 @@ export default function App() {
   }
 
 
-  if (user?.is_verifier) {
-    return (
-      <div className="antialiased min-h-screen flex flex-col bg-[#090a0c] text-[#f8f9fa]">
-        <ScrollToTop />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/verify" element={<VerifyPortalPage />} />
-            <Route path="/listings/:id" element={<ListingDetailPage />} />
-            <Route path="*" element={<Navigate to="/verify" replace />} />
-          </Routes>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="antialiased min-h-screen flex flex-col bg-[#090a0c] text-[#f8f9fa]">
@@ -83,11 +75,19 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify" element={<VerifyPortalPage />} />
+          <Route
+            path="/verify/dashboard"
+            element={
+              <ProtectedRoute>
+                <VerifierDashboardPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/listings" element={<ListingsPage />} />
           <Route
             path="/my-listings"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute blockVerifier>
                 <MyListingsPage />
               </ProtectedRoute>
             }
@@ -95,7 +95,7 @@ export default function App() {
           <Route
             path="/listings/new"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute blockVerifier>
                 <ListingFormPage />
               </ProtectedRoute>
             }
@@ -104,7 +104,7 @@ export default function App() {
           <Route
             path="/listings/:id/edit"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute blockVerifier>
                 <ListingFormPage />
               </ProtectedRoute>
             }
@@ -112,7 +112,7 @@ export default function App() {
           <Route
             path="/my-applications"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute blockVerifier>
                 <MyApplicationsPage />
               </ProtectedRoute>
             }
@@ -120,7 +120,7 @@ export default function App() {
           <Route
             path="/owner/applications"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute blockVerifier>
                 <ApplicationsPage />
               </ProtectedRoute>
             }
@@ -128,7 +128,7 @@ export default function App() {
           <Route
             path="/contracts/new"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute blockVerifier>
                 <ContractFormPage />
               </ProtectedRoute>
             }

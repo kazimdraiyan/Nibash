@@ -21,7 +21,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (token: string, initialUserData?: User) => Promise<void>;
+  login: (token: string, initialUserData?: User) => Promise<User | null>;
   logout: () => Promise<void>;
 }
 
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = async (newToken: string, initialUserData?: User) => {
+  const login = async (newToken: string, initialUserData?: User): Promise<User | null> => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
     if (initialUserData) {
@@ -107,7 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (fetchedUser) {
       setUser(fetchedUser);
       localStorage.setItem("user", JSON.stringify(fetchedUser));
+      return fetchedUser;
     }
+    return initialUserData || null;
   };
 
   const logout = async () => {

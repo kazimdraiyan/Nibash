@@ -3,10 +3,11 @@ import { useAuth } from "../context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  blockVerifier?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { token, loading } = useAuth();
+export function ProtectedRoute({ children, blockVerifier }: ProtectedRouteProps) {
+  const { token, user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -22,6 +23,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (blockVerifier && user?.is_verifier) {
+    return <Navigate to="/verify/dashboard" replace />;
   }
 
   return <>{children}</>;

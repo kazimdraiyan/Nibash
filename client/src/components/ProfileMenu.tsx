@@ -41,8 +41,8 @@ export function ProfileMenu() {
                 Profile
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#e2e5ea] border border-[#b8bec9] text-[9px] uppercase tracking-wider font-semibold text-[#0f172a]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#b08d3e]" />
-                Verified
+                <span className={`w-1.5 h-1.5 rounded-full ${user.is_verifier ? "bg-amber-600" : "bg-[#b08d3e]"}`} />
+                {user.is_verifier ? "Verifier" : "Verified"}
               </span>
             </div>
 
@@ -61,49 +61,86 @@ export function ProfileMenu() {
 
           {/* Menu Actions */}
           <div className="flex flex-col p-2.5 gap-1 bg-[#e2e5ea]">
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate("/my-listings");
-              }}
-              className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
-            >
-              <span className="material-symbols-outlined text-base">real_estate_agent</span>
-              <span>My Listings</span>
-            </button>
+            {user.is_verifier ? (
+              <>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/verify/dashboard");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-amber-900 bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-colors cursor-pointer flex items-center gap-2 font-semibold mb-1"
+                >
+                  <span className="material-symbols-outlined text-base text-amber-700">monitoring</span>
+                  <span>Verifier Dashboard</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/listings?view=pending");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-amber-900 bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-colors cursor-pointer flex items-center gap-2 font-semibold mb-1"
+                >
+                  <span className="material-symbols-outlined text-base text-amber-700">verified_user</span>
+                  <span>Review Queue</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/listings");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base">apartment</span>
+                  <span>All Apartments</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/my-listings");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base">real_estate_agent</span>
+                  <span>My Listings</span>
+                </button>
 
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate("/listings");
-              }}
-              className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
-            >
-              <span className="material-symbols-outlined text-base">apartment</span>
-              <span>All Apartments</span>
-            </button>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/listings");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base">apartment</span>
+                  <span>All Apartments</span>
+                </button>
 
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate("/listings/new");
-              }}
-              className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
-            >
-              <span className="material-symbols-outlined text-base">add_home</span>
-              <span>Post a Listing</span>
-            </button>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/listings/new");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base">add_home</span>
+                  <span>Post a Listing</span>
+                </button>
 
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate("/my-applications");
-              }}
-              className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
-            >
-              <span className="material-symbols-outlined text-base">assignment_turned_in</span>
-              <span>My Applications</span>
-            </button>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/my-applications");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base">assignment_turned_in</span>
+                  <span>My Applications</span>
+                </button>
+              </>
+            )}
 
             <div className="h-px bg-[#b8bec9] my-1" />
 
