@@ -12,7 +12,7 @@ create table payments(
     id serial primary key,
     contract_id int not null references contracts(id) on delete cascade,
     amount numeric not null,
-    payment_method varchar(20) not null check (
+    payment_method varchar(20) check (
         payment_method in ('bKash', 'SSLCommerz', 'Cash')
     ),
     status varchar(20) not null default 'pending' check (status in ('pending', 'confirmed', 'failed')),
