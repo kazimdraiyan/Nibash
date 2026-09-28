@@ -256,12 +256,12 @@ export async function createListing(ownerId: number, data: CreateListingInput) {
       "INSERT INTO terms (rent,electricity_bill,water_bill,service_charge,monthly_due_date,pet_allowed,security_deposit) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id",
       [
         rent,
-        electricity_bill,
-        water_bill,
-        service_charge,
-        monthly_due_date,
-        pet_allowed,
-        security_deposit,
+        electricity_bill ?? null,
+        water_bill ?? null,
+        service_charge ?? null,
+        monthly_due_date ?? null,
+        pet_allowed ?? false,
+        security_deposit ?? null,
       ],
     );
     const termsId = insertTerms.rows[0].id;
@@ -345,19 +345,46 @@ export async function updateListing(
         id,
       ],
     );
-    await client.query(
-      "UPDATE terms SET rent=COALESCE($1,rent), electricity_bill=COALESCE($2,electricity_bill), water_bill=COALESCE($3,water_bill), service_charge=COALESCE($4,service_charge), monthly_due_date=COALESCE($5,monthly_due_date), pet_allowed=COALESCE($6,pet_allowed), security_deposit=COALESCE($7,security_deposit) WHERE id=(SELECT terms_id FROM initial_terms WHERE listing_id=$8)",
-      [
-        rent ?? null,
-        electricity_bill ?? null,
-        water_bill ?? null,
-        service_charge ?? null,
-        monthly_due_date ?? null,
-        pet_allowed ?? null,
-        security_deposit ?? null,
-        id,
-      ],
-    );
+    const termsUpdates: string[] = [];
+    const termsParams: any[] = [];
+    let pIdx = 1;
+
+    if (rent !== undefined) {
+      termsUpdates.push(`rent = $${pIdx++}`);
+      termsParams.push(rent);
+    }
+    if (electricity_bill !== undefined) {
+      termsUpdates.push(`electricity_bill = $${pIdx++}`);
+      termsParams.push(electricity_bill);
+    }
+    if (water_bill !== undefined) {
+      termsUpdates.push(`water_bill = $${pIdx++}`);
+      termsParams.push(water_bill);
+    }
+    if (service_charge !== undefined) {
+      termsUpdates.push(`service_charge = $${pIdx++}`);
+      termsParams.push(service_charge);
+    }
+    if (monthly_due_date !== undefined) {
+      termsUpdates.push(`monthly_due_date = $${pIdx++}`);
+      termsParams.push(monthly_due_date);
+    }
+    if (pet_allowed !== undefined) {
+      termsUpdates.push(`pet_allowed = $${pIdx++}`);
+      termsParams.push(pet_allowed);
+    }
+    if (security_deposit !== undefined) {
+      termsUpdates.push(`security_deposit = $${pIdx++}`);
+      termsParams.push(security_deposit);
+    }
+
+    if (termsUpdates.length > 0) {
+      termsParams.push(id);
+      await client.query(
+        `UPDATE terms SET ${termsUpdates.join(", ")} WHERE id=(SELECT terms_id FROM initial_terms WHERE listing_id=$${pIdx})`,
+        termsParams,
+      );
+    }
 
     if (data.amenities !== undefined) {
       await client.query(

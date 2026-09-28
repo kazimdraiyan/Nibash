@@ -117,12 +117,13 @@ export function ListingFormPage() {
 
   // Initial Terms State
   const [rent, setRent] = useState("65000");
-  const [electricityBill, setElectricityBill] = useState("3500");
-  const [waterBill, setWaterBill] = useState("1200");
-  const [serviceCharge, setServiceCharge] = useState("5000");
-  const [monthlyDueDate, setMonthlyDueDate] = useState("5");
-  const [securityDeposit, setSecurityDeposit] = useState("130000");
+  const [electricityBill, setElectricityBill] = useState("");
+  const [waterBill, setWaterBill] = useState("");
+  const [serviceCharge, setServiceCharge] = useState("");
+  const [monthlyDueDate, setMonthlyDueDate] = useState("");
+  const [securityDeposit, setSecurityDeposit] = useState("");
   const [petAllowed, setPetAllowed] = useState(false);
+  const [showAdditionalTerms, setShowAdditionalTerms] = useState(false);
 
   // Amenities State
   const [availableAmenities, setAvailableAmenities] = useState<
@@ -306,13 +307,31 @@ export function ListingFormPage() {
         setBedroomCount(String(data.bedroom_count || 1));
         setBathroomCount(String(data.bathroom_count || 1));
         setOnWhichFloor(String(data.on_which_floor || 1));
-        setRent(String(data.rent || ""));
-        setElectricityBill(String(data.electricity_bill || ""));
-        setWaterBill(String(data.water_bill || ""));
-        setServiceCharge(String(data.service_charge || ""));
-        setMonthlyDueDate(String(data.monthly_due_date || "1"));
-        setSecurityDeposit(String(data.security_deposit || ""));
+        setRent(data.rent != null ? String(data.rent) : "");
+        setElectricityBill(
+          data.electricity_bill != null ? String(data.electricity_bill) : "",
+        );
+        setWaterBill(data.water_bill != null ? String(data.water_bill) : "");
+        setServiceCharge(
+          data.service_charge != null ? String(data.service_charge) : "",
+        );
+        setMonthlyDueDate(
+          data.monthly_due_date != null ? String(data.monthly_due_date) : "",
+        );
+        setSecurityDeposit(
+          data.security_deposit != null ? String(data.security_deposit) : "",
+        );
         setPetAllowed(Boolean(data.pet_allowed));
+        if (
+          data.electricity_bill != null ||
+          data.water_bill != null ||
+          data.service_charge != null ||
+          data.monthly_due_date != null ||
+          data.security_deposit != null ||
+          data.pet_allowed
+        ) {
+          setShowAdditionalTerms(true);
+        }
         if (Array.isArray(data.amenities) && data.amenities.length > 0) {
           setSelectedAmenities(
             data.amenities.map((a: any) =>
@@ -347,12 +366,16 @@ export function ListingFormPage() {
       on_which_floor: parseInt(onWhichFloor, 10),
       area_id: Number(areaId),
       rent: parseFloat(rent),
-      electricity_bill: parseFloat(electricityBill),
-      water_bill: parseFloat(waterBill),
-      service_charge: parseFloat(serviceCharge),
-      monthly_due_date: parseInt(monthlyDueDate, 10),
+      electricity_bill:
+        electricityBill.trim() !== "" ? parseFloat(electricityBill) : null,
+      water_bill: waterBill.trim() !== "" ? parseFloat(waterBill) : null,
+      service_charge:
+        serviceCharge.trim() !== "" ? parseFloat(serviceCharge) : null,
+      monthly_due_date:
+        monthlyDueDate.trim() !== "" ? parseInt(monthlyDueDate, 10) : null,
       pet_allowed: petAllowed,
-      security_deposit: parseFloat(securityDeposit),
+      security_deposit:
+        securityDeposit.trim() !== "" ? parseFloat(securityDeposit) : null,
       amenities: selectedAmenities,
     };
 
@@ -517,43 +540,70 @@ export function ListingFormPage() {
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="listing-area"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                >
-                  Neighborhood / Area *
-                </label>
-                <select
-                  id="listing-area"
-                  value={areaId}
-                  onChange={(e) => handleAreaChange(Number(e.target.value))}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                >
-                  {DHAKA_AREAS.map((area) => (
-                    <option
-                      key={area.id}
-                      value={area.id}
-                      className="bg-[#12151c] text-white"
-                    >
-                      {area.name} (Area #{area.id})
-                    </option>
-                  ))}
-                </select>
-
-                <div className="sm:col-span-2 mt-6">
-                  <label className="block text-xs uppercase font-medium text-slate-300 mb-1">
-                    Location *
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="listing-rent"
+                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                  >
+                    Monthly Rent (BDT) *
                   </label>
-                  <LocationPicker
-                    latitude={latitude}
-                    longitude={longitude}
-                    onChange={(lat, lng) => {
-                      setLatitude(lat);
-                      setLongitude(lng);
-                    }}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
+                      ৳
+                    </span>
+                    <input
+                      id="listing-rent"
+                      type="number"
+                      min="100"
+                      step="100"
+                      required
+                      value={rent}
+                      onChange={(e) => setRent(e.target.value)}
+                      placeholder="e.g. 35000"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                    />
+                  </div>
                 </div>
+
+                <div>
+                  <label
+                    htmlFor="listing-area"
+                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                  >
+                    Neighborhood / Area *
+                  </label>
+                  <select
+                    id="listing-area"
+                    value={areaId}
+                    onChange={(e) => handleAreaChange(Number(e.target.value))}
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
+                  >
+                    {DHAKA_AREAS.map((area) => (
+                      <option
+                        key={area.id}
+                        value={area.id}
+                        className="bg-[#12151c] text-white"
+                      >
+                        {area.name} (Area #{area.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase font-medium text-slate-300 mb-1">
+                  Location *
+                </label>
+                <LocationPicker
+                  latitude={latitude}
+                  longitude={longitude}
+                  onChange={(lat, lng) => {
+                    setLatitude(lat);
+                    setLongitude(lng);
+                  }}
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -612,140 +662,156 @@ export function ListingFormPage() {
             </div>
           </div>
 
-          {/* Section 2: Financial Terms */}
-          <div>
-            <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 border-b border-slate-800 pb-1">
-              2. Initial Lease Terms
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="terms-rent"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                >
-                  Monthly Rent (BDT) *
-                </label>
-                <input
-                  id="terms-rent"
-                  type="number"
-                  min="1000"
-                  step="500"
-                  required
-                  value={rent}
-                  onChange={(e) => setRent(e.target.value)}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                />
+          {/* Section 2: Additional Lease Terms (Collapsible) */}
+          <div className="border border-slate-800 bg-[#0e1118]/80 rounded-xl overflow-hidden transition-all">
+            <button
+              type="button"
+              onClick={() => setShowAdditionalTerms(!showAdditionalTerms)}
+              className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-800/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#d4b068]/10 text-[#d4b068] flex items-center justify-center font-mono text-sm">
+                  ৳
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-white">
+                      Additional Lease Terms
+                    </span>
+                    <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400">
+                      Optional
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Deposit, estimated utility bills, monthly due date, and pet policy
+                  </p>
+                </div>
               </div>
-
-              <div>
-                <label
-                  htmlFor="terms-deposit"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                <span>{showAdditionalTerms ? "Collapse" : "Expand to Add"}</span>
+                <span
+                  className={`material-symbols-outlined text-lg transition-transform duration-200 ${
+                    showAdditionalTerms ? "rotate-180" : ""
+                  }`}
                 >
-                  Security Deposit (BDT) *
-                </label>
-                <input
-                  id="terms-deposit"
-                  type="number"
-                  min="0"
-                  step="500"
-                  required
-                  value={securityDeposit}
-                  onChange={(e) => setSecurityDeposit(e.target.value)}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                />
+                  expand_more
+                </span>
               </div>
+            </button>
 
-              <div>
-                <label
-                  htmlFor="terms-electricity"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                >
-                  Electricity Bill Est. (BDT) *
-                </label>
-                <input
-                  id="terms-electricity"
-                  type="number"
-                  min="0"
-                  required
-                  value={electricityBill}
-                  onChange={(e) => setElectricityBill(e.target.value)}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                />
+            {showAdditionalTerms && (
+              <div className="p-4 pt-1 border-t border-slate-800/60 flex flex-col gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="terms-deposit"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Security Deposit (BDT)
+                    </label>
+                    <input
+                      id="terms-deposit"
+                      type="number"
+                      min="0"
+                      step="500"
+                      value={securityDeposit}
+                      onChange={(e) => setSecurityDeposit(e.target.value)}
+                      placeholder="e.g. 70000 (Optional)"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-due-date"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Monthly Due Date (Day 1 - 28)
+                    </label>
+                    <input
+                      id="terms-due-date"
+                      type="number"
+                      min="1"
+                      max="28"
+                      value={monthlyDueDate}
+                      onChange={(e) => setMonthlyDueDate(e.target.value)}
+                      placeholder="e.g. 5 (Optional)"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-electricity"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Electricity Bill Est. (BDT)
+                    </label>
+                    <input
+                      id="terms-electricity"
+                      type="number"
+                      min="0"
+                      value={electricityBill}
+                      onChange={(e) => setElectricityBill(e.target.value)}
+                      placeholder="e.g. 3500 (Optional)"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-water"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Water Bill (BDT)
+                    </label>
+                    <input
+                      id="terms-water"
+                      type="number"
+                      min="0"
+                      value={waterBill}
+                      onChange={(e) => setWaterBill(e.target.value)}
+                      placeholder="e.g. 1200 (Optional)"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-service"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Service Charge (BDT)
+                    </label>
+                    <input
+                      id="terms-service"
+                      type="number"
+                      min="0"
+                      value={serviceCharge}
+                      onChange={(e) => setServiceCharge(e.target.value)}
+                      placeholder="e.g. 5000 (Optional)"
+                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center gap-2">
+                  <input
+                    id="pet-allowed"
+                    type="checkbox"
+                    checked={petAllowed}
+                    onChange={(e) => setPetAllowed(e.target.checked)}
+                    className="w-4 h-4 rounded text-black accent-[#d4b068] cursor-pointer"
+                  />
+                  <label
+                    htmlFor="pet-allowed"
+                    className="text-sm text-slate-300 cursor-pointer"
+                  >
+                    Pets Allowed in this Apartment
+                  </label>
+                </div>
               </div>
-
-              <div>
-                <label
-                  htmlFor="terms-water"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                >
-                  Water Bill (BDT) *
-                </label>
-                <input
-                  id="terms-water"
-                  type="number"
-                  min="0"
-                  required
-                  value={waterBill}
-                  onChange={(e) => setWaterBill(e.target.value)}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="terms-service"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                >
-                  Service Charge (BDT) *
-                </label>
-                <input
-                  id="terms-service"
-                  type="number"
-                  min="0"
-                  required
-                  value={serviceCharge}
-                  onChange={(e) => setServiceCharge(e.target.value)}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="terms-due-date"
-                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                >
-                  Monthly Due Date (Day 1 - 28) *
-                </label>
-                <input
-                  id="terms-due-date"
-                  type="number"
-                  min="1"
-                  max="28"
-                  required
-                  value={monthlyDueDate}
-                  onChange={(e) => setMonthlyDueDate(e.target.value)}
-                  className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center gap-2">
-              <input
-                id="pet-allowed"
-                type="checkbox"
-                checked={petAllowed}
-                onChange={(e) => setPetAllowed(e.target.checked)}
-                className="w-4 h-4 rounded text-black accent-[#d4b068] cursor-pointer"
-              />
-              <label
-                htmlFor="pet-allowed"
-                className="text-sm text-slate-300 cursor-pointer"
-              >
-                Pets Allowed in this Apartment
-              </label>
-            </div>
+            )}
           </div>
 
           {/* Section 3: Amenities & Facilities */}

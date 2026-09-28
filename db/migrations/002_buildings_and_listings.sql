@@ -70,15 +70,15 @@ create table documents(
 create table terms(
     id serial primary key,
     rent numeric not null,
-    electricity_bill numeric not null,
-    water_bill numeric not null,
-    service_charge numeric not null,
-    monthly_due_date int not null check (
+    electricity_bill numeric,
+    water_bill numeric,
+    service_charge numeric,
+    monthly_due_date int check (
         monthly_due_date between 1
         and 28
     ),
-    pet_allowed boolean not null,
-    security_deposit numeric not null
+    pet_allowed boolean default false,
+    security_deposit numeric
 );
 
 create table initial_terms(

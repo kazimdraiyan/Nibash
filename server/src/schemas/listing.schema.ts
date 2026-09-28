@@ -22,22 +22,32 @@ export const createListingSchema = z.object({
   rent: z.number().positive("rent must be a positive number"),
   electricity_bill: z
     .number()
-    .nonnegative("electricity bill must be a non-negative number"),
+    .nonnegative("electricity bill must be a non-negative number")
+    .optional()
+    .nullable(),
   water_bill: z
     .number()
-    .nonnegative("water bill must be a non-negative number"),
+    .nonnegative("water bill must be a non-negative number")
+    .optional()
+    .nullable(),
   service_charge: z
     .number()
-    .nonnegative("service charge must be a non-negative number"),
+    .nonnegative("service charge must be a non-negative number")
+    .optional()
+    .nullable(),
   monthly_due_date: z
     .number()
     .int()
     .min(1, "monthly due date must be between 1 and 28")
-    .max(28, "monthly due date must be between 1 and 28"),
-  pet_allowed: z.boolean(),
+    .max(28, "monthly due date must be between 1 and 28")
+    .optional()
+    .nullable(),
+  pet_allowed: z.boolean().optional().nullable(),
   security_deposit: z
     .number()
-    .nonnegative("security deposit must be a non-negative number"),
+    .nonnegative("security deposit must be a non-negative number")
+    .optional()
+    .nullable(),
   amenities: z.array(z.string()).optional(),
 });
 
