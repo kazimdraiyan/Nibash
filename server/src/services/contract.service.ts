@@ -110,13 +110,36 @@ export async function getContractById(id: string, userId: number) {
     `SELECT c.id AS contract_id, c.tenant_id, c.listing_id, c.agreement_id,
          c.status, c.start_date, c.end_date, c.paid_security_deposit,
          t.rent, t.electricity_bill, t.water_bill, t.service_charge,
-         t.monthly_due_date, t.pet_allowed, t.security_deposit
+         t.monthly_due_date, t.pet_allowed, t.security_deposit,
+         l.title AS listing_title, l.owner_id,
+         u_tenant.name AS tenant_name, u_tenant.email AS tenant_email, u_tenant.phone AS tenant_phone,
+         ten.monthly_income, ten.emergency_contact,
+         u_owner.name AS owner_name, u_owner.email AS owner_email, u_owner.phone AS owner_phone
          FROM contracts c
          JOIN agreements a ON a.terms_id=c.agreement_id
          JOIN terms t ON t.id=a.terms_id
+         JOIN listings l ON l.id=c.listing_id
+         JOIN users u_tenant ON u_tenant.id=c.tenant_id
+         LEFT JOIN tenants ten ON ten.user_id=c.tenant_id
+         JOIN users u_owner ON u_owner.id=l.owner_id
          WHERE c.id=$1`,
     [id],
   );
+  return result.rows[0];
+}
+
+export async function getActiveContractForTenant(tenantId: number) {
+  const result = await pool.query(
+    `SELECT c.id AS contract_id
+     FROM contracts c
+     WHERE c.tenant_id = $1 AND c.status IN ('signed', 'active')
+     ORDER BY c.id DESC
+     LIMIT 1`,
+    [tenantId],
+  );
+  if (result.rows.length === 0) {
+    return null;
+  }
   return result.rows[0];
 }
 

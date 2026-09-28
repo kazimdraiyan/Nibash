@@ -73,7 +73,17 @@ export async function searchListings(
   return attachMediaToListingResults(result.rows);
 }
 export async function getMylistings(owner: number) {
-  const result = await pool.query("select l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id where l.owner_id=$1", [owner]);
+  const result = await pool.query(
+    `SELECT l.*, t.rent,
+       (SELECT c.id FROM contracts c
+        WHERE c.listing_id = l.id AND c.status IN ('signed', 'active')
+        ORDER BY c.id DESC LIMIT 1) AS ongoing_contract_id
+     FROM listings l
+     JOIN initial_terms it ON it.listing_id = l.id
+     JOIN terms t ON t.id = it.terms_id
+     WHERE l.owner_id = $1`,
+    [owner],
+  );
   return attachMediaToListingResults(result.rows);
 }
 

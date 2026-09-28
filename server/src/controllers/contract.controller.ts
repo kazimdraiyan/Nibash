@@ -36,6 +36,15 @@ export async function getById(req: Request, res: Response) {
   res.json({ contract });
 }
 
+export async function getActive(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const contract = await contractService.getActiveContractForTenant(req.user.id);
+  res.json({ contract });
+}
+
 export async function sign(req: Request, res: Response) {
   if (!req.user) {
     res.status(401).json({ error: "unauthorized" });

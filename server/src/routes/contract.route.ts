@@ -6,6 +6,7 @@ import * as contractController from "../controllers/contract.controller.js";
 const router = Router();
 
 router.post("/", authMiddleware, asyncHandler(contractController.create));
+router.get("/active", authMiddleware, asyncHandler(contractController.getActive));
 router.get("/:id", authMiddleware, asyncHandler(contractController.getById));
 router.patch("/:id", authMiddleware, asyncHandler(contractController.sign));
 

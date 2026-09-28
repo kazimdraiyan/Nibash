@@ -48,3 +48,12 @@ export async function resolve(req: Request, res: Response) {
   );
   res.json({ message: "payment updated successfully" });
 }
+
+export async function payByCash(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  await paymentService.payByCash(req.user.id, req.params.payment_id as string);
+  res.json({ message: "marked as paid by cash, awaiting owner verification" });
+}

@@ -56,10 +56,34 @@ export async function getPaymentsForContract(
     throw new AppError(403, "you are not the owner or tenant of this contract");
   }
   const result = await pool.query(
-    "SELECT * FROM payments WHERE contract_id=$1",
+    "SELECT * FROM payments WHERE contract_id=$1 ORDER BY billing_month ASC NULLS LAST, due_date ASC NULLS LAST, id ASC",
     [contractId],
   );
   return result.rows;
+}
+
+export async function payByCash(tenantId: number, paymentId: string) {
+  const payment = await pool.query(
+    `SELECT p.id, p.status, c.tenant_id
+     FROM payments p
+     JOIN contracts c ON p.contract_id = c.id
+     WHERE p.id = $1`,
+    [paymentId],
+  );
+  if (payment.rows.length === 0) {
+    throw new AppError(404, "payment not found");
+  }
+  if (payment.rows[0].tenant_id !== tenantId) {
+    throw new AppError(403, "you are not the tenant of this contract");
+  }
+  if (payment.rows[0].status !== "pending") {
+    throw new AppError(400, "only pending payments can be marked as paid by cash");
+  }
+
+  await pool.query(
+    "UPDATE payments SET payment_method = 'Cash' WHERE id = $1",
+    [paymentId],
+  );
 }
 
 export async function resolvePayment(

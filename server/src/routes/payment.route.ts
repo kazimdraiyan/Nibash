@@ -12,6 +12,11 @@ router.get(
   asyncHandler(paymentController.getForContract),
 );
 router.patch(
+  "/:payment_id/pay-cash",
+  authMiddleware,
+  asyncHandler(paymentController.payByCash),
+);
+router.patch(
   "/:payment_id",
   authMiddleware,
   asyncHandler(paymentController.resolve),

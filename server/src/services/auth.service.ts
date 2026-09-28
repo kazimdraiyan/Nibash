@@ -11,10 +11,15 @@ export async function getUserById(
   email: string;
   nid: string;
   phone: string;
+  is_verifier: boolean;
+  is_tenant: boolean;
+  is_owner: boolean;
 }> {
   const find = await pool.query(
     `SELECT u.id, u.name, u.email, u.nid, u.phone,
-            EXISTS(SELECT 1 FROM verifiers v WHERE v.user_id = u.id) AS is_verifier
+            EXISTS(SELECT 1 FROM verifiers v WHERE v.user_id = u.id) AS is_verifier,
+            EXISTS(SELECT 1 FROM tenants t WHERE t.user_id = u.id) AS is_tenant,
+            EXISTS(SELECT 1 FROM owners o WHERE o.user_id = u.id) AS is_owner
      FROM users u WHERE u.id = $1`,
     [userId],
   );
