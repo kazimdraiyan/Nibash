@@ -96,6 +96,19 @@ export function ProfileMenu() {
               </>
             ) : (
               <>
+                {Boolean(user?.is_tenant || (user && localStorage.getItem(`nibash_tenant_${user.id}`) === "true")) && (
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/my-contract");
+                    }}
+                    className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                  >
+                    <span className="material-symbols-outlined text-base text-emerald-600">description</span>
+                    <span>My Contract</span>
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     setOpen(false);

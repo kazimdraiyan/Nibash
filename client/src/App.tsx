@@ -15,6 +15,7 @@ import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { MyApplicationsPage } from "./pages/MyApplicationsPage";
 import { ContractFormPage } from "./pages/ContractFormPage";
 import { ContractDetailPage } from "./pages/ContractDetailPage";
+import { MyContractPage } from "./pages/MyContractPage";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ActualListings } from "./components/ActualListings";
@@ -130,6 +131,14 @@ export default function App() {
             element={
               <ProtectedRoute blockVerifier>
                 <ContractFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-contract"
+            element={
+              <ProtectedRoute blockVerifier>
+                <MyContractPage />
               </ProtectedRoute>
             }
           />

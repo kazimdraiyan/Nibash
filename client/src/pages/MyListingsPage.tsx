@@ -7,6 +7,7 @@ import type { BackendListing } from "./ListingsPage";
 
 export interface ListingWithApplications extends BackendListing {
   applicationCount: number;
+  ongoing_contract_id?: number | null;
 }
 
 function ApplicationCountBadge({ count }: { count: number }) {
@@ -30,16 +31,25 @@ function ApplicationCountBadge({ count }: { count: number }) {
 }
 
 function MyListingCard({ item }: { item: ListingWithApplications }) {
+  const isOccupied = item.status === "occupied";
   const areaName = getAreaName(item.area_id);
   const rentFormatted =
     item.rent !== undefined && item.rent !== null && item.rent !== "" && !isNaN(Number(item.rent))
       ? `৳${Number(item.rent).toLocaleString()} / month`
       : null;
 
+  const cardTarget = isOccupied && item.ongoing_contract_id
+    ? `/contracts/${item.ongoing_contract_id}`
+    : `/listings/${item.id}`;
+
   return (
     <Link
-      to={`/listings/${item.id}`}
-      className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 flex flex-col justify-between hover:border-slate-600 hover:shadow-lg transition-all duration-200 cursor-pointer group block text-left"
+      to={cardTarget}
+      className={`border rounded-2xl p-6 flex flex-col justify-between hover:shadow-lg transition-all duration-200 cursor-pointer group block text-left ${
+        isOccupied
+          ? "border-emerald-800/40 bg-[#101917] hover:border-emerald-500/50"
+          : "border-slate-800 bg-[#12151c] hover:border-slate-600"
+      }`}
     >
       <div>
         {/* Top Badges: Area + Status */}
@@ -63,7 +73,14 @@ function MyListingCard({ item }: { item: ListingWithApplications }) {
               e.stopPropagation();
             }}
           >
-            <StatusBadge status={item.status} />
+            {isOccupied ? (
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 border border-emerald-500/60 px-2.5 py-0.5 rounded flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Ongoing Contract
+              </span>
+            ) : (
+              <StatusBadge status={item.status} />
+            )}
           </span>
         </div>
 
@@ -105,7 +122,14 @@ function MyListingCard({ item }: { item: ListingWithApplications }) {
             e.stopPropagation();
           }}
         >
-          <ApplicationCountBadge count={item.applicationCount} />
+          {isOccupied && item.ongoing_contract_id ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 shadow-sm font-mono">
+              <span className="material-symbols-outlined text-xs">description</span>
+              <span>Contract #{item.ongoing_contract_id}</span>
+            </span>
+          ) : (
+            <ApplicationCountBadge count={item.applicationCount} />
+          )}
         </span>
 
         <div className="flex items-center gap-2">
@@ -120,7 +144,7 @@ function MyListingCard({ item }: { item: ListingWithApplications }) {
             Edit
           </Link>
           <span className="text-xs text-slate-300 group-hover:text-white font-medium flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-            <span>View</span>
+            <span>{isOccupied ? "View Contract" : "View"}</span>
             <span className="material-symbols-outlined text-xs">arrow_forward</span>
           </span>
         </div>
@@ -177,9 +201,12 @@ export function MyListingsPage() {
     fetchMyListingsAndApplications();
   }, []);
 
+  const occupiedListings = listings.filter((l) => l.status === "occupied");
   const waitingListings = listings.filter((l) => l.status === "waiting");
   const approvedListings = listings.filter((l) => l.status === "approved");
-  const otherListings = listings.filter((l) => l.status !== "waiting" && l.status !== "approved");
+  const otherListings = listings.filter(
+    (l) => l.status !== "waiting" && l.status !== "approved" && l.status !== "occupied"
+  );
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4 min-h-[75vh]">
@@ -277,9 +304,33 @@ export function MyListingsPage() {
         </div>
       )}
 
-      {/* Two Sections: Waiting for Approval & Approved */}
+      {/* Sections: Ongoing Contracts, Waiting for Approval & Approved */}
       {!loading && !error && listings.length > 0 && (
         <div className="flex flex-col gap-12">
+          {/* Section 0: Ongoing Contracts (Occupied Listings) */}
+          <div>
+            <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                Ongoing Contracts
+              </h2>
+              <span className="text-xs font-semibold text-emerald-300 bg-emerald-950/70 border border-emerald-600/60 px-2.5 py-0.5 rounded-full">
+                {occupiedListings.length}
+              </span>
+            </div>
+
+            {occupiedListings.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-400 border border-dashed border-slate-800 bg-[#12151c]/30 rounded-xl">
+                No occupied listings with ongoing contracts
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {occupiedListings.map((item) => (
+                  <MyListingCard key={item.id} item={item} />
+                ))}
+              </div>
+            )}
+          </div>
           {/* Section 1: Waiting for Approval */}
           <div>
             <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800">

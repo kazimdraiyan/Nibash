@@ -14,6 +14,8 @@ export interface User {
   nid: string;
   phone: string;
   is_verifier: boolean;
+  is_tenant?: boolean;
+  is_owner?: boolean;
 }
 
 interface AuthContextType {

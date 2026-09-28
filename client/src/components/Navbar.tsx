@@ -88,6 +88,19 @@ export function Navbar() {
               </>
             ) : (
               <>
+                {Boolean(user?.is_tenant || (user && localStorage.getItem(`nibash_tenant_${user.id}`) === "true")) && (
+                  <Link
+                    to="/my-contract"
+                    className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest font-label-sm transition-all border cursor-pointer ${
+                      location.pathname === "/my-contract" || location.pathname.startsWith("/contracts/")
+                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/40"
+                        : "bg-white/5 text-slate-300 border-white/10 hover:text-white hover:border-white/30 hover:bg-white/10"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-base text-emerald-400">description</span>
+                    <span>My Contract</span>
+                  </Link>
+                )}
                 <Link
                   to="/my-listings"
                   className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest font-label-sm transition-all border cursor-pointer ${
