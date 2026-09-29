@@ -2,7 +2,7 @@ import { test, describe, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { pool } from "../../db/pool.js";
 import { getActiveContractForTenant, getContractById } from "../contract.service.js";
-import { payByCash, getPaymentsForContract } from "../payment.service.js";
+import { payByCash, rejectCash, getPaymentsForContract } from "../payment.service.js";
 import { getMylistings } from "../listing.service.js";
 
 describe("Contract & Payment Enhancements", () => {
@@ -151,5 +151,13 @@ describe("Contract & Payment Enhancements", () => {
     assert.ok(updatedPayment);
     assert.equal(updatedPayment.payment_method, "Cash");
     assert.equal(updatedPayment.status, "pending");
+
+    // 4. Owner marks 'Didn't Receive' (rejectCash) -> method resets to null
+    await rejectCash(ownerId, String(paymentId));
+    const paymentsAfterReject = await getPaymentsForContract(tenantId, String(contractId));
+    const rejectedPayment = paymentsAfterReject.find((p: any) => p.id === paymentId);
+    assert.ok(rejectedPayment);
+    assert.equal(rejectedPayment.payment_method, null);
+    assert.equal(rejectedPayment.status, "pending");
   });
 });

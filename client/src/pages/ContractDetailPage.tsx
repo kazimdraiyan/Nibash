@@ -36,7 +36,7 @@ interface PaymentRecord {
   contract_id: number;
   amount: string | number;
   payment_method: string | null;
-  status: string; // 'pending' | 'confirmed' | 'failed'
+  status: string; // 'pending' | 'overdue' | 'confirmed' | 'failed'
   billing_month?: string | null;
   due_date?: string | null;
   paid_at?: string | null;
@@ -82,8 +82,9 @@ export function ContractDetailPage() {
   // Tenant Cash Payment action state
   const [payingCash, setPayingCash] = useState(false);
 
-  // Owner resolution action state
+  // Owner resolution / reject action state
   const [resolvingPaymentId, setResolvingPaymentId] = useState<number | null>(null);
+  const [rejectingCashId, setRejectingCashId] = useState<number | null>(null);
 
   // Signing state
   const [signing, setSigning] = useState(false);
@@ -144,7 +145,7 @@ export function ContractDetailPage() {
 
   const handleResolvePayment = async (paymentId: number, status: "confirmed" | "failed") => {
     const actionText = status === "confirmed" ? "confirm" : "fail";
-    if (!confirm(`Are you sure you want to mark this payment as ${actionText}?`)) return;
+    if (!confirm(`Are you sure you want to ${actionText} this payment?`)) return;
     setResolvingPaymentId(paymentId);
     try {
       await apiClient.patch(`/payments/${paymentId}`, { status });
@@ -153,6 +154,19 @@ export function ContractDetailPage() {
       alert(err.message || "Failed to update payment status.");
     } finally {
       setResolvingPaymentId(null);
+    }
+  };
+
+  const handleRejectCash = async (paymentId: number) => {
+    if (!confirm("Are you sure you didn't receive this cash payment? This will reset the payment method and notify the tenant to pay.")) return;
+    setRejectingCashId(paymentId);
+    try {
+      await apiClient.patch(`/payments/${paymentId}/reject-cash`, {});
+      await fetchContractAndPayments();
+    } catch (err: any) {
+      alert(err.message || "Failed to reset payment method.");
+    } finally {
+      setRejectingCashId(null);
     }
   };
 
@@ -175,7 +189,7 @@ export function ContractDetailPage() {
       <div className="py-24 text-center text-slate-400">
         <div className="w-10 h-10 rounded-full border-2 border-[#d4b068]/60 border-t-transparent animate-spin mx-auto mb-4" />
         <p className="text-sm text-white font-medium mb-1">Loading digital contract details...</p>
-        <p className="text-xs text-slate-500">Retrieving agreement terms, tenant records, and payment logs</p>
+        <p className="text-xs text-slate-500">Retrieving agreement terms, counterpart details, and payment logs</p>
       </div>
     );
   }
@@ -196,9 +210,12 @@ export function ContractDetailPage() {
   const isTenant = Boolean(user && user.id === contract.tenant_id);
   const isOwner = Boolean(user && user.id === contract.owner_id);
 
-  // Find due payments (status === 'pending')
-  const pendingPayments = payments.filter((p) => p.status === "pending");
-  const earliestDuePayment = pendingPayments[0] || null;
+  // Find due payments (pending OR overdue)
+  const duePayments = payments.filter((p) => p.status === "pending" || p.status === "overdue");
+  const earliestDuePayment = duePayments[0] || null;
+
+  // Confirmed payments for history list
+  const confirmedPayments = payments.filter((p) => p.status === "confirmed");
 
   // Monthly totals
   const totalMonthlyCommitment =
@@ -251,7 +268,7 @@ export function ContractDetailPage() {
 
       {/* Main 12-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* MAIN COLUMN (8 Columns on desktop): Listing Link, Tenant Details, Agreement Terms, Payments */}
+        {/* MAIN COLUMN (8 Columns on desktop): Listing Link, Counterpart Details, Agreement Terms, Payments */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           {/* 1. Property / Listing Reference Banner */}
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-sm">
@@ -280,85 +297,149 @@ export function ContractDetailPage() {
             </div>
           </div>
 
-          {/* 2. Tenant Details Section */}
-          <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
-              <div className="flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-xl text-[#d4b068]">
-                  person
+          {/* 2. Counterpart Details Section:
+                 - When logged in as OWNER: Show Tenant Information
+                 - When logged in as TENANT: Show Property Owner Information here
+          */}
+          {isOwner ? (
+            /* Tenant Information Card (for Owner) */
+            <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                    person
+                  </span>
+                  <h2 className="text-base font-bold text-white">Tenant Information</h2>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-600/50">
+                  <span className="material-symbols-outlined text-xs">verified</span>
+                  <span>Verified Tenant</span>
                 </span>
-                <h2 className="text-base font-bold text-white">Tenant Information</h2>
               </div>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-600/50">
-                <span className="material-symbols-outlined text-xs">verified</span>
-                <span>Verified Tenant</span>
-              </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
+                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                    Full Name
+                  </span>
+                  <span className="font-medium text-white">
+                    {contract.tenant_name || `Tenant #${contract.tenant_id}`}
+                  </span>
+                </div>
+
+                {contract.tenant_email && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Email Address
+                    </span>
+                    <span className="font-mono text-white text-xs truncate block">
+                      {contract.tenant_email}
+                    </span>
+                  </div>
+                )}
+
+                {contract.tenant_phone && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Contact Phone
+                    </span>
+                    <span className="font-mono text-white text-xs">
+                      {contract.tenant_phone}
+                    </span>
+                  </div>
+                )}
+
+                {contract.monthly_income && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Verified Income
+                    </span>
+                    <span className="font-mono text-white font-medium">
+                      ৳{Number(contract.monthly_income).toLocaleString()} / month
+                    </span>
+                  </div>
+                )}
+
+                {contract.emergency_contact && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Emergency Contact
+                    </span>
+                    <span className="font-mono text-white text-xs">
+                      {contract.emergency_contact}
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                    Tenant Reference
+                  </span>
+                  <span className="font-mono text-slate-300 text-xs">
+                    User #{contract.tenant_id}
+                  </span>
+                </div>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
-              <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                  Full Name
-                </span>
-                <span className="font-medium text-white">
-                  {contract.tenant_name || `Tenant #${contract.tenant_id}`}
+          ) : (
+            /* Property Owner Information Card (for Tenant or third-party) */
+            <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                    shield_person
+                  </span>
+                  <h2 className="text-base font-bold text-white">Property Owner</h2>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-600/50">
+                  <span className="material-symbols-outlined text-xs">verified</span>
+                  <span>Registered Landlord</span>
                 </span>
               </div>
 
-              {contract.tenant_email && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
                 <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
                   <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Email Address
+                    Owner Name
                   </span>
-                  <span className="font-mono text-white text-xs truncate block">
-                    {contract.tenant_email}
+                  <span className="font-medium text-white">
+                    {contract.owner_name || `Owner #${contract.owner_id}`}
                   </span>
                 </div>
-              )}
 
-              {contract.tenant_phone && (
+                {contract.owner_email && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Email Address
+                    </span>
+                    <span className="font-mono text-white text-xs truncate block">
+                      {contract.owner_email}
+                    </span>
+                  </div>
+                )}
+
+                {contract.owner_phone && (
+                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                      Contact Phone
+                    </span>
+                    <span className="font-mono text-white text-xs">
+                      {contract.owner_phone}
+                    </span>
+                  </div>
+                )}
+
                 <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
                   <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Contact Phone
+                    Owner Reference
                   </span>
-                  <span className="font-mono text-white text-xs">
-                    {contract.tenant_phone}
-                  </span>
-                </div>
-              )}
-
-              {contract.monthly_income && (
-                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Verified Income
-                  </span>
-                  <span className="font-mono text-white font-medium">
-                    ৳{Number(contract.monthly_income).toLocaleString()} / month
+                  <span className="font-mono text-slate-300 text-xs">
+                    User #{contract.owner_id}
                   </span>
                 </div>
-              )}
-
-              {contract.emergency_contact && (
-                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Emergency Contact
-                  </span>
-                  <span className="font-mono text-white text-xs">
-                    {contract.emergency_contact}
-                  </span>
-                </div>
-              )}
-
-              <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                  Tenant Reference
-                </span>
-                <span className="font-mono text-slate-300 text-xs">
-                  User #{contract.tenant_id}
-                </span>
               </div>
             </div>
-          </div>
+          )}
 
           {/* 3. Lease Agreement (Terms) of this contract */}
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
@@ -456,25 +537,59 @@ export function ContractDetailPage() {
                 </p>
               </div>
 
-              {pendingPayments.length > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-600/60 self-start sm:self-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span>{pendingPayments.length} Payment Due</span>
+              {duePayments.length > 0 && (
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold self-start sm:self-center border ${
+                    earliestDuePayment?.status === "overdue"
+                      ? "bg-rose-950/80 text-rose-300 border-rose-600/60"
+                      : "bg-amber-950/80 text-amber-300 border-amber-600/60"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      earliestDuePayment?.status === "overdue"
+                        ? "bg-rose-400 animate-ping"
+                        : "bg-amber-400 animate-pulse"
+                    }`}
+                  />
+                  <span>
+                    {earliestDuePayment?.status === "overdue"
+                      ? `${duePayments.length} Payment Overdue`
+                      : `${duePayments.length} Payment Due`}
+                  </span>
                 </span>
               )}
             </div>
 
-            {/* EMPHASIZED DUE PAYMENT (Tenant & General view if there is a pending payment) */}
+            {/* EMPHASIZED ACTIVE DUE / OVERDUE PAYMENT CARD */}
             {earliestDuePayment && (
-              <div className="mb-6 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#17140f] to-[#12151c] border-2 border-amber-500/50 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
+              <div
+                className={`mb-6 p-5 sm:p-6 rounded-2xl border-2 shadow-lg relative overflow-hidden ${
+                  earliestDuePayment.status === "overdue"
+                    ? "bg-gradient-to-r from-[#220f13] via-[#1a0f14] to-[#12151c] border-rose-500/60"
+                    : "bg-gradient-to-r from-[#17140f] to-[#12151c] border-amber-500/50"
+                }`}
+              >
+                <div
+                  className={`absolute top-0 right-0 w-36 h-36 rounded-full blur-2xl pointer-events-none ${
+                    earliestDuePayment.status === "overdue" ? "bg-rose-500/10" : "bg-amber-500/5"
+                  }`}
+                />
 
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative z-10">
                   <div>
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-xs uppercase font-mono tracking-wider font-semibold text-amber-400 bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded">
-                        Active Due Payment
-                      </span>
+                      {earliestDuePayment.status === "overdue" ? (
+                        <span className="text-xs uppercase font-mono tracking-wider font-semibold text-rose-300 bg-rose-950/90 border border-rose-500/60 px-2 py-0.5 rounded flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                          Payment Overdue
+                        </span>
+                      ) : (
+                        <span className="text-xs uppercase font-mono tracking-wider font-semibold text-amber-400 bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                          Active Due Payment
+                        </span>
+                      )}
                       <span className="text-xs font-medium text-slate-300">
                         {formatMonth(earliestDuePayment.billing_month)}
                       </span>
@@ -484,13 +599,21 @@ export function ContractDetailPage() {
                       <span className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
                         ৳{Number(earliestDuePayment.amount).toLocaleString()}
                       </span>
-                      <span className="text-xs text-slate-400">
-                        due by {formatDate(earliestDuePayment.due_date)}
+                      <span
+                        className={`text-xs ${
+                          earliestDuePayment.status === "overdue"
+                            ? "text-rose-300 font-medium"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {earliestDuePayment.status === "overdue"
+                          ? `was due on ${formatDate(earliestDuePayment.due_date)}`
+                          : `due by ${formatDate(earliestDuePayment.due_date)}`}
                       </span>
                     </div>
 
                     <p className="text-xs text-slate-400 mt-1">
-                      Billing Cycle: 1st of month • Payment applies to monthly rent and utilities
+                      Billing Cycle: 1st of month • Covers monthly rent and utilities
                     </p>
                   </div>
 
@@ -516,192 +639,147 @@ export function ContractDetailPage() {
                     </div>
                   )}
 
-                  {/* Owner resolution controls directly on emphasized card */}
+                  {/* Owner resolution controls on emphasized card */}
                   {isOwner && (
-                    <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-2">
-                      <div className="text-xs text-slate-300">
-                        Method:{" "}
-                        <span className="font-semibold text-white">
-                          {earliestDuePayment.payment_method || "Unspecified"}
-                        </span>
+                    <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-2.5">
+                      <div className="text-xs text-slate-300 flex items-center gap-1.5">
+                        <span>Payment Method:</span>
+                        {earliestDuePayment.payment_method === "Cash" ? (
+                          <span className="font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-700/50 px-2 py-0.5 rounded font-mono">
+                            Claimed Cash
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 italic">Not Paid</span>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          disabled={resolvingPaymentId === earliestDuePayment.id}
-                          onClick={() => handleResolvePayment(earliestDuePayment.id, "confirmed")}
-                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 shadow-sm disabled:opacity-50"
-                        >
-                          <span className="material-symbols-outlined text-xs">check</span>
-                          <span>Confirm Payment</span>
-                        </button>
-                        <button
-                          type="button"
-                          disabled={resolvingPaymentId === earliestDuePayment.id}
-                          onClick={() => handleResolvePayment(earliestDuePayment.id, "failed")}
-                          className="bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700 px-3 py-2 rounded-lg text-xs transition cursor-pointer disabled:opacity-50"
-                        >
-                          Fail
-                        </button>
-                      </div>
+
+                      {/* If claimed cash: Show Confirm Payment AND Didn't Receive */}
+                      {earliestDuePayment.payment_method === "Cash" && (
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <button
+                            type="button"
+                            disabled={resolvingPaymentId === earliestDuePayment.id || rejectingCashId === earliestDuePayment.id}
+                            onClick={() => handleResolvePayment(earliestDuePayment.id, "confirmed")}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 shadow-sm disabled:opacity-50"
+                          >
+                            <span className="material-symbols-outlined text-xs">check</span>
+                            <span>Confirm Payment</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={resolvingPaymentId === earliestDuePayment.id || rejectingCashId === earliestDuePayment.id}
+                            onClick={() => handleRejectCash(earliestDuePayment.id)}
+                            className="bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-600/50 px-3.5 py-2 rounded-lg text-xs transition cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-xs">close</span>
+                            <span>Didn't Receive</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* If method is null: No Fail or Didn't Receive button. Clean status note and optional manual confirmation */}
+                      {!earliestDuePayment.payment_method && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-slate-400 italic bg-white/5 border border-white/10 px-2.5 py-1 rounded">
+                            Awaiting tenant payment
+                          </span>
+                          <button
+                            type="button"
+                            disabled={resolvingPaymentId === earliestDuePayment.id}
+                            onClick={() => handleResolvePayment(earliestDuePayment.id, "confirmed")}
+                            className="bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 px-3 py-1 rounded text-xs transition cursor-pointer disabled:opacity-50"
+                            title="Confirm if cash was handed directly in person"
+                          >
+                            Received Direct Cash
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Compact Payment History List */}
+            {/* Compact Payment History List (ONLY CONFIRMED PAYMENTS) */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 font-mono">
-                Payment History ({payments.length})
+                Confirmed Payment History ({confirmedPayments.length})
               </h3>
 
-              {payments.length === 0 ? (
+              {confirmedPayments.length === 0 ? (
                 <div className="py-10 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl bg-[#090a0c]/50">
                   <span className="material-symbols-outlined text-2xl text-slate-600 block mb-1">
                     receipt
                   </span>
-                  No payment records generated for this contract yet.
+                  No confirmed payments recorded for this contract yet.
                 </div>
               ) : (
                 <div className="flex flex-col gap-2.5">
-                  {payments.map((pmt) => {
-                    const isPending = pmt.status === "pending";
-                    const isConfirmed = pmt.status === "confirmed";
-                    const isCash = pmt.payment_method === "Cash";
+                  {confirmedPayments.map((pmt) => (
+                    <div
+                      key={pmt.id}
+                      className="p-3.5 sm:p-4 rounded-xl border bg-[#090a0c] border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all"
+                    >
+                      <div className="flex items-center gap-3.5 flex-wrap">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border bg-emerald-950/60 border-emerald-700/50 text-emerald-400">
+                          <span className="material-symbols-outlined text-lg">check_circle</span>
+                        </div>
 
-                    return (
-                      <div
-                        key={pmt.id}
-                        className={`p-3.5 sm:p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all ${
-                          isConfirmed
-                            ? "bg-[#090a0c] border-slate-800/80"
-                            : isPending
-                            ? "bg-[#11141b] border-amber-700/40"
-                            : "bg-[#090a0c] border-red-900/40"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3.5 flex-wrap">
-                          <div
-                            className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-                              isConfirmed
-                                ? "bg-emerald-950/60 border-emerald-700/50 text-emerald-400"
-                                : isPending
-                                ? "bg-amber-950/60 border-amber-700/50 text-amber-400"
-                                : "bg-red-950/60 border-red-700/50 text-red-400"
-                            }`}
-                          >
-                            <span className="material-symbols-outlined text-lg">
-                              {isConfirmed ? "check_circle" : isPending ? "schedule" : "cancel"}
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                            <span className="text-sm font-bold text-white font-mono">
+                              ৳{Number(pmt.amount).toLocaleString()}
+                            </span>
+                            <span className="text-xs font-medium text-slate-300">
+                              • {formatMonth(pmt.billing_month)}
+                            </span>
+                            <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              Confirmed
                             </span>
                           </div>
 
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                              <span className="text-sm font-bold text-white font-mono">
-                                ৳{Number(pmt.amount).toLocaleString()}
-                              </span>
-                              <span className="text-xs font-medium text-slate-300">
-                                • {formatMonth(pmt.billing_month)}
-                              </span>
-                              <span
-                                className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded font-semibold ${
-                                  isConfirmed
-                                    ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
-                                    : pmt.status === "failed"
-                                    ? "bg-red-950 text-red-300 border border-red-800"
-                                    : "bg-amber-950 text-amber-300 border border-amber-800"
-                                }`}
-                              >
-                                {pmt.status}
-                              </span>
-                            </div>
-
-                            <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
-                              <span>
-                                Method:{" "}
-                                <strong className="text-slate-200">
-                                  {pmt.payment_method || "Unassigned"}
-                                </strong>
-                              </span>
-                              <span>•</span>
-                              {pmt.paid_at ? (
-                                <span>Paid at: {formatDate(pmt.paid_at)}</span>
-                              ) : pmt.due_date ? (
-                                <span>Due date: {formatDate(pmt.due_date)}</span>
-                              ) : null}
-                              {pmt.bkash_transaction_id && (
-                                <>
-                                  <span>•</span>
-                                  <span className="font-mono text-slate-400">
-                                    bKash: {pmt.bkash_transaction_id}
-                                  </span>
-                                </>
-                              )}
-                              {pmt.sslcommerz_transaction_id && (
-                                <>
-                                  <span>•</span>
-                                  <span className="font-mono text-slate-400">
-                                    SSL: {pmt.sslcommerz_transaction_id}
-                                  </span>
-                                </>
-                              )}
-                            </div>
+                          <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
+                            <span>
+                              Method:{" "}
+                              <strong className="text-slate-200">
+                                {pmt.payment_method || "Cash"}
+                              </strong>
+                            </span>
+                            <span>•</span>
+                            <span>Paid at: {formatDate(pmt.paid_at || pmt.due_date)}</span>
+                            {pmt.bkash_transaction_id && (
+                              <>
+                                <span>•</span>
+                                <span className="font-mono text-slate-400">
+                                  bKash: {pmt.bkash_transaction_id}
+                                </span>
+                              </>
+                            )}
+                            {pmt.sslcommerz_transaction_id && (
+                              <>
+                                <span>•</span>
+                                <span className="font-mono text-slate-400">
+                                  SSL: {pmt.sslcommerz_transaction_id}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
-
-                        {/* Action buttons on individual row */}
-                        <div className="flex items-center gap-2 self-end sm:self-center">
-                          {isTenant && isPending && (
-                            <>
-                              {isCash ? (
-                                <span className="text-[11px] text-amber-400 bg-amber-950/60 border border-amber-600/40 px-2.5 py-1 rounded">
-                                  Awaiting owner verification
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  disabled={payingCash}
-                                  onClick={() => handlePayByCash(pmt.id)}
-                                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
-                                >
-                                  Paid by Cash
-                                </button>
-                              )}
-                            </>
-                          )}
-
-                          {isOwner && isPending && (
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                disabled={resolvingPaymentId === pmt.id}
-                                onClick={() => handleResolvePayment(pmt.id, "confirmed")}
-                                className="bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 border border-emerald-700 px-2.5 py-1 rounded text-xs cursor-pointer transition"
-                              >
-                                Confirm
-                              </button>
-                              <button
-                                type="button"
-                                disabled={resolvingPaymentId === pmt.id}
-                                onClick={() => handleResolvePayment(pmt.id, "failed")}
-                                className="bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700 px-2.5 py-1 rounded text-xs cursor-pointer transition"
-                              >
-                                Fail
-                              </button>
-                            </div>
-                          )}
-                        </div>
                       </div>
-                    );
-                  })}
+
+                      <div className="text-xs text-emerald-400 font-mono font-medium self-end sm:self-center flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">verified</span>
+                        <span>Paid & Verified</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* SIDEBAR COLUMN (4 Columns on desktop): Status, Dates, Financial Summary, Owner Info */}
+        {/* SIDEBAR COLUMN (4 Columns on desktop): Status, Dates, Financial Summary */}
         <div className="lg:col-span-4 flex flex-col gap-6 sticky top-20">
           {/* Contract Status & Duration Card */}
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-sm">
@@ -788,48 +866,6 @@ export function ContractDetailPage() {
               <span className="font-extrabold text-[#d4b068] font-mono text-base">
                 ৳{totalMonthlyCommitment.toLocaleString()}
               </span>
-            </div>
-          </div>
-
-          {/* Landlord / Owner Contact Card */}
-          <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <span className="material-symbols-outlined text-base text-[#d4b068]">
-                  shield_person
-                </span>
-                <span>Property Owner</span>
-              </h3>
-              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-600/40 px-2 py-0.5 rounded">
-                Verified
-              </span>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <span className="text-slate-500 block mb-0.5">Name</span>
-                <span className="text-white font-medium">
-                  {contract.owner_name || `Owner #${contract.owner_id}`}
-                </span>
-              </div>
-
-              {contract.owner_email && (
-                <div>
-                  <span className="text-slate-500 block mb-0.5">Email</span>
-                  <span className="text-white font-mono truncate block">
-                    {contract.owner_email}
-                  </span>
-                </div>
-              )}
-
-              {contract.owner_phone && (
-                <div>
-                  <span className="text-slate-500 block mb-0.5">Phone</span>
-                  <span className="text-white font-mono">
-                    {contract.owner_phone}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>

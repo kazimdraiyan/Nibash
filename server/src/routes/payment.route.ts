@@ -17,6 +17,11 @@ router.patch(
   asyncHandler(paymentController.payByCash),
 );
 router.patch(
+  "/:payment_id/reject-cash",
+  authMiddleware,
+  asyncHandler(paymentController.rejectCash),
+);
+router.patch(
   "/:payment_id",
   authMiddleware,
   asyncHandler(paymentController.resolve),

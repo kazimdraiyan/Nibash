@@ -57,3 +57,12 @@ export async function payByCash(req: Request, res: Response) {
   await paymentService.payByCash(req.user.id, req.params.payment_id as string);
   res.json({ message: "marked as paid by cash, awaiting owner verification" });
 }
+
+export async function rejectCash(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  await paymentService.rejectCash(req.user.id, req.params.payment_id as string);
+  res.json({ message: "cash payment claim rejected, payment method reset to null" });
+}

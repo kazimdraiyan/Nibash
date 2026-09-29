@@ -10,6 +10,8 @@
 -- ALTER TABLE Payments
 --   ADD CONSTRAINT uq_payment_contract_month UNIQUE (contract_id, billing_month);
 
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
 -- Insert a payment for each active contract every month
 CREATE OR REPLACE PROCEDURE generate_monthly_payments()
 LANGUAGE plpgsql
@@ -35,7 +37,24 @@ BEGIN
 END;
 $$;
 
-CREATE EXTENSION IF NOT EXISTS pg_cron;
 -- 1st of every month at 00:00 UTC
 -- SELECT cron.schedule('monthly-payments', '0 0 1 * *',
 --                      $$CALL generate_monthly_payments()$$);
+
+-- Mark pending payments as overdue once their due date has passed
+CREATE OR REPLACE PROCEDURE mark_overdue_payments()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  UPDATE Payments
+  SET status = 'overdue'
+  WHERE status = 'pending'
+    AND due_date < CURRENT_DATE;
+END;
+$$;
+
+SELECT cron.schedule(
+  'mark-overdue-payments',
+  '0 1 * * *',  -- 01:00 UTC daily, an hour after payment generation
+  $$CALL mark_overdue_payments()$$
+);
