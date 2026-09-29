@@ -61,11 +61,26 @@ function formatPhoneForWhatsApp(phone: string): string {
   return "";
 }
 
+interface ReviewMediaItem {
+  id: number;
+  url: string;
+}
+
 interface Review {
+  id: number;
+  contract_id: number;
+  reviewer_name?: string | null;
+  reviewer_id?: number;
   rating: number;
-  description: string;
+  description?: string | null;
   created_at: string;
-  average_rating?: number;
+  media?: ReviewMediaItem[];
+}
+
+interface ReviewSummary {
+  total_reviews: number;
+  average_rating: number;
+  rating_counts: Record<number, number>;
 }
 
 interface Application {
@@ -108,6 +123,17 @@ export function ListingDetailPage() {
 
   const [listing, setListing] = useState<OwnerPhoneListing | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary>({
+    total_reviews: 0,
+    average_rating: 0,
+    rating_counts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  });
+  const [reviewLightbox, setReviewLightbox] = useState<{
+    photos: ReviewMediaItem[];
+    selectedIndex: number;
+    reviewerName?: string | null;
+    rating: number;
+  } | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -244,10 +270,39 @@ export function ListingDetailPage() {
         if (e.key === "ArrowRight") handleNextPhoto();
         if (e.key === "Escape") setIsLightboxOpen(false);
       }
+      if (reviewLightbox) {
+        if (e.key === "ArrowLeft" && reviewLightbox.photos.length > 1) {
+          setReviewLightbox((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  selectedIndex:
+                    prev.selectedIndex === 0
+                      ? prev.photos.length - 1
+                      : prev.selectedIndex - 1,
+                }
+              : null
+          );
+        }
+        if (e.key === "ArrowRight" && reviewLightbox.photos.length > 1) {
+          setReviewLightbox((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  selectedIndex:
+                    prev.selectedIndex === prev.photos.length - 1
+                      ? 0
+                      : prev.selectedIndex + 1,
+                }
+              : null
+          );
+        }
+        if (e.key === "Escape") setReviewLightbox(null);
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLightboxOpen, handlePrevPhoto, handleNextPhoto]);
+  }, [isLightboxOpen, reviewLightbox, handlePrevPhoto, handleNextPhoto]);
 
   const fetchDetails = useCallback(async () => {
     if (!id) return;
@@ -325,12 +380,21 @@ export function ListingDetailPage() {
 
       // 2. Fetch reviews for this listing
       try {
-        const reviewsRes = await apiClient.get<{ reviews: Review[] }>(
-          `/reviews/listings/${id}`,
-        );
+        const reviewsRes = await apiClient.get<{
+          reviews: Review[];
+          summary: ReviewSummary;
+        }>(`/reviews/listings/${id}`);
         setReviews(reviewsRes.reviews || []);
+        if (reviewsRes.summary) {
+          setReviewSummary(reviewsRes.summary);
+        }
       } catch {
         setReviews([]);
+        setReviewSummary({
+          total_reviews: 0,
+          average_rating: 0,
+          rating_counts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        });
       }
 
       // 3. If current logged-in user is the owner, fetch applicants
@@ -1595,49 +1659,207 @@ export function ListingDetailPage() {
           )}
 
           {/* 7. Tenant Reviews (order-8 on mobile) */}
-          <div className="order-8 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg text-amber-400">
-                  star
+          <div className="order-8 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-xl text-amber-400">
+                  hotel_class
                 </span>
-                <span>Tenant Reviews</span>
-              </h2>
-              {reviews.length > 0 && (
-                <span className="text-xs bg-slate-800 text-amber-300 px-2.5 py-1 rounded-full font-medium border border-slate-700">
-                  ★{" "}
-                  {reviews[0]?.average_rating
-                    ? Number(reviews[0].average_rating).toFixed(1)
-                    : "N/A"}
+                <div>
+                  <h2 className="text-base font-bold text-white">Tenant Reviews</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Authentic feedback from verified tenants with confirmed rental payments
+                  </p>
+                </div>
+              </div>
+
+              {reviewSummary.total_reviews > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-600/50 font-mono self-start sm:self-center">
+                  <span className="material-symbols-outlined text-xs">star</span>
+                  <span>{reviewSummary.average_rating.toFixed(1)} / 5.0</span>
                 </span>
               )}
             </div>
 
+            {/* Ratings Summary Banner (if reviews exist) */}
+            {reviewSummary.total_reviews > 0 && (
+              <div className="p-5 sm:p-6 rounded-xl bg-[#090a0c] border border-slate-800 mb-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                {/* Left: Overall Score */}
+                <div className="md:col-span-4 flex flex-col items-center justify-center text-center p-4 border-b md:border-b-0 md:border-r border-slate-800/80">
+                  <div className="text-4xl sm:text-5xl font-extrabold text-white font-mono tracking-tight mb-1">
+                    {reviewSummary.average_rating.toFixed(1)}
+                  </div>
+                  <div className="flex items-center text-amber-400 text-lg mb-1.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`material-symbols-outlined text-lg ${
+                          star <= Math.round(reviewSummary.average_rating)
+                            ? "font-variation-fill"
+                            : "text-slate-700"
+                        }`}
+                        style={{
+                          fontVariationSettings:
+                            star <= Math.round(reviewSummary.average_rating)
+                              ? "'FILL' 1"
+                              : "'FILL' 0",
+                        }}
+                      >
+                        star
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Based on {reviewSummary.total_reviews} verified tenant review{reviewSummary.total_reviews > 1 ? "s" : ""}
+                  </p>
+                </div>
+
+                {/* Right: Star Distribution Bars */}
+                <div className="md:col-span-8 flex flex-col gap-2">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = reviewSummary.rating_counts[star] || 0;
+                    const percent =
+                      reviewSummary.total_reviews > 0
+                        ? Math.round((count / reviewSummary.total_reviews) * 100)
+                        : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-3 text-xs">
+                        <span className="w-12 font-medium text-slate-400 font-mono shrink-0 flex items-center gap-1">
+                          <span>{star}</span>
+                          <span className="material-symbols-outlined text-xs text-amber-400">star</span>
+                        </span>
+                        <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div
+                            className="h-full bg-amber-400 rounded-full transition-all duration-500"
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                        <span className="w-12 text-right text-slate-400 font-mono text-[11px] shrink-0">
+                          {count}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Empty state or Review Cards Feed */}
             {reviews.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
-                No verified tenant reviews yet for this listing.
+              <div className="py-12 px-4 text-center border border-dashed border-slate-800 rounded-xl bg-[#090a0c]/50">
+                <div className="w-12 h-12 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-400 mx-auto mb-3">
+                  <span className="material-symbols-outlined text-2xl text-slate-500">rate_review</span>
+                </div>
+                <h3 className="text-sm font-semibold text-slate-200 mb-1">
+                  No Reviews Yet
+                </h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  Only verified tenants with at least one confirmed rent payment can write a review for this property.
+                </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
-                {reviews.map((rev, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 bg-[#090a0c] border border-slate-800/80 rounded-xl"
-                  >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex text-amber-400 text-xs">
-                        {"★".repeat(rev.rating)}
-                        {"☆".repeat(5 - rev.rating)}
+              <div className="flex flex-col gap-4">
+                {reviews.map((rev) => {
+                  const initial = (rev.reviewer_name || "T").trim().charAt(0).toUpperCase();
+                  const formattedDate = new Date(rev.created_at).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  });
+
+                  return (
+                    <div
+                      key={rev.id}
+                      className="p-5 bg-[#090a0c] border border-slate-800/80 rounded-xl shadow-xs transition hover:border-slate-700"
+                    >
+                      {/* Reviewer Header */}
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-emerald-950/80 border border-emerald-700/60 flex items-center justify-center text-emerald-300 font-bold text-sm shrink-0">
+                            {initial}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-white">
+                                {rev.reviewer_name || "Verified Tenant"}
+                              </span>
+                              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-700/50">
+                                <span className="material-symbols-outlined text-[11px]">verified</span>
+                                <span>Verified Tenant</span>
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-slate-400 block mt-0.5">
+                              {formattedDate}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Rating Stars */}
+                        <div className="flex items-center text-amber-400">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span
+                              key={star}
+                              className={`material-symbols-outlined text-base ${
+                                star <= rev.rating ? "font-variation-fill" : "text-slate-700"
+                              }`}
+                              style={{
+                                fontVariationSettings: star <= rev.rating ? "'FILL' 1" : "'FILL' 0",
+                              }}
+                            >
+                              star
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-[10px] text-slate-500">
-                        {new Date(rev.created_at).toLocaleDateString()}
-                      </span>
+
+                      {/* Review Description */}
+                      {rev.description ? (
+                        <p className="text-xs sm:text-sm text-slate-300 whitespace-pre-line leading-relaxed mb-3.5">
+                          {rev.description}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-slate-500 italic mb-3">
+                          No written description provided.
+                        </p>
+                      )}
+
+                      {/* Review Media Attachments Grid */}
+                      {rev.media && rev.media.length > 0 && (
+                        <div className="pt-2 border-t border-slate-800/60">
+                          <div className="text-[10px] uppercase font-mono text-slate-400 mb-2">
+                            Tenant Photos ({rev.media.length})
+                          </div>
+                          <div className="flex flex-wrap gap-2.5">
+                            {rev.media.map((img, imgIdx) => (
+                              <button
+                                key={img.id}
+                                type="button"
+                                onClick={() =>
+                                  setReviewLightbox({
+                                    photos: rev.media!,
+                                    selectedIndex: imgIdx,
+                                    reviewerName: rev.reviewer_name,
+                                    rating: rev.rating,
+                                  })
+                                }
+                                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-slate-700/80 hover:border-amber-400/80 transition-all hover:scale-105 group cursor-pointer shadow-sm"
+                              >
+                                <img
+                                  src={img.url}
+                                  alt={`Review attachment ${imgIdx + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                                  <span className="material-symbols-outlined text-lg">fullscreen</span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                      {rev.description}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -2406,6 +2628,134 @@ export function ListingDetailPage() {
                     alt={`Thumbnail ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Review Photos Lightbox Modal */}
+      {reviewLightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 select-none animate-fadeIn"
+          onClick={() => setReviewLightbox(null)}
+        >
+          {/* Top Bar */}
+          <div
+            className="flex items-center justify-between w-full max-w-6xl mx-auto text-white z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <h3 className="text-sm font-semibold truncate max-w-xs sm:max-w-md text-white">
+                  {reviewLightbox.reviewerName || "Verified Tenant"}'s Review Photo
+                </h3>
+                <span className="text-xs text-amber-400 font-mono">
+                  ★ {reviewLightbox.rating}/5
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-mono">
+                Photo {reviewLightbox.selectedIndex + 1} of {reviewLightbox.photos.length}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setReviewLightbox(null)}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+              aria-label="Close fullscreen gallery"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Main Image */}
+          <div
+            className="relative flex-1 flex items-center justify-center my-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={reviewLightbox.photos[reviewLightbox.selectedIndex]?.url}
+              alt={`Review photo ${reviewLightbox.selectedIndex + 1}`}
+              className="max-w-full max-h-[78vh] object-contain rounded-lg shadow-2xl"
+            />
+
+            {reviewLightbox.photos.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReviewLightbox((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            selectedIndex:
+                              prev.selectedIndex === 0
+                                ? prev.photos.length - 1
+                                : prev.selectedIndex - 1,
+                          }
+                        : null
+                    )
+                  }
+                  className="absolute left-2 sm:left-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
+                  aria-label="Previous photo"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReviewLightbox((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            selectedIndex:
+                              prev.selectedIndex === prev.photos.length - 1
+                                ? 0
+                                : prev.selectedIndex + 1,
+                          }
+                        : null
+                    )
+                  }
+                  className="absolute right-2 sm:right-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
+                  aria-label="Next photo"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Bottom Thumbnails */}
+          {reviewLightbox.photos.length > 1 && (
+            <div
+              className="w-full max-w-4xl mx-auto flex items-center justify-center gap-2 overflow-x-auto py-2 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {reviewLightbox.photos.map((photo, idx) => (
+                <button
+                  key={photo.id || idx}
+                  type="button"
+                  onClick={() =>
+                    setReviewLightbox((prev) => (prev ? { ...prev, selectedIndex: idx } : null))
+                  }
+                  className={`w-14 sm:w-16 aspect-square rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${
+                    idx === reviewLightbox.selectedIndex
+                      ? "ring-2 ring-white border-white scale-105 opacity-100"
+                      : "border-white/20 opacity-50 hover:opacity-100"
+                  }`}
+                >
+                  <img src={photo.url} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
