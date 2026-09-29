@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -8,27 +8,70 @@ export function ContractFormPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const initialListingId = searchParams.get("listingId") || "";
-  const initialTenantId = searchParams.get("tenantId") || "";
+  const listingId = searchParams.get("listingId") || "";
+  const tenantId = searchParams.get("tenantId") || "";
 
   // Contract form states
-  const [listingId, setListingId] = useState(initialListingId);
-  const [tenantId, setTenantId] = useState(initialTenantId);
-  const [startDate, setStartDate] = useState("2026-10-01");
-  const [endDate, setEndDate] = useState("2027-09-30");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
-  // Financial Terms
-  const [rent, setRent] = useState("65000");
-  const [electricityBill, setElectricityBill] = useState("3500");
-  const [waterBill, setWaterBill] = useState("1200");
-  const [serviceCharge, setServiceCharge] = useState("5000");
-  const [monthlyDueDate, setMonthlyDueDate] = useState("5");
-  const [securityDeposit, setSecurityDeposit] = useState("130000");
+  // Financial Terms (seeded from listing initial terms)
+  const [rent, setRent] = useState("");
+  const [electricityBill, setElectricityBill] = useState("");
+  const [waterBill, setWaterBill] = useState("");
+  const [serviceCharge, setServiceCharge] = useState("");
+  const [monthlyDueDate, setMonthlyDueDate] = useState("");
+  const [securityDeposit, setSecurityDeposit] = useState("");
   const [petAllowed, setPetAllowed] = useState(false);
 
   // Status
+  const [loadingTerms, setLoadingTerms] = useState(true);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch listing initial terms on mount
+  useEffect(() => {
+    if (!listingId) {
+      setTermsError("No listing ID provided.");
+      setLoadingTerms(false);
+      return;
+    }
+    setLoadingTerms(true);
+    apiClient
+      .get<{
+        listing: {
+          rent: number | null;
+          electricity_bill: number | null;
+          water_bill: number | null;
+          service_charge: number | null;
+          monthly_due_date: number | null;
+          pet_allowed: boolean | null;
+          security_deposit: number | null;
+        };
+      }>(`/listings/${listingId}`)
+      .then(({ listing }) => {
+        setRent(listing.rent != null ? String(listing.rent) : "");
+        setElectricityBill(
+          listing.electricity_bill != null ? String(listing.electricity_bill) : ""
+        );
+        setWaterBill(listing.water_bill != null ? String(listing.water_bill) : "");
+        setServiceCharge(
+          listing.service_charge != null ? String(listing.service_charge) : ""
+        );
+        setMonthlyDueDate(
+          listing.monthly_due_date != null ? String(listing.monthly_due_date) : ""
+        );
+        setSecurityDeposit(
+          listing.security_deposit != null ? String(listing.security_deposit) : ""
+        );
+        setPetAllowed(listing.pet_allowed ?? false);
+      })
+      .catch((err: any) => {
+        setTermsError(err.message || "Failed to load listing terms.");
+      })
+      .finally(() => setLoadingTerms(false));
+  }, [listingId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +122,25 @@ export function ContractFormPage() {
     );
   }
 
+  if (loadingTerms) {
+    return (
+      <div className="max-w-2xl mx-auto py-10 px-4 text-center text-slate-400 text-sm">
+        Loading listing terms...
+      </div>
+    );
+  }
+
+  if (termsError) {
+    return (
+      <div className="max-w-2xl mx-auto py-10 px-4 text-center">
+        <p className="text-red-400 text-sm mb-4">{termsError}</p>
+        <Link to="/owner/applications" className="text-xs text-slate-400 hover:text-white">
+          ← Back to Applications
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <div className="mb-6">
@@ -100,41 +162,6 @@ export function ContractFormPage() {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="contract-listing-id"
-                className="block text-xs uppercase font-medium text-slate-300 mb-1"
-              >
-                Listing ID *
-              </label>
-              <input
-                id="contract-listing-id"
-                type="number"
-                required
-                value={listingId}
-                onChange={(e) => setListingId(e.target.value)}
-                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="contract-tenant-id"
-                className="block text-xs uppercase font-medium text-slate-300 mb-1"
-              >
-                Tenant ID *
-              </label>
-              <input
-                id="contract-tenant-id"
-                type="number"
-                required
-                value={tenantId}
-                onChange={(e) => setTenantId(e.target.value)}
-                className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-              />
-            </div>
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
