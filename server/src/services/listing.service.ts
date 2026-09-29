@@ -21,14 +21,16 @@ export async function searchListings(
   areaId: number | null,
   // Optional upper limit for the monthly rent.
   maxRent: number | null,
+  // Optional amenity names — listing must have ALL of them (AND behavior).
+  amenityNames: string[],
 ) {
   // Every search is limited to publicly approved listings.
   const conditions = ["l.status = 'approved'"];
   // Store values separately so PostgreSQL can bind them safely to placeholders.
-  const params: Array<string | number> = [];
+  const params: Array<string | number | string[]> = [];
 
   // Add a value to the parameters array and return its numbered SQL placeholder.
-  const addParam = (value: string | number) => {
+  const addParam = (value: string | number | string[]) => {
     // Append the value that will be bound by the database driver.
     params.push(value);
     // PostgreSQL placeholders are one-based, so use the new array length.
@@ -56,6 +58,14 @@ export async function searchListings(
   if (maxRent !== null) {
     // Exclude listings whose rent is above the requested maximum.
     conditions.push(`t.rent <= ${addParam(maxRent)}`);
+  }
+  if (amenityNames.length > 0) {
+    // AND behavior: the listing must have every requested amenity.
+    // For each amenity name, require at least one matching row in listing_amenities joined with amenities.
+    const placeholder = addParam(amenityNames);
+    conditions.push(
+      `(SELECT COUNT(DISTINCT a.name) FROM listing_amenities la JOIN amenities a ON a.id = la.amenity_id WHERE la.listing_id = l.id AND a.name = ANY(${placeholder})) = ${amenityNames.length}`
+    );
   }
 
   // Select listing data and rent after joining each listing to its initial terms.

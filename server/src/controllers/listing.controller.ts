@@ -33,14 +33,23 @@ export async function search(req: Request, res: Response) {
 
   const maxRent_raw = parseInt(req.query.maxRent as string, 10);
   const maxRent = isNaN(maxRent_raw) ? null : maxRent_raw;
+
+  // Comma-separated amenity names, e.g. ?amenities=Parking,Gym
+  const amenitiesRaw = (req.query.amenities as string) ?? "";
+  const amenityNames = amenitiesRaw
+    ? amenitiesRaw.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
+
   const listings = await listingService.searchListings(
     q,
     bedrooms,
     areaId,
     maxRent,
+    amenityNames,
   );
   res.json({ listings });
 }
+
 
 export async function getById(req: Request, res: Response) {
   const listing = await listingService.getListingById(

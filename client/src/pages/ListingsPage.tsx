@@ -55,6 +55,12 @@ export function ListingsPage() {
     const r = searchParams.get("maxRent");
     return r ? parseInt(r, 10) : null;
   });
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>(() => {
+    const a = searchParams.get("amenities");
+    return a ? a.split(",").filter(Boolean) : [];
+  });
+  const [allAmenities, setAllAmenities] = useState<{ id: number; name: string }[]>([]);
+  const [amenityPanelOpen, setAmenityPanelOpen] = useState(false);
 
   // Base listings data
   const [listings, setListings] = useState<BackendListing[]>([]);
@@ -165,6 +171,13 @@ export function ListingsPage() {
     fetchListings();
   }, []);
 
+  // Fetch all available amenities for the filter panel
+  useEffect(() => {
+    apiClient.get<{ amenities: { id: number; name: string }[] }>("/listings/amenities")
+      .then((res) => setAllAmenities(res.amenities || []))
+      .catch(() => {});
+  }, []);
+
   // Fetch authenticated user's own listings
   useEffect(() => {
     async function fetchMyListings() {
@@ -186,7 +199,7 @@ export function ListingsPage() {
 
   // Check whether any search filter is active
   const isFilterActive = Boolean(
-    searchTerm.trim() || areaName.trim() || bedrooms !== null || maxRent !== null
+    searchTerm.trim() || areaName.trim() || bedrooms !== null || maxRent !== null || selectedAmenities.length > 0
   );
 
   // Debounced search query to backend with AbortController for race condition protection
@@ -194,7 +207,7 @@ export function ListingsPage() {
     const trimmed = searchTerm.trim();
     const trimmedArea = areaName.trim();
     const hasFilters = Boolean(
-      trimmed || trimmedArea || bedrooms !== null || maxRent !== null
+      trimmed || trimmedArea || bedrooms !== null || maxRent !== null || selectedAmenities.length > 0
     );
 
     if (!hasFilters) {
@@ -234,6 +247,10 @@ export function ListingsPage() {
           params.set("maxRent", maxRent.toString());
         }
 
+        if (selectedAmenities.length > 0) {
+          params.set("amenities", selectedAmenities.join(","));
+        }
+
         const data = await apiClient.get<{ listings: BackendListing[] }>(
           `/listings/search?${params.toString()}`,
           { signal: abortController.signal }
@@ -257,7 +274,7 @@ export function ListingsPage() {
       clearTimeout(timer);
       abortController.abort();
     };
-  }, [searchTerm, areaName, bedrooms, maxRent]);
+  }, [searchTerm, areaName, bedrooms, maxRent, selectedAmenities]);
 
   // Handlers for modifying filters
   const handleKeywordChange = (newVal: string) => {
@@ -288,8 +305,17 @@ export function ListingsPage() {
     setAreaName("");
     setBedrooms(null);
     setMaxRent(null);
+    setSelectedAmenities([]);
     updateUrlParams("", "", null, null);
   };
+
+  const toggleAmenity = (name: string) => {
+    setSelectedAmenities((prev) =>
+      prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name]
+    );
+  };
+
+  const clearAmenities = () => setSelectedAmenities([]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -452,8 +478,70 @@ export function ListingsPage() {
           </div>
         </div>
 
-        {/* Active Filter Chips & Clear Action */}
+        {/* Amenity Multi-select Panel */}
+        {allAmenities.length > 0 && (
+          <div className="border border-slate-700 rounded-xl bg-[#12151c] overflow-hidden">
+            {/* Panel header / toggle */}
+            <button
+              type="button"
+              onClick={() => setAmenityPanelOpen((o) => !o)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-300 hover:text-white transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px] text-slate-400">hotel_class</span>
+                <span className="font-medium">Filter by Amenities</span>
+                {selectedAmenities.length > 0 && (
+                  <span className="bg-[#d4b068]/20 text-[#d4b068] border border-[#d4b068]/40 text-[11px] font-mono px-2 py-0.5 rounded-full">
+                    {selectedAmenities.length} selected
+                  </span>
+                )}
+              </div>
+              <span className="material-symbols-outlined text-sm text-slate-500">
+                {amenityPanelOpen ? "expand_less" : "expand_more"}
+              </span>
+            </button>
+
+            {amenityPanelOpen && (
+              <div className="px-4 pb-4 border-t border-slate-800">
+                <div className="flex flex-wrap gap-2 pt-3 max-h-40 overflow-y-auto">
+                  {allAmenities.map((amenity) => {
+                    const isSelected = selectedAmenities.includes(amenity.name);
+                    return (
+                      <button
+                        key={amenity.id}
+                        type="button"
+                        onClick={() => toggleAmenity(amenity.name)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#d4b068]/15 text-[#d4b068] border-[#d4b068]/50"
+                            : "bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200"
+                        }`}
+                      >
+                        {isSelected && (
+                          <span className="material-symbols-outlined text-[13px]">check</span>
+                        )}
+                        {amenity.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedAmenities.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={clearAmenities}
+                    className="mt-3 text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">close</span>
+                    Clear amenity filters
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {isFilterActive && (
+
           <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
             <span className="text-slate-400 font-medium">Active Filters:</span>
 
@@ -508,6 +596,23 @@ export function ListingsPage() {
                 </button>
               </span>
             )}
+
+            {selectedAmenities.map((name) => (
+              <span
+                key={name}
+                className="inline-flex items-center gap-1.5 bg-[#d4b068]/10 text-[#d4b068] border border-[#d4b068]/40 px-2.5 py-1 rounded-full"
+              >
+                <span className="material-symbols-outlined text-[13px]">hotel_class</span>
+                <span>{name}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleAmenity(name)}
+                  className="hover:text-white"
+                >
+                  <span className="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </span>
+            ))}
 
             <button
               type="button"
