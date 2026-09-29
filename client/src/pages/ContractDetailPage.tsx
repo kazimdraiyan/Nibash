@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { ReviewModal, type ReviewData } from "../components/ReviewModal";
+import { DeleteConfirmModal } from "../components/DeleteConfirmModal";
 
 interface ContractData {
   contract_id: number;
@@ -89,6 +91,16 @@ export function ContractDetailPage() {
   // Signing state
   const [signing, setSigning] = useState(false);
 
+  // Tenant review state
+  const [review, setReview] = useState<ReviewData | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingReview, setIsDeletingReview] = useState(false);
+  const [reviewPhotoViewer, setReviewPhotoViewer] = useState<{
+    photos: { id: number; url: string }[];
+    selectedIndex: number;
+  } | null>(null);
+
   const fetchContractAndPayments = useCallback(async () => {
     if (!id || !token) return;
     setLoading(true);
@@ -105,6 +117,14 @@ export function ContractDetailPage() {
       } catch {
         setPayments([]);
       }
+
+      // 3. Fetch Review for this contract
+      try {
+        const revRes = await apiClient.get<{ review: ReviewData | null }>(`/reviews/contract/${id}`);
+        setReview(revRes.review || null);
+      } catch {
+        setReview(null);
+      }
     } catch (err: any) {
       setError(err.message || "Failed to load contract details.");
     } finally {
@@ -115,6 +135,41 @@ export function ContractDetailPage() {
   useEffect(() => {
     fetchContractAndPayments();
   }, [fetchContractAndPayments]);
+
+  useEffect(() => {
+    if (!reviewPhotoViewer) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setReviewPhotoViewer(null);
+      if (e.key === "ArrowLeft" && reviewPhotoViewer.photos.length > 1) {
+        setReviewPhotoViewer((prev) =>
+          prev
+            ? {
+                ...prev,
+                selectedIndex:
+                  prev.selectedIndex === 0
+                    ? prev.photos.length - 1
+                    : prev.selectedIndex - 1,
+              }
+            : null
+        );
+      }
+      if (e.key === "ArrowRight" && reviewPhotoViewer.photos.length > 1) {
+        setReviewPhotoViewer((prev) =>
+          prev
+            ? {
+                ...prev,
+                selectedIndex:
+                  prev.selectedIndex === prev.photos.length - 1
+                    ? 0
+                    : prev.selectedIndex + 1,
+              }
+            : null
+        );
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [reviewPhotoViewer]);
 
   const handleSignContract = async () => {
     if (!id || !confirm("Are you sure you want to sign this digital lease contract?")) return;
@@ -170,6 +225,24 @@ export function ContractDetailPage() {
     }
   };
 
+  const handleReviewSaved = (savedReview: ReviewData) => {
+    setReview(savedReview);
+  };
+
+  const handleDeleteReview = async () => {
+    if (!review) return;
+    setIsDeletingReview(true);
+    try {
+      await apiClient.delete(`/reviews/${review.id}`);
+      setReview(null);
+      setIsDeleteModalOpen(false);
+    } catch (err: any) {
+      alert(err.message || "Failed to delete review.");
+    } finally {
+      setIsDeletingReview(false);
+    }
+  };
+
   if (!token) {
     return (
       <div className="max-w-md mx-auto py-16 px-4 text-center">
@@ -216,6 +289,7 @@ export function ContractDetailPage() {
 
   // Confirmed payments for history list
   const confirmedPayments = payments.filter((p) => p.status === "confirmed");
+  const hasConfirmedPayment = confirmedPayments.length > 0;
 
   // Monthly totals
   const totalMonthlyCommitment =
@@ -777,6 +851,172 @@ export function ContractDetailPage() {
               )}
             </div>
           </div>
+
+          {/* 5. Tenancy Review Section (for Tenants) */}
+          {isTenant && (
+            <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                    hotel_class
+                  </span>
+                  <div>
+                    <h2 className="text-base font-bold text-white">Tenancy & Landlord Review</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Share your living experience to help prospective tenants
+                    </p>
+                  </div>
+                </div>
+
+                {review && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 self-start sm:self-center">
+                    <span className="material-symbols-outlined text-xs">verified</span>
+                    <span>Review Submitted</span>
+                  </span>
+                )}
+              </div>
+
+              {!review ? (
+                /* No review submitted yet */
+                <div className="p-6 rounded-xl bg-[#090a0c] border border-dashed border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+                  <div className="max-w-md">
+                    <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
+                      <span>Rate Your Experience</span>
+                      <span className="text-[11px] font-mono text-amber-400 bg-amber-950/70 border border-amber-600/40 px-2 py-0.5 rounded">
+                        1–5 Stars
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Your feedback on the apartment and tenancy will appear on the listing page. You can add a description and photos of the apartment.
+                    </p>
+                  </div>
+
+                  <div className="relative group self-stretch sm:self-auto flex flex-col sm:items-end">
+                    <button
+                      type="button"
+                      disabled={!hasConfirmedPayment}
+                      onClick={() => {
+                        if (hasConfirmedPayment) setIsReviewModalOpen(true);
+                      }}
+                      className={`w-full sm:w-auto font-semibold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 ${
+                        hasConfirmedPayment
+                          ? "bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer shadow-md"
+                          : "bg-slate-800/80 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-75"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-base">rate_review</span>
+                      <span>Write a Review</span>
+                    </button>
+
+                    {/* Tooltip for disabled state */}
+                    {!hasConfirmedPayment && (
+                      <div className="pointer-events-none absolute bottom-full mb-2 right-0 hidden group-hover:flex flex-col items-center z-30 w-64 text-center">
+                        <div className="bg-[#1e2330] text-amber-200 text-xs py-1.5 px-3 rounded-lg border border-amber-500/30 shadow-xl font-medium">
+                          You must have at least 1 successful payment to write a review
+                        </div>
+                        <div className="w-2 h-2 bg-[#1e2330] rotate-45 -mt-1 border-r border-b border-amber-500/30" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Review submitted - display card with Edit & Delete options */
+                <div className="p-5 sm:p-6 rounded-xl bg-[#090a0c] border border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center text-amber-400 text-base">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span
+                            key={star}
+                            className={`material-symbols-outlined text-lg ${
+                              star <= review.rating ? "font-variation-fill" : "text-slate-700"
+                            }`}
+                            style={{
+                              fontVariationSettings: star <= review.rating ? "'FILL' 1" : "'FILL' 0",
+                            }}
+                          >
+                            star
+                          </span>
+                        ))}
+                      </div>
+                      <span className="text-xs font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">
+                        {review.rating}.0 / 5.0
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-slate-400">
+                        Submitted on {formatDate(review.created_at)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {review.description ? (
+                    <p className="text-xs sm:text-sm text-slate-300 whitespace-pre-line leading-relaxed mb-4">
+                      {review.description}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-500 italic mb-4">
+                      No written description provided.
+                    </p>
+                  )}
+
+                  {/* Review Photos Thumbnail Grid */}
+                  {review.media && review.media.length > 0 && (
+                    <div className="mb-5">
+                      <div className="text-[11px] uppercase tracking-wider text-slate-400 font-mono mb-2">
+                        Attached Photos ({review.media.length})
+                      </div>
+                      <div className="flex flex-wrap gap-2.5">
+                        {review.media.map((img, idx) => (
+                          <button
+                            key={img.id}
+                            type="button"
+                            onClick={() =>
+                              setReviewPhotoViewer({
+                                photos: review.media,
+                                selectedIndex: idx,
+                              })
+                            }
+                            className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-slate-700/80 hover:border-amber-400/80 transition-all hover:scale-105 group cursor-pointer shadow-sm"
+                          >
+                            <img
+                              src={img.url}
+                              alt={`Review photo ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                              <span className="material-symbols-outlined text-lg">fullscreen</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Edit and Delete Actions */}
+                  <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setIsReviewModalOpen(true)}
+                      className="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span className="material-symbols-outlined text-sm">edit</span>
+                      <span>Edit Review</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsDeleteModalOpen(true)}
+                      className="px-4 py-2 rounded-xl text-xs font-medium text-rose-300 hover:text-white bg-rose-950/60 hover:bg-rose-900 border border-rose-800/60 transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span className="material-symbols-outlined text-sm">delete</span>
+                      <span>Delete Review</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* SIDEBAR COLUMN (4 Columns on desktop): Status, Dates, Financial Summary */}
@@ -870,6 +1110,145 @@ export function ContractDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      {contract && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          contractId={contract.contract_id}
+          listingTitle={contract.listing_title}
+          initialReview={review}
+          onReviewSaved={handleReviewSaved}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteReview}
+        isDeleting={isDeletingReview}
+        title="Delete Your Review?"
+        message="Are you sure you want to permanently delete your review and photos? This action cannot be undone."
+      />
+
+      {/* Fullscreen Review Photo Lightbox */}
+      {reviewPhotoViewer && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 select-none animate-fadeIn"
+          onClick={() => setReviewPhotoViewer(null)}
+        >
+          {/* Lightbox Top Bar */}
+          <div
+            className="flex items-center justify-between w-full max-w-6xl mx-auto text-white z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <h3 className="text-sm font-semibold truncate max-w-xs sm:max-w-md text-white">
+                Review Photo {reviewPhotoViewer.selectedIndex + 1} of {reviewPhotoViewer.photos.length}
+              </h3>
+              <p className="text-xs text-slate-400 font-mono">
+                {contract.listing_title || `Contract #${contract.contract_id}`}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setReviewPhotoViewer(null)}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+              aria-label="Close fullscreen image"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+
+          {/* Lightbox Main Image & Arrows */}
+          <div
+            className="relative flex-1 flex items-center justify-center my-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={reviewPhotoViewer.photos[reviewPhotoViewer.selectedIndex]?.url}
+              alt={`Review photo ${reviewPhotoViewer.selectedIndex + 1}`}
+              className="max-w-full max-h-[78vh] object-contain rounded-lg shadow-2xl"
+            />
+
+            {reviewPhotoViewer.photos.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReviewPhotoViewer((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            selectedIndex:
+                              prev.selectedIndex === 0
+                                ? prev.photos.length - 1
+                                : prev.selectedIndex - 1,
+                          }
+                        : null
+                    )
+                  }
+                  className="absolute left-2 sm:left-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
+                  aria-label="Previous photo"
+                >
+                  <span className="material-symbols-outlined text-2xl">chevron_left</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReviewPhotoViewer((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            selectedIndex:
+                              prev.selectedIndex === prev.photos.length - 1
+                                ? 0
+                                : prev.selectedIndex + 1,
+                          }
+                        : null
+                    )
+                  }
+                  className="absolute right-2 sm:right-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
+                  aria-label="Next photo"
+                >
+                  <span className="material-symbols-outlined text-2xl">chevron_right</span>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Thumbnail Strip */}
+          {reviewPhotoViewer.photos.length > 1 && (
+            <div
+              className="w-full max-w-xl mx-auto flex items-center justify-center gap-2 overflow-x-auto p-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {reviewPhotoViewer.photos.map((item, idx) => (
+                <button
+                  key={item.id || idx}
+                  type="button"
+                  onClick={() =>
+                    setReviewPhotoViewer((prev) => (prev ? { ...prev, selectedIndex: idx } : null))
+                  }
+                  className={`w-14 h-14 rounded-lg overflow-hidden border transition cursor-pointer ${
+                    idx === reviewPhotoViewer.selectedIndex
+                      ? "ring-2 ring-white border-white scale-105"
+                      : "border-slate-800 opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <img src={item.url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

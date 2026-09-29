@@ -17,7 +17,8 @@ export interface Listing {
   propertyType?: "Apartment" | "Penthouse" | "Duplex" | "Studio";
   verified?: boolean;
   featured?: boolean;
-  rating?: number;
+  rating?: number | string | null;
+  review_count?: number | null;
   floor?: number;
   petAllowed?: boolean;
   tags?: string[];

@@ -137,7 +137,7 @@ test("rejectListing throws 404 when listing does not exist or cannot be rejected
   );
 });
 
-test("getListingById query allows verifier access regardless of listing approval status", async (t) => {
+test("getListingById query allows verifier, owner, and current tenant access for occupied listing", async (t) => {
   type QueryCall = { query: string; values?: readonly unknown[] };
   type MockablePool = {
     query: (query: string, values?: readonly unknown[]) => Promise<{ rows: any[] }>;
@@ -149,7 +149,7 @@ test("getListingById query allows verifier access regardless of listing approval
   mockablePool.query = async (query, values) => {
     calls.push({ query, values });
     return calls.length === 1
-      ? { rows: [{ id: 12, status: "rejected" }] }
+      ? { rows: [{ id: 12, status: "occupied" }] }
       : { rows: [] };
   };
   t.after(() => {
@@ -160,7 +160,45 @@ test("getListingById query allows verifier access regardless of listing approval
 
   assert.match(
     calls[0].query,
-    /WHERE l\.id = \$1\s+AND \(l\.status = 'approved' OR l\.owner_id = \$2 OR EXISTS \(SELECT 1 FROM verifiers v WHERE v\.user_id = \$2\)\)/i,
+    /WHERE l\.id = \$1\s+AND \(l\.status = 'approved' OR l\.owner_id = \$2 OR EXISTS \(SELECT 1 FROM verifiers v WHERE v\.user_id = \$2\) OR \(l\.status = 'occupied' AND EXISTS \(SELECT 1 FROM contracts c WHERE c\.listing_id = l\.id AND c\.tenant_id = \$2 AND c\.status IN \('signed', 'active'\)\)\)\)/i,
+  );
+  assert.match(
+    calls[0].query,
+    /SELECT ROUND\(AVG\(r\.rating\)::numeric, 1\) FROM reviews r JOIN contracts c ON c\.id = r\.contract_id WHERE c\.listing_id = l\.id\s*\)\s*AS rating/i,
+  );
+  assert.match(
+    calls[0].query,
+    /SELECT COUNT\(r\.id\)::int FROM reviews r JOIN contracts c ON c\.id = r\.contract_id WHERE c\.listing_id = l\.id\s*\)\s*AS review_count/i,
   );
 });
+
+test("getAllListings query includes rating and review_count subqueries", async (t) => {
+  type QueryCall = { query: string; values?: readonly unknown[] };
+  type MockablePool = {
+    query: (query: string, values?: readonly unknown[]) => Promise<{ rows: any[] }>;
+  };
+  const mockablePool = pool as unknown as MockablePool;
+  const originalQuery = mockablePool.query;
+  const calls: QueryCall[] = [];
+
+  mockablePool.query = async (query, values) => {
+    calls.push({ query, values });
+    return { rows: [] };
+  };
+  t.after(() => {
+    mockablePool.query = originalQuery;
+  });
+
+  await listingService.getAllListings();
+
+  assert.match(
+    calls[0].query,
+    /SELECT ROUND\(AVG\(r\.rating\)::numeric, 1\) FROM reviews r JOIN contracts c ON c\.id = r\.contract_id WHERE c\.listing_id = l\.id\s*\)\s*AS rating/i,
+  );
+  assert.match(
+    calls[0].query,
+    /SELECT COUNT\(r\.id\)::int FROM reviews r JOIN contracts c ON c\.id = r\.contract_id WHERE c\.listing_id = l\.id\s*\)\s*AS review_count/i,
+  );
+});
+
 

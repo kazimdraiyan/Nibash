@@ -71,6 +71,23 @@ export const apiClient = {
     }
     return data as T;
   },
+  patchForm: async <T>(endpoint: string, formData: FormData): Promise<T> => {
+    const token = localStorage.getItem("token");
+    const url = endpoint.startsWith("http") ? endpoint : `${BASE_URL}${endpoint}`;
+
+    const res = await fetch(url, {
+      method: "PATCH",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: formData, // no Content-Type — browser sets it with the correct multipart boundary
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message = data.error || data.message || `Request failed with status ${res.status}`;
+      throw new Error(message);
+    }
+    return data as T;
+  },
   patch: <T>(endpoint: string, body?: any) =>
     request<T>(endpoint, {
       method: "PATCH",
