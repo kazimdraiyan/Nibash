@@ -115,3 +115,29 @@ export async function isTokenRevoked(token: string): Promise<boolean> {
   );
   return result.rows.length > 0;
 }
+
+export async function changePassword(
+  userId: number,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const find = await pool.query(
+    "SELECT id, password_hash FROM users WHERE id = $1",
+    [userId],
+  );
+  if (find.rows.length === 0) throw new AppError(404, "user not found");
+
+  const correct = await bcrypt.compare(currentPassword, find.rows[0].password_hash);
+  if (!correct) throw new AppError(400, "incorrect current password");
+
+  const isSame = await bcrypt.compare(newPassword, find.rows[0].password_hash);
+  if (isSame)
+    throw new AppError(400, "new password must be different from current password");
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await pool.query("UPDATE users SET password_hash = $1 WHERE id = $2", [
+    hashedPassword,
+    userId,
+  ]);
+}
+

@@ -19,5 +19,10 @@ router.post(
   asyncHandler(authController.becomeTenant),
 );
 router.post("/logout", authMiddleware, asyncHandler(authController.logout));
+router.patch(
+  "/change-password",
+  authMiddleware,
+  asyncHandler(authController.changePassword),
+);
 
 export default router;

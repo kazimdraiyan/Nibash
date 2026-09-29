@@ -24,6 +24,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { VerifyPortalPage } from "./pages/VerifyPortalPage";
 import { VerifierDashboardPage } from "./pages/VerifierDashboardPage";
+import { ChangePasswordPage } from "./pages/ChangePasswordPage";
 
 function HomePage() {
   const { user } = useAuth();
@@ -82,6 +83,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <VerifierDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/change-password"
+            element={
+              <ProtectedRoute>
+                <ChangePasswordPage />
               </ProtectedRoute>
             }
           />

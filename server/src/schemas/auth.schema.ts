@@ -38,7 +38,19 @@ export const becomeTenantSchema = z.object({
 
 export const becomeOwnerSchema = z.object({});
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "current password cannot be empty"),
+    newPassword: z.string().min(8, "new password must be at least 8 characters long"),
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "new password must be different from current password",
+    path: ["newPassword"],
+  });
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type BecomeTenantInput = z.infer<typeof becomeTenantSchema>;
 export type BecomeOwnerInput = z.infer<typeof becomeOwnerSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+

@@ -4,6 +4,7 @@ import {
   registerSchema,
   loginSchema,
   becomeTenantSchema,
+  changePasswordSchema,
 } from "../schemas/auth.schema.js";
 import * as authService from "../services/auth.service.js";
 
@@ -86,3 +87,19 @@ export async function logout(req: Request, res: Response) {
   await authService.revokeToken(token, expiresAt);
   res.json({ message: "logged out successfully" });
 }
+
+export async function changePassword(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const result = changePasswordSchema.safeParse(req.body);
+  if (!result.success) {
+    res.status(400).json({ error: result.error.issues[0].message });
+    return;
+  }
+  const { currentPassword, newPassword } = result.data;
+  await authService.changePassword(req.user.id, currentPassword, newPassword);
+  res.json({ message: "Password changed successfully" });
+}
+

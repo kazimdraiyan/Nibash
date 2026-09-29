@@ -161,21 +161,12 @@ export function LoginPage() {
 
                 {/* Password Field */}
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center">
-                    <label
-                      className="block text-xs uppercase tracking-widest text-slate-400 font-label-sm font-semibold"
-                      htmlFor="login-password"
-                    >
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => alert("Password reset is managed via administrative verification.")}
-                      className="text-xs text-slate-500 hover:text-white transition-colors underline cursor-pointer"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
+                  <label
+                    className="block text-xs uppercase tracking-widest text-slate-400 font-label-sm font-semibold"
+                    htmlFor="login-password"
+                  >
+                    Password
+                  </label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xl">
                       lock
