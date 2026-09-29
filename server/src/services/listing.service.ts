@@ -8,7 +8,13 @@ import { getPublicUrl } from "./media.service.js";
 
 export async function getAllListings() {
   const result = await pool.query(
-    "SELECT l.* , t.rent FROM listings l join initial_terms it on it.listing_id=l.id join terms t on t.id= it.terms_id WHERE l.status='approved'",
+    `SELECT l.*, t.rent,
+       (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS rating,
+       (SELECT COUNT(r.id)::int FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS review_count
+     FROM listings l
+     JOIN initial_terms it ON it.listing_id = l.id
+     JOIN terms t ON t.id = it.terms_id
+     WHERE l.status = 'approved'`,
   );
   return attachMediaToListingResults(result.rows);
 }
@@ -60,7 +66,9 @@ export async function searchListings(
 
   // Select listing data and rent after joining each listing to its initial terms.
   const query = `
-    SELECT l.*, t.rent
+    SELECT l.*, t.rent,
+      (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS rating,
+      (SELECT COUNT(r.id)::int FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS review_count
     FROM listings l
     JOIN initial_terms it ON it.listing_id = l.id
     JOIN terms t ON t.id = it.terms_id
@@ -75,6 +83,8 @@ export async function searchListings(
 export async function getMylistings(owner: number) {
   const result = await pool.query(
     `SELECT l.*, t.rent,
+       (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS rating,
+       (SELECT COUNT(r.id)::int FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS review_count,
        (SELECT c.id FROM contracts c
         WHERE c.listing_id = l.id AND c.status IN ('signed', 'active')
         ORDER BY c.id DESC LIMIT 1) AS ongoing_contract_id
@@ -142,6 +152,8 @@ export async function getListingById(
              t.monthly_due_date,
              t.pet_allowed,
              t.security_deposit,
+             (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS rating,
+             (SELECT COUNT(r.id)::int FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS review_count,
              CASE
                WHEN $2::integer IS NOT NULL 
                     AND l.owner_id <> $2::integer
@@ -158,7 +170,7 @@ export async function getListingById(
      JOIN terms t ON t.id = it.terms_id
      LEFT JOIN users u ON u.id = l.owner_id
      WHERE l.id = $1 
-       AND (l.status = 'approved' OR l.owner_id = $2 OR EXISTS (SELECT 1 FROM verifiers v WHERE v.user_id = $2))`,
+       AND (l.status = 'approved' OR l.owner_id = $2 OR EXISTS (SELECT 1 FROM verifiers v WHERE v.user_id = $2) OR (l.status = 'occupied' AND EXISTS (SELECT 1 FROM contracts c WHERE c.listing_id = l.id AND c.tenant_id = $2 AND c.status IN ('signed', 'active'))))`,
     [id, viewerUserId]
   );
 

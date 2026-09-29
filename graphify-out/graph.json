@@ -534,7 +534,7 @@
       "file_type": "code",
       "norm_label": "area",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L174"
+      "source_location": "L186"
     },
     {
       "id": "server_src_services_listing_service_test_area",
@@ -5326,7 +5326,7 @@
       "file_type": "code",
       "norm_label": "attachamenitiestolistingresults()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L112"
+      "source_location": "L122"
     },
     {
       "id": "server_src_services_listing_service_attachmediatolistingresults",
@@ -5338,7 +5338,7 @@
       "file_type": "code",
       "norm_label": "attachmediatolistingresults()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L91"
+      "source_location": "L101"
     },
     {
       "id": "server_src_services_listing_service_createlisting",
@@ -5350,7 +5350,7 @@
       "file_type": "code",
       "norm_label": "createlisting()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L217"
+      "source_location": "L229"
     },
     {
       "id": "server_src_services_listing_service_deletelisting",
@@ -5362,7 +5362,7 @@
       "file_type": "code",
       "norm_label": "deletelisting()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L431"
+      "source_location": "L443"
     },
     {
       "id": "server_src_services_listing_service_findareaidforcoordinates",
@@ -5374,7 +5374,7 @@
       "file_type": "code",
       "norm_label": "findareaidforcoordinates()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L184"
+      "source_location": "L196"
     },
     {
       "id": "server_src_services_listing_service_getallamenities",
@@ -5386,7 +5386,7 @@
       "file_type": "code",
       "norm_label": "getallamenities()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L507"
+      "source_location": "L519"
     },
     {
       "id": "server_src_services_listing_service_getalllistings",
@@ -5410,7 +5410,7 @@
       "file_type": "code",
       "norm_label": "getlistingbyid()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L132"
+      "source_location": "L142"
     },
     {
       "id": "server_src_services_listing_service_getmylistings",
@@ -5422,7 +5422,7 @@
       "file_type": "code",
       "norm_label": "getmylistings()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L75"
+      "source_location": "L83"
     },
     {
       "id": "server_src_services_listing_service_getunverifiedlistings",
@@ -5434,7 +5434,7 @@
       "file_type": "code",
       "norm_label": "getunverifiedlistings()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L478"
+      "source_location": "L490"
     },
     {
       "id": "server_src_services_listing_service_rejectlisting",
@@ -5446,7 +5446,7 @@
       "file_type": "code",
       "norm_label": "rejectlisting()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L498"
+      "source_location": "L510"
     },
     {
       "id": "server_src_services_listing_service_searchlistings",
@@ -5458,7 +5458,7 @@
       "file_type": "code",
       "norm_label": "searchlistings()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L15"
+      "source_location": "L21"
     },
     {
       "id": "server_src_services_listing_service_updatelisting",
@@ -5470,7 +5470,7 @@
       "file_type": "code",
       "norm_label": "updatelisting()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L311"
+      "source_location": "L323"
     },
     {
       "id": "server_src_services_listing_service_verifylisting",
@@ -5482,7 +5482,7 @@
       "file_type": "code",
       "norm_label": "verifylisting()",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L489"
+      "source_location": "L501"
     },
     {
       "id": "server_src_services_user_service_ensureowner",
@@ -6766,7 +6766,7 @@
       "file_type": "code",
       "norm_label": "listingspage()",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L41"
+      "source_location": "L43"
     },
     {
       "id": "client_src_pages_listingspage_listingspage_fetchmylistings",
@@ -6778,7 +6778,7 @@
       "file_type": "code",
       "norm_label": "fetchmylistings()",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L170"
+      "source_location": "L172"
     },
     {
       "id": "client_src_utils_applicationstorage_getapplicationskey",
@@ -48874,7 +48874,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/src/components/PropertyCard.tsx",
-      "source_location": "L63",
+      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -49210,7 +49210,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L220",
+      "source_location": "L222",
       "weight": 1.0
     },
     {
@@ -49222,7 +49222,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L336",
+      "source_location": "L338",
       "weight": 1.0
     },
     {
@@ -49234,7 +49234,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L42",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
@@ -49246,7 +49246,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L764",
+      "source_location": "L766",
       "weight": 1.0
     },
     {
@@ -50218,7 +50218,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L105",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -50230,7 +50230,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L238",
+      "source_location": "L250",
       "weight": 1.0
     },
     {
@@ -50242,7 +50242,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L244",
+      "source_location": "L256",
       "weight": 1.0
     },
     {
@@ -50254,7 +50254,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L441",
+      "source_location": "L453",
       "weight": 1.0
     },
     {
@@ -50266,7 +50266,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L13",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -50278,7 +50278,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L166",
+      "source_location": "L178",
       "weight": 1.0
     },
     {
@@ -50290,7 +50290,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L169",
+      "source_location": "L181",
       "weight": 1.0
     },
     {
@@ -50302,7 +50302,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L170",
+      "source_location": "L182",
       "weight": 1.0
     },
     {
@@ -50314,7 +50314,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L87",
+      "source_location": "L97",
       "weight": 1.0
     },
     {
@@ -50326,7 +50326,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L486",
+      "source_location": "L498",
       "weight": 1.0
     },
     {
@@ -50338,7 +50338,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L503",
+      "source_location": "L515",
       "weight": 1.0
     },
     {
@@ -50350,7 +50350,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L73",
+      "source_location": "L81",
       "weight": 1.0
     },
     {
@@ -50362,7 +50362,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L317",
+      "source_location": "L329",
       "weight": 1.0
     },
     {
@@ -50374,7 +50374,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L494",
+      "source_location": "L506",
       "weight": 1.0
     },
     {
@@ -50830,7 +50830,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L170",
+      "source_location": "L172",
       "weight": 1.0
     },
     {
@@ -86373,7 +86373,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/src/pages/ListingsPage.tsx",
-      "source_location": "L41",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -89546,13 +89546,24 @@
     },
     {
       "source": "server_src_services_listing_service",
+      "target": "server_src_services_listing_service_attachmediatolistingresults",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/src/services/listing.service.ts",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "server_src_services_listing_service",
       "target": "server_src_services_listing_service_attachamenitiestolistingresults",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L112",
+      "source_location": "L122",
       "weight": 1.0
     },
     {
@@ -89563,18 +89574,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L132",
-      "weight": 1.0
-    },
-    {
-      "source": "server_src_services_listing_service",
-      "target": "server_src_services_listing_service_searchlistings",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L15",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -89585,7 +89585,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L174",
+      "source_location": "L186",
       "weight": 1.0
     },
     {
@@ -89596,7 +89596,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L184",
+      "source_location": "L196",
+      "weight": 1.0
+    },
+    {
+      "source": "server_src_services_listing_service",
+      "target": "server_src_services_listing_service_searchlistings",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/src/services/listing.service.ts",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -89607,7 +89618,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L217",
+      "source_location": "L229",
       "weight": 1.0
     },
     {
@@ -89618,7 +89629,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L311",
+      "source_location": "L323",
       "weight": 1.0
     },
     {
@@ -89629,7 +89640,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L431",
+      "source_location": "L443",
       "weight": 1.0
     },
     {
@@ -89640,7 +89651,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L478",
+      "source_location": "L490",
       "weight": 1.0
     },
     {
@@ -89651,7 +89662,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L489",
+      "source_location": "L501",
       "weight": 1.0
     },
     {
@@ -89662,7 +89673,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L498",
+      "source_location": "L510",
       "weight": 1.0
     },
     {
@@ -89673,7 +89684,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L507",
+      "source_location": "L519",
       "weight": 1.0
     },
     {
@@ -89684,7 +89695,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L75",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -89696,17 +89707,6 @@
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.ts",
       "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "server_src_services_listing_service",
-      "target": "server_src_services_listing_service_attachmediatolistingresults",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/src/services/listing.service.ts",
-      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -89728,7 +89728,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.test.ts",
-      "source_location": "L141",
+      "source_location": "L176",
       "weight": 1.0
     },
     {
@@ -89739,7 +89739,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/src/services/listing.service.test.ts",
-      "source_location": "L142",
+      "source_location": "L177",
       "weight": 1.0
     },
     {
@@ -96932,5 +96932,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f49ee38c32c8682f7245d509daed82d0aa7322d6"
+  "built_at_commit": "0f5f00d18b1d487f5e89270eda47bbf56f462a8d"
 }

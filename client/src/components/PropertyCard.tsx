@@ -56,6 +56,17 @@ export function PropertyCard({
   const isApproved = statusDisplay.toLowerCase() === "approved";
   const isWaiting =
     statusDisplay.toLowerCase() === "waiting" || statusDisplay.toLowerCase() === "pending";
+  const isOccupied = statusDisplay.toLowerCase() === "occupied";
+
+  const numericRating =
+    "rating" in listing && listing.rating !== null && listing.rating !== undefined
+      ? Number(listing.rating)
+      : null;
+  const reviewCount =
+    "review_count" in listing && listing.review_count !== null && listing.review_count !== undefined
+      ? Number(listing.review_count)
+      : null;
+  const hasRating = numericRating !== null && !isNaN(numericRating) && numericRating > 0;
 
   // Normalize Location using area code lookup or existing string
   const location =
@@ -287,15 +298,27 @@ export function PropertyCard({
 
         {/* Bottom CTA Row */}
         <div className="flex items-center justify-between pt-1 border-t border-white/5">
-          <div className="flex items-center gap-1 text-xs text-[#d4b068]">
-            <span>★</span>
-            <span className="font-semibold text-white">
-              {"rating" in listing && listing.rating ? listing.rating : "4.9"}
-            </span>
-            <span className="text-[#94a3b8] text-[11px] font-sans">
-              (Verified)
-            </span>
-          </div>
+          {hasRating ? (
+            <div className="flex items-center gap-1 text-xs text-[#d4b068]">
+              <span>★</span>
+              <span className="font-semibold text-white">
+                {numericRating.toFixed(1)}
+              </span>
+              <span className="text-[#94a3b8] text-[11px] font-sans">
+                ({reviewCount ? `${reviewCount} review${reviewCount === 1 ? "" : "s"}` : "1 review"})
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-xs text-[#94a3b8]">
+              <span className="text-[#d4b068]/60">★</span>
+              <span className="font-medium text-slate-300">
+                New
+              </span>
+              <span className="text-[#94a3b8] text-[11px] font-sans">
+                (No reviews)
+              </span>
+            </div>
+          )}
 
           <div className="flex items-center gap-2">
             {isOwner ? (
@@ -305,6 +328,8 @@ export function PropertyCard({
                     ? "text-emerald-300 bg-emerald-950/80 border-emerald-500/40 shadow-sm"
                     : isWaiting
                     ? "text-amber-300 bg-amber-950/80 border-amber-500/40 shadow-sm"
+                    : isOccupied
+                    ? "text-rose-300 bg-rose-950/80 border-rose-500/40 shadow-sm"
                     : "text-slate-300 bg-slate-800 border-slate-700"
                 }`}
               >
@@ -314,6 +339,8 @@ export function PropertyCard({
                       ? "bg-emerald-400"
                       : isWaiting
                       ? "bg-amber-400 animate-pulse"
+                      : isOccupied
+                      ? "bg-rose-400"
                       : "bg-slate-400"
                   }`}
                 />

@@ -1875,11 +1875,13 @@ export function ListingDetailPage() {
                 <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2.5 py-1 rounded">
                   {getAreaName(listing.area_id)}
                 </span>
-                {isOwner && (
+                {(isOwner || user?.is_verifier || listing.status?.toLowerCase() === "occupied") && (
                   <span
                     className={`text-xs font-medium px-2.5 py-1 rounded border capitalize ${
-                      listing.status?.toLowerCase() === "waiting" ||
-                      listing.status?.toLowerCase() === "pending"
+                      listing.status?.toLowerCase() === "occupied"
+                        ? "text-rose-300 bg-rose-950/60 border-rose-800/60"
+                        : listing.status?.toLowerCase() === "waiting" ||
+                          listing.status?.toLowerCase() === "pending"
                         ? "text-amber-300 bg-amber-950/60 border-amber-800/60"
                         : "text-emerald-400 bg-emerald-950/60 border-emerald-800/60"
                     }`}
@@ -2136,10 +2138,14 @@ export function ListingDetailPage() {
             ) : (
               <div id="apply-section">
                 <h3 className="text-base font-bold text-white mb-1">
-                  Apply for this Apartment
+                  {listing.status === "occupied" && !isApplied
+                    ? "Property Leased & Occupied"
+                    : "Apply for this Apartment"}
                 </h3>
                 <p className="text-xs text-slate-400 mb-5">
-                  Submit your rental application directly to the owner.
+                  {listing.status === "occupied" && !isApplied
+                    ? "This property is currently leased. New applications are not being accepted."
+                    : "Submit your rental application directly to the owner."}
                 </p>
 
                 {applySuccess && (
@@ -2153,7 +2159,19 @@ export function ListingDetailPage() {
                   </div>
                 )}
 
-                {!user ? (
+                {listing.status === "occupied" && !isApplied ? (
+                  <div className="p-5 text-center border border-rose-900/40 rounded-xl bg-[#090a0c]">
+                    <div className="w-10 h-10 rounded-full bg-rose-950/80 border border-rose-800/60 text-rose-400 flex items-center justify-center mx-auto mb-2.5">
+                      <span className="material-symbols-outlined text-xl">home_work</span>
+                    </div>
+                    <p className="text-xs font-semibold text-rose-200 mb-1">
+                      Applications Closed
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      An active lease contract is currently signed for this property.
+                    </p>
+                  </div>
+                ) : !user ? (
                   <div className="p-4 text-center border border-slate-800 rounded-xl bg-[#090a0c]">
                     <p className="text-xs text-slate-400 mb-3">
                       You must be logged in to apply for this property.

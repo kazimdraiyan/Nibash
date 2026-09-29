@@ -36,6 +36,8 @@ export interface BackendListing {
   imageAlt?: string;
   images?: ListingImage[];
   amenities?: { id: number; name: string; description?: string }[];
+  rating?: number | string | null;
+  review_count?: number | null;
 }
 
 export function ListingsPage() {

@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "client/src/components/PropertyCard.tsx": {
-    "mtime": 1790484422.2257504,
-    "seen": 1790514329.4607232,
-    "ast_hash": "a7f3cad81dc1bf5d6e8e6a323675c8d6",
+    "mtime": 1790697981.4503841,
+    "seen": 1790698070.1090257,
+    "ast_hash": "1479afd46e305538cc7a83554441be4d",
     "semantic_hash": ""
   },
   "client/src/components/ProtectedRoute.tsx": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "client/src/pages/ListingDetailPage.tsx": {
-    "mtime": 1790695754.5078437,
-    "seen": 1790695840.2309504,
-    "ast_hash": "6fda611f8f8d8602d78bf51f7d123ac7",
+    "mtime": 1790698026.3640323,
+    "seen": 1790698070.1090257,
+    "ast_hash": "35abfc8db130cb40061f8bb0941cf9e9",
     "semantic_hash": ""
   },
   "client/src/pages/ListingFormPage.tsx": {
@@ -444,9 +444,9 @@
     "semantic_hash": ""
   },
   "client/src/pages/ListingsPage.tsx": {
-    "mtime": 1790694841.5022037,
-    "seen": 1790695840.2309504,
-    "ast_hash": "6bb4bd3e535ab2a9e73c4156b3129232",
+    "mtime": 1790697954.683833,
+    "seen": 1790698070.1090257,
+    "ast_hash": "e37ce26263aa56b3fd579245dd7fe8a7",
     "semantic_hash": ""
   },
   "client/src/pages/MyApplicationsPage.tsx": {
@@ -462,9 +462,9 @@
     "semantic_hash": ""
   },
   "client/src/types/listing.ts": {
-    "mtime": 1790178791.3385756,
-    "seen": 1790236167.129977,
-    "ast_hash": "e59596d313682a5312dc8f39ffd2ef0c",
+    "mtime": 1790697938.70814,
+    "seen": 1790698070.1090257,
+    "ast_hash": "0325b3964e48016555f7b199aced0671",
     "semantic_hash": ""
   },
   "client/src/utils/applicationStorage.ts": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "server/src/services/listing.service.ts": {
-    "mtime": 1790694841.5341702,
-    "seen": 1790695840.2309504,
-    "ast_hash": "e03a4de9f85105df8ea447f1437d6f41",
+    "mtime": 1790697790.1171505,
+    "seen": 1790698070.1095662,
+    "ast_hash": "09121ed60ae92aeeccb4109058412966",
     "semantic_hash": ""
   },
   "server/src/services/payment.service.ts": {
@@ -1938,9 +1938,9 @@
     "semantic_hash": ""
   },
   "server/src/services/listing.service.test.ts": {
-    "mtime": 1790535611.8457098,
-    "seen": 1790536057.2876794,
-    "ast_hash": "af17a2771a711ebd40400abe43bcf822",
+    "mtime": 1790697670.9383504,
+    "seen": 1790698070.1095662,
+    "ast_hash": "f7ba76268b6aad819f2162f5f09c1ee0",
     "semantic_hash": ""
   },
   "db/migrations/009_contract_created_at.sql": {
