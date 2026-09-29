@@ -94,7 +94,8 @@ export async function getMylistings(owner: number) {
      WHERE l.owner_id = $1`,
     [owner],
   );
-  return attachMediaToListingResults(result.rows);
+  const withMedia = await attachMediaToListingResults(result.rows);
+  return attachAmenitiesToListingResults(withMedia);
 }
 
 // Attach media URLs to listings

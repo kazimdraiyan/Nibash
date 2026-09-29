@@ -333,7 +333,12 @@ export function ListingsPage() {
       !areaName.trim() || targetAreaId === null || Number(item.area_id) === targetAreaId;
     const matchesBed = bedrooms === null || Number(item.bedroom_count) === bedrooms;
     const matchesRent = maxRent === null || (item.rent != null && Number(item.rent) <= maxRent);
-    return matchesText && matchesArea && matchesBed && matchesRent;
+    const matchesAmenities =
+      selectedAmenities.length === 0 ||
+      selectedAmenities.every((name) =>
+        item.amenities?.some((a) => a.name === name)
+      );
+    return matchesText && matchesArea && matchesBed && matchesRent && matchesAmenities;
   });
 
   // Base list of public listings: backend search results if filter active, otherwise default all listings
