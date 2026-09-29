@@ -112,6 +112,17 @@ export function ProfileMenu() {
                 <button
                   onClick={() => {
                     setOpen(false);
+                    navigate("/starred");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1", color: "#b08d3e" }}>grade</span>
+                  <span>Starred Listings</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setOpen(false);
                     navigate("/my-listings");
                   }}
                   className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"

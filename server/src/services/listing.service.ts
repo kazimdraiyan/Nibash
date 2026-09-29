@@ -511,7 +511,7 @@ export async function getAllAmenities() {
   return result.rows;
 }
 
-export async function toggleStar(listingId: string, userId: number) {
+export async function toggleStar(listingId: string, userId: number): Promise<boolean> {
   const isStarredResult = await pool.query(
     `SELECT 1 FROM Starred_Listings
       WHERE user_id = $1
@@ -524,7 +524,8 @@ export async function toggleStar(listingId: string, userId: number) {
       `INSERT INTO Starred_Listings(user_id, listing_id)
         VALUES($1, $2)`,
       [userId, listingId]
-    )
+    );
+    return true;
   }
   else {
     // Remove from starred
@@ -533,6 +534,29 @@ export async function toggleStar(listingId: string, userId: number) {
       WHERE user_id = $1
         AND listing_id = $2`,
       [userId, listingId]
-    )
+    );
+    return false;
   }
+}
+
+export async function getStarredListings(userId: number) {
+  const result = await pool.query(
+    `SELECT l.*, t.rent
+     FROM listings l
+     JOIN starred_listings sl ON sl.listing_id = l.id
+     JOIN initial_terms it ON it.listing_id = l.id
+     JOIN terms t ON t.id = it.terms_id
+     WHERE sl.user_id = $1 AND l.status = 'approved'
+     ORDER BY l.id DESC`,
+    [userId]
+  );
+  return attachMediaToListingResults(result.rows);
+}
+
+export async function isListingStarred(listingId: string, userId: number): Promise<boolean> {
+  const result = await pool.query(
+    `SELECT 1 FROM Starred_Listings WHERE user_id = $1 AND listing_id = $2`,
+    [userId, listingId]
+  );
+  return result.rows.length > 0;
 }

@@ -199,6 +199,8 @@ export function ListingDetailPage() {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<Record<number, boolean>>({});
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isStarred, setIsStarred] = useState(false);
+  const [starLoading, setStarLoading] = useState(false);
 
   // Compute available photos from listing
   const photoList =
@@ -397,6 +399,28 @@ export function ListingDetailPage() {
   useEffect(() => {
     fetchDetails();
   }, [fetchDetails]);
+
+  // Fetch starred state after listing loads
+  useEffect(() => {
+    if (!id || !user) return;
+    apiClient.get<{ starred: boolean }>(`/listings/${id}/starred`)
+      .then((res) => setIsStarred(res.starred))
+      .catch(() => {});
+  }, [id, user]);
+
+  const handleToggleStar = async () => {
+    if (!user || starLoading) return;
+    const next = !isStarred;
+    setIsStarred(next); // optimistic
+    setStarLoading(true);
+    try {
+      await apiClient.post(`/listings/${id}/togglestar`);
+    } catch {
+      setIsStarred(!next); // revert
+    } finally {
+      setStarLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && window.location.hash === "#apply-section") {
@@ -1647,7 +1671,6 @@ export function ListingDetailPage() {
         <aside className="contents lg:flex lg:flex-col lg:col-span-5 xl:col-span-4 lg:sticky lg:top-6 lg:gap-6">
           {/* 1. Listing Information Card (order-2 on mobile) */}
           <div className="order-2 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
-            {/* Area Badge & Status */}
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2.5 py-1 rounded">
@@ -1666,9 +1689,33 @@ export function ListingDetailPage() {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-mono text-slate-500">
-                Ref #{listing.id}
-              </span>
+              {/* Star button (non-owners only) */}
+              {user && !isOwner ? (
+                <button
+                  type="button"
+                  onClick={handleToggleStar}
+                  disabled={starLoading}
+                  aria-label={isStarred ? "Remove from starred" : "Add to starred"}
+                  title={isStarred ? "Remove from starred" : "Save to starred listings"}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border cursor-pointer ${
+                    isStarred
+                      ? "text-[#d4b068] bg-[#d4b068]/10 border-[#d4b068]/40 shadow-[0_0_12px_rgba(212,175,85,0.25)]"
+                      : "text-slate-400 bg-slate-800/60 border-slate-700 hover:text-[#d4b068] hover:border-[#d4b068]/40"
+                  } disabled:opacity-50`}
+                >
+                  <span
+                    className="material-symbols-outlined text-base"
+                    style={{ fontVariationSettings: isStarred ? "'FILL' 1" : "'FILL' 0" }}
+                  >
+                    grade
+                  </span>
+                  <span>{isStarred ? "Starred" : "Star"}</span>
+                </button>
+              ) : (
+                <span className="text-xs font-mono text-slate-500">
+                  Ref #{listing.id}
+                </span>
+              )}
             </div>
 
             {/* Title */}

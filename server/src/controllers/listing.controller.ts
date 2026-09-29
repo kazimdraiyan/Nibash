@@ -123,5 +123,24 @@ export async function toggleStar(req: Request, res: Response) {
     res.status(401).json({ error: "unauthorized" });
     return;
   }
-  await listingService.toggleStar(req.params.id as string, req.user.id);
+  const starred = await listingService.toggleStar(req.params.id as string, req.user.id);
+  res.json({ starred });
+}
+
+export async function getStarred(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const listings = await listingService.getStarredListings(req.user.id);
+  res.json({ listings });
+}
+
+export async function isStarred(req: Request, res: Response) {
+  if (!req.user) {
+    res.json({ starred: false });
+    return;
+  }
+  const starred = await listingService.isListingStarred(req.params.id as string, req.user.id);
+  res.json({ starred });
 }

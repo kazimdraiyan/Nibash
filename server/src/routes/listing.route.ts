@@ -10,7 +10,9 @@ router.get("/", asyncHandler(listingController.getAll));
 router.get("/my", optionalAuthMiddleware, authMiddleware, asyncHandler(listingController.getMy));
 router.get("/search", asyncHandler(listingController.search));
 router.get("/amenities", asyncHandler(listingController.getAmenities));
+router.get("/starred", authMiddleware, asyncHandler(listingController.getStarred));
 router.get("/:id", optionalAuthMiddleware, asyncHandler(listingController.getById));
+router.get("/:id/starred", optionalAuthMiddleware, asyncHandler(listingController.isStarred));
 router.post("/", authMiddleware, asyncHandler(listingController.create));
 router.patch("/:id", authMiddleware, asyncHandler(listingController.update));
 router.delete("/:id", authMiddleware, asyncHandler(listingController.remove));
@@ -18,3 +20,4 @@ router.post("/:id/media", authMiddleware, upload.array("images", 10), asyncHandl
 router.post("/:id/togglestar", authMiddleware, asyncHandler(listingController.toggleStar));
 
 export default router;
+

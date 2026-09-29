@@ -5,6 +5,7 @@ import type { BackendListing } from "../pages/ListingsPage";
 import { getAreaName } from "../utils/areaLookup";
 import { useAuth } from "../context/AuthContext";
 import { hasUserApplied } from "../utils/applicationStorage";
+import { apiClient } from "../api/client";
 
 export type PropertyCardItem = Listing | BackendListing;
 
@@ -12,6 +13,7 @@ interface PropertyCardProps {
   listing: PropertyCardItem;
   isOwn?: boolean;
   isApplied?: boolean;
+  initialStarred?: boolean;
   onSelect?: (listing: PropertyCardItem) => void;
   onOpenAppInfo?: (item: BackendListing) => void;
 }
@@ -20,12 +22,13 @@ export function PropertyCard({
   listing,
   isOwn: isOwnProp = false,
   isApplied: isAppliedProp = false,
+  initialStarred = false,
   onSelect,
   onOpenAppInfo,
 }: PropertyCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isStarred, setIsStarred] = useState(initialStarred);
   const [imgError, setImgError] = useState(false);
 
   // Normalize ID
@@ -208,29 +211,38 @@ export function PropertyCard({
             )}
           </div>
 
-          {/* Interactive Favorite Button */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsFavorite(!isFavorite);
-            }}
-            aria-label="Save listing"
-            className={`w-9 h-9 rounded-full glass-panel-subtle border border-white/20 flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer ${
-              isFavorite
-                ? "bg-white/20 text-[#d4b068] border-[#d4b068]/50 shadow-[0_0_15px_rgba(212,175,85,0.4)]"
-                : "text-white/80 hover:text-white"
-            }`}
-          >
-            <span
-              className="material-symbols-outlined text-[18px]"
-              style={{
-                fontVariationSettings: isFavorite ? "'FILL' 1" : "'FILL' 0",
+          {/* Star Button — only for logged-in non-owners */}
+          {user && !isOwner && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                const next = !isStarred;
+                setIsStarred(next); // optimistic
+                try {
+                  await apiClient.post(`/listings/${id}/togglestar`);
+                } catch {
+                  setIsStarred(!next); // revert on error
+                }
               }}
+              aria-label={isStarred ? "Unstar listing" : "Star listing"}
+              className={`w-9 h-9 rounded-full glass-panel-subtle border border-white/20 flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer ${
+                isStarred
+                  ? "bg-white/20 text-[#d4b068] border-[#d4b068]/50 shadow-[0_0_15px_rgba(212,175,85,0.4)]"
+                  : "text-white/80 hover:text-white"
+              }`}
             >
-              favorite
-            </span>
-          </button>
+              <span
+                className="material-symbols-outlined text-[18px]"
+                style={{
+                  fontVariationSettings: isStarred ? "'FILL' 1" : "'FILL' 0",
+                }}
+              >
+                grade
+              </span>
+            </button>
+          )}
+
         </div>
 
         {/* Floating Quick Price Tag */}
