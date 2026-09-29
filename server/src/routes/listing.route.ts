@@ -15,5 +15,6 @@ router.post("/", authMiddleware, asyncHandler(listingController.create));
 router.patch("/:id", authMiddleware, asyncHandler(listingController.update));
 router.delete("/:id", authMiddleware, asyncHandler(listingController.remove));
 router.post("/:id/media", authMiddleware, upload.array("images", 10), asyncHandler(listingController.uploadMedia));
+router.post("/:id/togglestar", authMiddleware, asyncHandler(listingController.toggleStar));
 
 export default router;

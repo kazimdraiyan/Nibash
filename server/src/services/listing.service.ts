@@ -511,3 +511,28 @@ export async function getAllAmenities() {
   return result.rows;
 }
 
+export async function toggleStar(listingId: string, userId: number) {
+  const isStarredResult = await pool.query(
+    `SELECT 1 FROM Starred_Listings
+      WHERE user_id = $1
+      AND listing_id = $2;`,
+    [userId, listingId]
+  );
+  if (isStarredResult.rows.length == 0) {
+    // Add to starred
+    await pool.query(
+      `INSERT INTO Starred_Listings(user_id, listing_id)
+        VALUES($1, $2)`,
+      [userId, listingId]
+    )
+  }
+  else {
+    // Remove from starred
+    await pool.query(
+      `DELETE FROM Starred_Listings
+      WHERE user_id = $1
+        AND listing_id = $2`,
+      [userId, listingId]
+    )
+  }
+}

@@ -33,9 +33,13 @@ export async function search(req: Request, res: Response) {
 
   const maxRent_raw = parseInt(req.query.maxRent as string, 10);
   const maxRent = isNaN(maxRent_raw) ? null : maxRent_raw;
-  const listings = await listingService.searchListings(q, bedrooms, areaId, maxRent);
+  const listings = await listingService.searchListings(
+    q,
+    bedrooms,
+    areaId,
+    maxRent,
+  );
   res.json({ listings });
-
 }
 
 export async function getById(req: Request, res: Response) {
@@ -114,3 +118,10 @@ export async function getAmenities(_req: Request, res: Response) {
   res.json({ amenities });
 }
 
+export async function toggleStar(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  await listingService.toggleStar(req.params.id as string, req.user.id);
+}

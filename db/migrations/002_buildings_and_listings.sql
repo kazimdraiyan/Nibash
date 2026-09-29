@@ -91,3 +91,9 @@ create table agreements(
     terms_id int references terms(id) on delete cascade,
     primary key (terms_id)
 );
+
+CREATE TABLE Starred_Listings (
+    user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    listing_id INT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, listing_id)
+);
