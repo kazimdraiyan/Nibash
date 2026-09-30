@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "client/src/components/ProfileMenu.tsx": {
-    "mtime": 1790789782.700586,
-    "seen": 1790789893.6778889,
-    "ast_hash": "c0bc87ca2dd44ad7ccec8ab4a21aaf63",
+    "mtime": 1790794416.0018897,
+    "seen": 1790794504.1843917,
+    "ast_hash": "d7652ce1fdf4e054d6e3e790423377fb",
     "semantic_hash": ""
   },
   "client/src/components/PropertyCard.tsx": {
@@ -456,9 +456,9 @@
     "semantic_hash": ""
   },
   "client/src/pages/MyListingsPage.tsx": {
-    "mtime": 1790793131.3159556,
-    "seen": 1790793158.109181,
-    "ast_hash": "51bf038e71e181c70a6ed2a456838376",
+    "mtime": 1790794391.6878915,
+    "seen": 1790794504.1843917,
+    "ast_hash": "d23f5c857fcb1b8e86e99675f54d1bb9",
     "semantic_hash": ""
   },
   "client/src/types/listing.ts": {
@@ -2097,6 +2097,12 @@
     "mtime": 1790792701.206201,
     "seen": 1790792730.277676,
     "ast_hash": "e7d1dd96f85062bf37da4aa05962bef1",
+    "semantic_hash": ""
+  },
+  "docs/features/07-listings-navigation-and-profile-dropdown-fixes.md": {
+    "mtime": 1790794492.6370497,
+    "seen": 1790794504.1843917,
+    "ast_hash": "051fffe65333a1d41d0cb6dc3438e238",
     "semantic_hash": ""
   }
 }

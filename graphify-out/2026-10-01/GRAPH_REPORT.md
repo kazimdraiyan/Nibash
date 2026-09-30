@@ -1,12 +1,12 @@
 # Graph Report - Nibash  (2026-10-01)
 
 ## Corpus Check
-- 315 files · ~412,804 words
+- 315 files · ~413,029 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 107 file(s) not represented in the graph (top: .ttf 54, .csv 45, (none) 4)
 
 ## Summary
-- 3651 nodes · 5124 edges · 308 communities (242 shown, 66 thin omitted)
+- 3651 nodes · 5122 edges · 306 communities (240 shown, 66 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 73 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
@@ -52,7 +52,7 @@
 - TestGeneratedConfigIsValidJs
 - design-tokens-starter.json
 - application.controller.ts
-- payment.service.ts
+- payment.controller.ts
 - validate-tokens.cjs
 - card
 - Tailwind CSS Utility Reference
@@ -116,7 +116,7 @@
 - .test_add_plugins_no_duplicates
 - .test_recommend_plugins_nextjs
 - .test_generate_typescript_config
-- zod
+- review.controller.ts
 - Color Semantics
 - income.service.ts
 - Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)
@@ -161,7 +161,7 @@
 - Defense-in-Depth Validation
 - Writing Plans
 - [Analysis Title]
-- MyListingsPage.tsx
+- MyApplicationsPage.tsx
 - Nibash
 - Returns: "OK" or lists conflicts
 - Returns: "OK" or lists conflicts
@@ -245,7 +245,7 @@
 - Core principles
 - File Organization
 - Skill Types
-- Example: TDD Skill Bulletproofing
+- scripts
 - Pi Tool Mapping
 - Evaluation and iteration
 - Checklist for effective Skills
@@ -282,7 +282,7 @@
 - .test_validate_config_valid
 - .test_default_content_paths_nextjs
 - .test_add_colors
-- contract.service.ts
+- contract.controller.ts
 - ShadcnInstaller
 - .agents/skills/writing-plans/plan-document-reviewer-prompt.md
 - workflows/graphify.md
@@ -298,15 +298,13 @@
 - .check_shadcn_config
 - dependencies
 - .test_add_all_components_success
-- OwnerIncomePage.tsx
-- Gemini CLI Tool Mapping
 - split_values
 - _style_is_dark_primary
 - BM25
 - CatalogSummaryLineEndingsTest
 - .temp_project
 - TestTextLayoutRetrieval
-- pool.ts
+- createVerifier.ts
 - .test_add_components_no_config
 - .test_add_components_already_installed
 - .test_add_components_dry_run
@@ -345,7 +343,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (308 total, 66 thin omitted)
+## Communities (306 total, 66 thin omitted)
 
 ### Community 0 - "App.tsx"
 Cohesion: 0.12
@@ -396,20 +394,20 @@ Cohesion: 0.11
 Nodes (28): _contains_phrase(), _domain_keywords(), _file_signature(), _get_bm25(), _load_csv(), _load_csv_snapshot(), _load_product_keywords(), _load_rows_or_empty() (+20 more)
 
 ### Community 12 - "server/package.json"
-Cohesion: 0.07
-Nodes (26): cors, multer, node-cron, pg, tsx, @types/bcrypt, @types/cors, @types/express (+18 more)
+Cohesion: 0.09
+Nodes (22): cors, dotenv, multer, node-cron, pg, tsx, @types/bcrypt, @types/cors (+14 more)
 
 ### Community 13 - "TailwindConfigGenerator"
 Cohesion: 0.09
 Nodes (13): main(), Add custom font families. Args: fonts: Dict of font_type: [font_names] e.g.,…, Add custom spacing values. Args: spacing: Dict of name: value e.g., {'18':…, Add custom breakpoints. Args: breakpoints: Dict of name: width e.g., {'3xl':…, Add plugin requirements. Args: plugins: List of plugin names e.g.,…, Get plugin recommendations based on configuration. Returns: List of recommended…, Generate Tailwind CSS configuration files., Validate configuration. Returns: Tuple of (valid, message) (+5 more)
 
 ### Community 14 - "index.ts"
-Cohesion: 0.15
-Nodes (23): dotenv, express, app, AuthenticatedUser, authMiddleware(), getOptionalUser(), optionalAuthMiddleware(), RevocationCheck (+15 more)
+Cohesion: 0.16
+Nodes (22): express, app, AuthenticatedUser, authMiddleware(), getOptionalUser(), optionalAuthMiddleware(), RevocationCheck, upload (+14 more)
 
 ### Community 15 - "AppError"
-Cohesion: 0.15
-Nodes (25): ref_crypto, create(), getForContract(), getForListing(), remove(), update(), AppError, CreateReviewInput (+17 more)
+Cohesion: 0.13
+Nodes (32): ref_crypto, apply(), pool, AppError, applyToListing(), getAllApplications(), getApplicationsForListing(), rejectApplication() (+24 more)
 
 ### Community 16 - "generate-slide.py"
 Cohesion: 0.12
@@ -429,7 +427,7 @@ Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtension
 
 ### Community 20 - "listing.service.ts"
 Cohesion: 0.07
-Nodes (42): ref_node_assert_strict, ref_node_test, create(), getAll(), getAmenities(), getById(), getMy(), getStarred() (+34 more)
+Nodes (46): ref_node_assert_strict, ref_node_test, create(), getAll(), getAmenities(), getById(), getMy(), getStarred() (+38 more)
 
 ### Community 21 - "color"
 Cohesion: 0.11
@@ -480,12 +478,12 @@ Cohesion: 0.15
 Nodes (12): component, $type, $value, dark, semantic, $schema, $type, $value (+4 more)
 
 ### Community 35 - "application.controller.ts"
-Cohesion: 0.16
-Nodes (15): apply(), getAll(), getForListing(), getMy(), reject(), ApplyInput, applySchema, UpdateApplicationInput (+7 more)
+Cohesion: 0.22
+Nodes (9): getAll(), getForListing(), getMy(), reject(), ApplyInput, applySchema, UpdateApplicationInput, updateApplicationSchema (+1 more)
 
-### Community 36 - "payment.service.ts"
-Cohesion: 0.18
-Nodes (14): create(), getForContract(), payByCash(), rejectCash(), resolve(), CreatePaymentInput, createPaymentSchema, UpdatePaymentInput (+6 more)
+### Community 36 - "payment.controller.ts"
+Cohesion: 0.22
+Nodes (9): create(), getForContract(), payByCash(), rejectCash(), resolve(), CreatePaymentInput, createPaymentSchema, UpdatePaymentInput (+1 more)
 
 ### Community 37 - "validate-tokens.cjs"
 Cohesion: 0.24
@@ -680,8 +678,8 @@ Cohesion: 0.13
 Nodes (8): BM25, BM25 ranking algorithm for text search, Lowercase, normalize synonyms, split, remove punctuation, filter stopwords, Build BM25 index from documents, Score all documents against query, All indexed terms, for suggestion/typo-recovery purposes., TestBm25CoreBehavior, TestTokenizer
 
 ### Community 90 - "client.ts"
-Cohesion: 0.16
-Nodes (11): apiClient, ApiError, makeowner, TODO: Learn more, request(), uploadListingDocuments(), uploadListingImages(), ChangePasswordPage() (+3 more)
+Cohesion: 0.10
+Nodes (19): apiClient, ApiError, makeowner, TODO: Learn more, request(), uploadListingDocuments(), uploadListingImages(), ChangePasswordPage() (+11 more)
 
 ### Community 91 - "Visual Companion Guide"
 Cohesion: 0.10
@@ -707,9 +705,9 @@ Nodes (19): Browser Events Format, Cards (visual designs), Cleaning Up, CSS Clas
 Cohesion: 0.10
 Nodes (19): Bulletproofing Elements, Creation Log: Systematic Debugging Skill, Enhancement 1: TDD Reference, Extraction Decisions, Final Outcome, Initial Version, Iterations, Key Insight (+11 more)
 
-### Community 100 - "zod"
-Cohesion: 0.25
-Nodes (7): zod, list(), upload(), verify(), documentTypeEnum, UploadDocumentInput, uploadDocumentSchema
+### Community 100 - "review.controller.ts"
+Cohesion: 0.22
+Nodes (9): create(), getForContract(), getForListing(), remove(), update(), CreateReviewInput, createReviewSchema, UpdateReviewInput (+1 more)
 
 ### Community 101 - "Color Semantics"
 Cohesion: 0.11
@@ -844,8 +842,8 @@ Cohesion: 0.15
 Nodes (12): 10. Charts & Data (LOW), 1. Accessibility (CRITICAL), 2. Touch & Interaction (CRITICAL), 3. Performance (HIGH), 4. Style Selection (HIGH), 5. Layout & Responsive (HIGH), 6. Typography & Color (MEDIUM), 7. Animation (MEDIUM) (+4 more)
 
 ### Community 138 - "Testing Skills With Subagents"
-Cohesion: 0.15
-Nodes (13): Common Mistakes (Same as TDD), GREEN Phase: Write Minimal Skill (Make It Pass), Meta-Testing (When GREEN Isn't Working), Overview, Quick Reference (TDD Cycle), Real-World Impact, RED Phase: Baseline Testing (Watch It Fail), TDD Mapping for Skill Testing (+5 more)
+Cohesion: 0.12
+Nodes (17): Common Mistakes (Same as TDD), Example: TDD Skill Bulletproofing, GREEN Phase: Write Minimal Skill (Make It Pass), Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle, Meta-Testing (When GREEN Isn't Working), Overview (+9 more)
 
 ### Community 139 - "Testing Skills With Subagents"
 Cohesion: 0.15
@@ -883,9 +881,9 @@ Nodes (11): Bite-Sized Task Granularity, Execution Handoff, File Structure, No P
 Cohesion: 0.17
 Nodes (12): Advanced: Skills with executable code, [Analysis Title], Anti-patterns to avoid, Avoid offering too many options, Avoid Windows-style paths, Conditional workflow pattern, Examples pattern, Executive summary (+4 more)
 
-### Community 148 - "MyListingsPage.tsx"
-Cohesion: 0.19
-Nodes (9): StatusBadge(), ApplicationDetailModal(), ApplicationModalProps, MyApplicationsPage(), TenantApplication, ListingWithApplications, MyListingCard(), MyListingsPage() (+1 more)
+### Community 148 - "MyApplicationsPage.tsx"
+Cohesion: 0.21
+Nodes (8): ApplicationDetailModal(), ApplicationModalProps, MyApplicationsPage(), TenantApplication, ListingWithApplications, MyListingCard(), MyListingsPage(), getAreaName()
 
 ### Community 149 - "Nibash"
 Cohesion: 0.17
@@ -960,8 +958,8 @@ Cohesion: 0.22
 Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
 ### Community 168 - ".agents/skills/using-superpowers/references/codex-tools.md"
-Cohesion: 0.22
-Nodes (5): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children
+Cohesion: 0.15
+Nodes (9): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children, Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file (+1 more)
 
 ### Community 169 - "Skill authoring best practices"
 Cohesion: 0.22
@@ -1211,9 +1209,9 @@ Nodes (4): File Organization, Self-Contained Skill, Skill with Heavy Reference, 
 Cohesion: 0.50
 Nodes (4): Pattern, Reference, Skill Types, Technique
 
-### Community 232 - "Example: TDD Skill Bulletproofing"
-Cohesion: 0.50
-Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle
+### Community 232 - "scripts"
+Cohesion: 0.40
+Nodes (5): scripts, build, dev, start, test
 
 ### Community 233 - "Pi Tool Mapping"
 Cohesion: 0.50
@@ -1248,7 +1246,7 @@ Cohesion: 0.50
 Nodes (3): Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
 ### Community 241 - "ListingsPage.tsx"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (22): ActualListings(), ApplicationInfoModal(), ApplicationInfoModalProps, Hero(), PropertyCard(), PropertyCardItem, PropertyCardProps, mockListings (+14 more)
 
 ### Community 242 - "8"
@@ -1263,9 +1261,9 @@ Nodes (10): ConcurrentTenant, DashboardData, DuplicateLocation, GrowthTrendItem,
 Cohesion: 0.19
 Nodes (9): Find matching reasoning rule for a category., Apply reasoning rules to search results., apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), Return deterministic mutations and an audit trail; never execute data., Closed, non-executable grammar for design-system decision rules., Parse the canonical condition -> action-array representation. (+1 more)
 
-### Community 269 - "contract.service.ts"
-Cohesion: 0.21
-Nodes (12): create(), getActive(), getById(), sign(), CreateContractInput, createContractSchema, UpdateContractInput, updateContractSchema (+4 more)
+### Community 269 - "contract.controller.ts"
+Cohesion: 0.12
+Nodes (15): zod, create(), getActive(), getById(), sign(), list(), upload(), verify() (+7 more)
 
 ### Community 270 - "ShadcnInstaller"
 Cohesion: 0.17
@@ -1287,14 +1285,6 @@ Nodes (10): dependencies, bcrypt, cors, dotenv, express, jsonwebtoken, multer, n
 Cohesion: 0.22
 Nodes (5): Test successful component addition., Test component addition with subprocess error., Test component addition when npx is not found., Test successful addition of all components., patch
 
-### Community 287 - "OwnerIncomePage.tsx"
-Cohesion: 0.22
-Nodes (8): ContractIncomeItem, ListingIncomeItem, OverallIncomeSummary, OwnerIncomePage(), PaginationMeta, PaymentLedgerItem, PeriodType, TabType
-
-### Community 288 - "Gemini CLI Tool Mapping"
-Cohesion: 0.29
-Nodes (7): Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file, Parallel dispatch, Personal skills directory, Prompt filling, Subagent support
-
 ### Community 289 - "split_values"
 Cohesion: 0.47
 Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
@@ -1311,23 +1301,23 @@ Nodes (5): BM25, BM25 ranking algorithm for text search, Lowercase, split, remov
 Cohesion: 0.40
 Nodes (3): CatalogSummaryLineEndingsTest, _load_generator(), Simulate a Windows checkout: the recorded hashes must still validate.
 
-### Community 296 - "pool.ts"
-Cohesion: 0.17
-Nodes (11): bcrypt, ref_node_process, ref_node_readline_promises, pool, main(), prompt(), rl, Area (+3 more)
+### Community 296 - "createVerifier.ts"
+Cohesion: 0.22
+Nodes (9): Parallel dispatch, Prompt filling, Subagent support, bcrypt, ref_node_process, ref_node_readline_promises, main(), prompt() (+1 more)
 
 ## Knowledge Gaps
 - **1662 isolated node(s):** `crypto`, `http`, `fs`, `path`, `OPCODES` (+1657 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2095 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2096 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `prompt()` connect `pool.ts` to `Gemini CLI Tool Mapping`, `Gemini CLI Tool Mapping`?**
+- **Why does `prompt()` connect `createVerifier.ts` to `Gemini CLI Tool Mapping`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Why does `authMiddleware()` connect `index.ts` to `Feature: Change Password`, `06-tenant-history.md`, `Feature: Rental Income Tracking`, `auth.controller.ts`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `Subagent support` connect `Gemini CLI Tool Mapping` to `pool.ts`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `Subagent support` connect `createVerifier.ts` to `.agents/skills/using-superpowers/references/codex-tools.md`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._

@@ -330,14 +330,6 @@ export function MyListingsPage() {
             <span className="material-symbols-outlined text-base text-amber-400">payments</span>
             <span>Rental Income</span>
           </Link>
-
-          <Link
-            to="/listings/new"
-            className="bg-white text-slate-900 font-semibold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:bg-slate-200 transition text-center flex items-center gap-1.5 shadow-sm cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-base">add_circle</span>
-            <span>Post New Listing</span>
-          </Link>
         </div>
       </div>
 

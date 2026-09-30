@@ -33,9 +33,9 @@ export function ProfileMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-3 w-72 bg-[#e2e5ea] border border-[#b8bec9] rounded-2xl shadow-[0_16px_45px_rgba(0,0,0,0.3)] overflow-hidden z-50 animate-fadeIn text-[#0f172a]">
+        <div className="absolute right-0 mt-3 w-72 max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain scrollbar-silver [scrollbar-width:thin] [scrollbar-color:#94a3b8_transparent] bg-[#e2e5ea] border border-[#b8bec9] rounded-2xl shadow-[0_16px_45px_rgba(0,0,0,0.3)] z-50 animate-fadeIn text-[#0f172a]">
           {/* Profile Header — Solid Silver Banner */}
-          <div className="p-4 bg-[#d0d5dc] border-b border-[#b8bec9]">
+          <div className="sticky top-0 z-10 p-4 bg-[#d0d5dc] border-b border-[#b8bec9]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#475569]">
                 Profile
