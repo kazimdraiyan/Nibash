@@ -228,7 +228,7 @@ export function findAreaIdForCoordinates(
       EARTH_RADIUS_METERS *
       Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
 
-    if (distance <= Number(area.radius) && distance < closestDistance) {
+    if (distance < closestDistance) {
       closestAreaId = area.id;
       closestDistance = distance;
     }

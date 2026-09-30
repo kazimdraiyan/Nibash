@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { apiClient } from "../api/client";
 import { useAuth } from "../context/AuthContext";
-import { DHAKA_AREAS } from "../utils/areaLookup";
 import { uploadListingImages } from "../api/uploadImages";
 import { LocationPicker } from "../components/LocationPicker";
 import { uploadListingDocuments } from "../api/uploadDocuments";
@@ -76,12 +75,11 @@ export function ListingFormPage() {
   // Form State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [areaId, setAreaId] = useState(4); // Default to Gulshan (id 4)
   const [latitude, setLatitude] = useState(23.7917);
   const [longitude, setLongitude] = useState(90.4167);
-  const [bedroomCount, setBedroomCount] = useState("3");
-  const [bathroomCount, setBathroomCount] = useState("3");
-  const [onWhichFloor, setOnWhichFloor] = useState("4");
+  const [bedroomCount, setBedroomCount] = useState("0");
+  const [bathroomCount, setBathroomCount] = useState("0");
+  const [onWhichFloor, setOnWhichFloor] = useState("0");
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<
@@ -116,7 +114,7 @@ export function ListingFormPage() {
   }, []);
 
   // Initial Terms State
-  const [rent, setRent] = useState("65000");
+  const [rent, setRent] = useState("0");
   const [electricityBill, setElectricityBill] = useState("");
   const [waterBill, setWaterBill] = useState("");
   const [serviceCharge, setServiceCharge] = useState("");
@@ -158,16 +156,6 @@ export function ListingFormPage() {
     setSelectedAmenities((prev) =>
       prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name],
     );
-  };
-
-  // Handle Area Change to automatically update lat/lng coordinates
-  const handleAreaChange = (newAreaId: number) => {
-    setAreaId(newAreaId);
-    const matched = DHAKA_AREAS.find((a) => a.id === newAreaId);
-    if (matched && matched.lat && matched.lng) {
-      setLatitude(matched.lat);
-      setLongitude(matched.lng);
-    }
   };
 
   function handleImageFiles(incoming: FileList | File[] | null) {
@@ -238,7 +226,9 @@ export function ListingFormPage() {
     if (validFiles.length === 0) return;
 
     // Check count for targetDocType (max 5 per type)
-    const existingCount = stagedDocs.filter((d) => d.type === targetDocType).length;
+    const existingCount = stagedDocs.filter(
+      (d) => d.type === targetDocType,
+    ).length;
     const remainingSlots = 5 - existingCount;
     if (remainingSlots <= 0) return;
 
@@ -301,7 +291,6 @@ export function ListingFormPage() {
         const data = res.listing;
         setTitle(data.title || "");
         setDescription(data.description || "");
-        setAreaId(data.area_id || 4);
         setLatitude(parseFloat(data.latitude) || 23.7917);
         setLongitude(parseFloat(data.longitude) || 90.4167);
         setBedroomCount(String(data.bedroom_count || 1));
@@ -364,7 +353,6 @@ export function ListingFormPage() {
       bedroom_count: parseInt(bedroomCount, 10),
       bathroom_count: parseInt(bathroomCount, 10),
       on_which_floor: parseInt(onWhichFloor, 10),
-      area_id: Number(areaId),
       rent: parseFloat(rent),
       electricity_bill:
         electricityBill.trim() !== "" ? parseFloat(electricityBill) : null,
@@ -540,55 +528,28 @@ export function ListingFormPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="listing-rent"
-                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                  >
-                    Monthly Rent (BDT) *
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
-                      ৳
-                    </span>
-                    <input
-                      id="listing-rent"
-                      type="number"
-                      min="100"
-                      step="100"
-                      required
-                      value={rent}
-                      onChange={(e) => setRent(e.target.value)}
-                      placeholder="e.g. 35000"
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="listing-area"
-                    className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                  >
-                    Neighborhood / Area *
-                  </label>
-                  <select
-                    id="listing-area"
-                    value={areaId}
-                    onChange={(e) => handleAreaChange(Number(e.target.value))}
-                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
-                  >
-                    {DHAKA_AREAS.map((area) => (
-                      <option
-                        key={area.id}
-                        value={area.id}
-                        className="bg-[#12151c] text-white"
-                      >
-                        {area.name} (Area #{area.id})
-                      </option>
-                    ))}
-                  </select>
+              <div>
+                <label
+                  htmlFor="listing-rent"
+                  className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                >
+                  Monthly Rent (BDT) *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
+                    ৳
+                  </span>
+                  <input
+                    id="listing-rent"
+                    type="number"
+                    min="100"
+                    step="100"
+                    required
+                    value={rent}
+                    onChange={(e) => setRent(e.target.value)}
+                    placeholder="e.g. 35000"
+                    className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                  />
                 </div>
               </div>
 
@@ -683,12 +644,15 @@ export function ListingFormPage() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Deposit, estimated utility bills, monthly due date, and pet policy
+                    Deposit, estimated utility bills, monthly due date, and pet
+                    policy
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-                <span>{showAdditionalTerms ? "Collapse" : "Expand to Add"}</span>
+                <span>
+                  {showAdditionalTerms ? "Collapse" : "Expand to Add"}
+                </span>
                 <span
                   className={`material-symbols-outlined text-lg transition-transform duration-200 ${
                     showAdditionalTerms ? "rotate-180" : ""
@@ -826,7 +790,8 @@ export function ListingFormPage() {
             </div>
 
             <p className="text-xs text-slate-400 mb-3.5">
-              Select building features and living conveniences offered with this residence.
+              Select building features and living conveniences offered with this
+              residence.
             </p>
 
             {amenitiesLoading ? (
@@ -1173,7 +1138,9 @@ export function ListingFormPage() {
                   <div className="bg-[#0d1017] border border-slate-800 rounded-xl p-3.5 mb-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-base">{currentTypeInfo.icon}</span>
+                        <span className="text-base">
+                          {currentTypeInfo.icon}
+                        </span>
                         <span className="text-xs font-semibold text-white">
                           {currentTypeInfo.label}
                         </span>
@@ -1238,7 +1205,8 @@ export function ListingFormPage() {
                       } files (PDF or Images)`}
                 </p>
                 <p className="text-xs text-slate-400 mb-3">
-                  PDF, JPG, PNG, or WebP &bull; Up to 5MB per file &bull; Max 5 files
+                  PDF, JPG, PNG, or WebP &bull; Up to 5MB per file &bull; Max 5
+                  files
                 </p>
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition">
                   <svg
@@ -1318,7 +1286,8 @@ export function ListingFormPage() {
                                 key={doc.id}
                                 onClick={
                                   isPdf
-                                    ? () => window.open(doc.previewUrl, "_blank")
+                                    ? () =>
+                                        window.open(doc.previewUrl, "_blank")
                                     : undefined
                                 }
                                 title={
