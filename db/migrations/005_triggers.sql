@@ -84,3 +84,23 @@ $$ language plpgsql;
 create trigger check_review_eligibility_trigger
 before insert on reviews
 for each row execute function check_review_eligibility();
+
+
+-- Returns the average rating (1-5) for a listing, or NULL if no reviews exist
+create or replace function get_listing_avg_rating(p_listing_id int)
+returns numeric as $$
+    select round(avg(r.rating)::numeric, 2)
+    from reviews r
+    join contracts c on c.id = r.contract_id
+    where c.listing_id = p_listing_id;
+$$ language sql stable;
+
+
+-- Returns the total amount of confirmed payments made against a contract
+create or replace function get_contract_total_paid(p_contract_id int)
+returns numeric as $$
+    select coalesce(sum(amount), 0)
+    from payments
+    where contract_id = p_contract_id
+    and status = 'confirmed';
+$$ language sql stable;
