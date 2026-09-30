@@ -11,6 +11,7 @@ router.get("/my", optionalAuthMiddleware, authMiddleware, asyncHandler(listingCo
 router.get("/search", asyncHandler(listingController.search));
 router.get("/amenities", asyncHandler(listingController.getAmenities));
 router.get("/starred", authMiddleware, asyncHandler(listingController.getStarred));
+router.get("/:id/tenants", authMiddleware, asyncHandler(listingController.getTenantsHistory));
 router.get("/:id", optionalAuthMiddleware, asyncHandler(listingController.getById));
 router.get("/:id/starred", optionalAuthMiddleware, asyncHandler(listingController.isStarred));
 router.post("/", authMiddleware, asyncHandler(listingController.create));

@@ -104,6 +104,27 @@ interface OwnerInfo {
   phone?: string;
 }
 
+interface TenantHistoryRecord {
+  contractId: number;
+  tenantId: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  emergencyContact: string | null;
+  startDate: string;
+  endDate: string;
+  monthlyRent: number;
+  contractStatus: string;
+  createdAt: string;
+}
+
+interface ListingTenantHistoryResponse {
+  listingId: number;
+  listingTitle: string;
+  currentTenants: TenantHistoryRecord[];
+  pastTenants: TenantHistoryRecord[];
+}
+
 function formatDueDate(day: number | string) {
   const d = typeof day === "string" ? parseInt(day, 10) : day;
   if (isNaN(d)) return `${day}th of each month`;
@@ -201,6 +222,12 @@ export function ListingDetailPage() {
   const [documents, setDocuments] = useState<ListingDocument[]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsError, setDocumentsError] = useState<string | null>(null);
+
+  // Tenant history state for owner
+  const [tenantHistory, setTenantHistory] = useState<ListingTenantHistoryResponse | null>(null);
+  const [tenantHistoryLoading, setTenantHistoryLoading] = useState(false);
+  const [tenantHistoryError, setTenantHistoryError] = useState<string | null>(null);
+  const [activeTenantTab, setActiveTenantTab] = useState<"current" | "past">("current");
 
   // Verifier actions state
   const [verifyingDocId, setVerifyingDocId] = useState<number | null>(null);
@@ -428,6 +455,22 @@ export function ListingDetailPage() {
           setDocumentsLoading(false);
         }
       }
+
+      // 6. Fetch tenant history if property owner
+      if (user && currentListing.owner_id === user.id) {
+        setTenantHistoryLoading(true);
+        setTenantHistoryError(null);
+        try {
+          const histRes = await apiClient.get<ListingTenantHistoryResponse>(
+            `/listings/${id}/tenants`,
+          );
+          setTenantHistory(histRes);
+        } catch (histErr: any) {
+          setTenantHistoryError(histErr.message || "Failed to load tenant history.");
+        } finally {
+          setTenantHistoryLoading(false);
+        }
+      }
     } catch (err: any) {
       setError(err.message || "Failed to load apartment details.");
     } finally {
@@ -469,6 +512,31 @@ export function ListingDetailPage() {
       }, 100);
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (!loading && window.location.hash === "#tenant-history") {
+      setTimeout(() => {
+        const el = document.getElementById("tenant-history");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 150);
+    }
+  }, [loading]);
+
+  const loadTenantHistory = async () => {
+    if (!id || !user) return;
+    setTenantHistoryLoading(true);
+    setTenantHistoryError(null);
+    try {
+      const histRes = await apiClient.get<ListingTenantHistoryResponse>(
+        `/listings/${id}/tenants`,
+      );
+      setTenantHistory(histRes);
+    } catch (histErr: any) {
+      setTenantHistoryError(histErr.message || "Failed to load tenant history.");
+    } finally {
+      setTenantHistoryLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -1412,7 +1480,144 @@ export function ListingDetailPage() {
             </div>
           )}
 
-          {/* 6. Verification Documents Section (order-7 on mobile) */}
+          {/* 6. If Owner: Tenant History Section (order-7 on mobile) */}
+          {isOwner && (
+            <div
+              id="tenant-history"
+              className="order-7 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-xl scroll-mt-24"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-white/10">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-xl text-sky-400">
+                      history
+                    </span>
+                    <h2 className="text-lg font-serif font-bold text-white tracking-wide">
+                      Tenant History
+                    </h2>
+                    <span className="text-xs bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
+                      {(tenantHistory?.currentTenants?.length || 0) +
+                        (tenantHistory?.pastTenants?.length || 0)}{" "}
+                      Total
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Public record of current and previous tenants for this apartment.
+                  </p>
+                </div>
+
+                {/* Tab Controls */}
+                <div className="flex items-center gap-2 bg-[#090a0c] p-1 rounded-xl border border-slate-800 self-start sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTenantTab("current")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                      activeTenantTab === "current"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>
+                      Current ({tenantHistory?.currentTenants?.length || 0})
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTenantTab("past")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                      activeTenantTab === "past"
+                        ? "bg-slate-700/60 text-slate-200 border border-slate-600 shadow-sm"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                    <span>Past ({tenantHistory?.pastTenants?.length || 0})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Error Banner */}
+              {tenantHistoryError && (
+                <div className="p-3 mb-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center justify-between">
+                  <span>{tenantHistoryError}</span>
+                  <button
+                    type="button"
+                    onClick={loadTenantHistory}
+                    className="text-red-400 hover:text-white text-xs ml-2 cursor-pointer"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {/* Loading Spinner */}
+              {tenantHistoryLoading ? (
+                <div className="py-12 text-center text-slate-400">
+                  <div className="w-7 h-7 rounded-full border-2 border-sky-400/40 border-t-transparent animate-spin mx-auto mb-2" />
+                  <p className="text-xs">Loading tenant history...</p>
+                </div>
+              ) : activeTenantTab === "current" ? (
+                <div>
+                  {tenantHistory &&
+                  tenantHistory.currentTenants &&
+                  tenantHistory.currentTenants.length > 0 ? (
+                    <div className="flex flex-col gap-4">
+                      {tenantHistory.currentTenants.map((tenant) => (
+                        <TenantHistoryCard
+                          key={tenant.contractId}
+                          tenant={tenant}
+                          isCurrent={true}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-10 text-center border border-dashed border-slate-800 rounded-xl p-6 bg-[#090a0c]/60">
+                      <span className="material-symbols-outlined text-3xl text-slate-600 mb-2">
+                        no_accounts
+                      </span>
+                      <h4 className="text-sm font-medium text-slate-300 mb-1">
+                        No Current Tenants
+                      </h4>
+                      <p className="text-xs text-slate-500">
+                        This apartment is not currently occupied by an active tenant.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  {tenantHistory &&
+                  tenantHistory.pastTenants &&
+                  tenantHistory.pastTenants.length > 0 ? (
+                    <div className="flex flex-col gap-4">
+                      {tenantHistory.pastTenants.map((tenant) => (
+                        <TenantHistoryCard
+                          key={tenant.contractId}
+                          tenant={tenant}
+                          isCurrent={false}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-10 text-center border border-dashed border-slate-800 rounded-xl p-6 bg-[#090a0c]/60">
+                      <span className="material-symbols-outlined text-3xl text-slate-600 mb-2">
+                        history_toggle_off
+                      </span>
+                      <h4 className="text-sm font-medium text-slate-300 mb-1">
+                        No Past Tenants
+                      </h4>
+                      <p className="text-xs text-slate-500">
+                        No historical tenancy records found for this property.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 7. Verification Documents Section (order-7 on mobile) */}
           {(user?.is_verifier || isOwner) && (
             <div className="order-7 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-xl">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-white/10">
@@ -2137,6 +2342,13 @@ export function ListingDetailPage() {
                   Manage this listing or update information.
                 </p>
                 <div className="flex flex-col gap-2.5">
+                  <a
+                    href="#tenant-history"
+                    className="w-full bg-sky-950/40 hover:bg-sky-900/50 text-sky-300 border border-sky-800/60 font-medium py-2.5 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-sm">history</span>
+                    <span>View Tenant History</span>
+                  </a>
                   <Link
                     to={`/listings/${id}/edit`}
                     className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 px-4 rounded-xl text-xs transition text-center border border-slate-700"
@@ -2869,6 +3081,123 @@ export function ListingDetailPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function TenantHistoryCard({
+  tenant,
+  isCurrent,
+}: {
+  tenant: TenantHistoryRecord;
+  isCurrent: boolean;
+}) {
+  return (
+    <div className="p-5 rounded-xl bg-[#090a0c] border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-5 hover:border-slate-700 transition">
+      <div className="space-y-2.5 flex-1">
+        {/* Name, Status Badge, and ID */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-semibold text-xs">
+            {tenant.name.charAt(0).toUpperCase()}
+          </div>
+          <span className="font-semibold text-white text-base">
+            {tenant.name}
+          </span>
+          <span className="text-xs text-slate-500 font-mono">
+            (ID: #{tenant.tenantId})
+          </span>
+          <span
+            className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded flex items-center gap-1 ${
+              isCurrent
+                ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                : "bg-slate-800 text-slate-300 border border-slate-700"
+            }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                isCurrent ? "bg-emerald-400" : "bg-slate-400"
+              }`}
+            />
+            {isCurrent ? "Active Tenancy" : "Completed Lease"}
+          </span>
+        </div>
+
+        {/* Tenant Details Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs">
+          {tenant.email && (
+            <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="material-symbols-outlined text-xs text-slate-500">
+                mail
+              </span>
+              <span className="font-mono text-slate-300 truncate">
+                {tenant.email}
+              </span>
+            </div>
+          )}
+          {tenant.phone && (
+            <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="material-symbols-outlined text-xs text-slate-500">
+                call
+              </span>
+              <span className="font-mono text-slate-300">{tenant.phone}</span>
+            </div>
+          )}
+          {tenant.monthlyRent > 0 && (
+            <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="material-symbols-outlined text-xs text-slate-500">
+                payments
+              </span>
+              <span>
+                Agreed Rent:{" "}
+                <strong className="text-slate-200 font-mono">
+                  ৳{tenant.monthlyRent.toLocaleString()} / month
+                </strong>
+              </span>
+            </div>
+          )}
+          {tenant.emergencyContact && (
+            <div className="flex items-center gap-1.5 text-slate-400">
+              <span className="material-symbols-outlined text-xs text-slate-500">
+                contact_phone
+              </span>
+              <span>
+                Emergency:{" "}
+                <strong className="text-slate-200 font-mono">
+                  {tenant.emergencyContact}
+                </strong>
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Tenancy Duration / Dates */}
+        <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1 border-t border-slate-800/80">
+          <div className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs">calendar_today</span>
+            <span>
+              {isCurrent
+                ? `Started: ${tenant.startDate}`
+                : `Tenancy: ${tenant.startDate} — ${tenant.endDate}`}
+            </span>
+          </div>
+          {isCurrent && tenant.endDate && (
+            <span className="text-slate-500 font-mono">
+              (Expires: {tenant.endDate})
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Contract Action Link */}
+      <div className="flex items-center gap-2 self-start md:self-center shrink-0">
+        <Link
+          to={`/contracts/${tenant.contractId}`}
+          className="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-700 transition flex items-center gap-1 font-mono"
+        >
+          <span>Contract #{tenant.contractId}</span>
+          <span className="material-symbols-outlined text-xs">arrow_forward</span>
+        </Link>
+      </div>
     </div>
   );
 }

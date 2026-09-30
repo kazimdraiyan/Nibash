@@ -134,6 +134,17 @@ export function ProfileMenu() {
                 <button
                   onClick={() => {
                     setOpen(false);
+                    navigate("/owner/income");
+                  }}
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                >
+                  <span className="material-symbols-outlined text-base text-amber-600">payments</span>
+                  <span>Rental Income</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setOpen(false);
                     navigate("/listings");
                   }}
                   className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"

@@ -575,3 +575,109 @@ export async function isListingStarred(listingId: string, userId: number): Promi
   );
   return result.rows.length > 0;
 }
+
+export interface TenantHistoryRecord {
+  contractId: number;
+  tenantId: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  emergencyContact: string | null;
+  startDate: string;
+  endDate: string;
+  monthlyRent: number;
+  contractStatus: string;
+  createdAt: string;
+}
+
+export interface ListingTenantHistoryResponse {
+  listingId: number;
+  listingTitle: string;
+  currentTenants: TenantHistoryRecord[];
+  pastTenants: TenantHistoryRecord[];
+}
+
+export async function getListingTenantHistory(
+  ownerId: number,
+  listingId: number,
+): Promise<ListingTenantHistoryResponse> {
+  // 1. Verify listing exists
+  const listingRes = await pool.query(
+    "SELECT id, title, owner_id FROM listings WHERE id = $1",
+    [listingId],
+  );
+  if (listingRes.rows.length === 0) {
+    throw new AppError(404, "listing not found");
+  }
+
+  const listing = listingRes.rows[0];
+
+  // 2. Enforce ownership: requesting user MUST own the listing
+  if (listing.owner_id !== ownerId) {
+    throw new AppError(403, "you are not authorized to view tenant history for this listing");
+  }
+
+  // 3. Query contracts with active/completed statuses
+  const query = `
+    SELECT
+      c.id AS contract_id,
+      c.tenant_id,
+      c.status AS contract_status,
+      TO_CHAR(c.start_date, 'YYYY-MM-DD') AS start_date,
+      TO_CHAR(c.end_date, 'YYYY-MM-DD') AS end_date,
+      c.created_at,
+      u.name AS tenant_name,
+      u.email AS tenant_email,
+      u.phone AS tenant_phone,
+      tn.emergency_contact,
+      COALESCE(t.rent, 0)::numeric AS agreed_rent
+    FROM contracts c
+    JOIN users u ON u.id = c.tenant_id
+    LEFT JOIN tenants tn ON tn.user_id = c.tenant_id
+    LEFT JOIN agreements a ON a.terms_id = c.agreement_id
+    LEFT JOIN terms t ON t.id = a.terms_id
+    WHERE c.listing_id = $1
+      AND c.status IN ('signed', 'completed')
+    ORDER BY c.start_date DESC, c.id DESC
+  `;
+
+  const contractsRes = await pool.query(query, [listingId]);
+
+  const now = new Date();
+  const todayStr = now.toISOString().split("T")[0];
+
+  const currentTenants: TenantHistoryRecord[] = [];
+  const pastTenants: TenantHistoryRecord[] = [];
+
+  for (const row of contractsRes.rows) {
+    const item: TenantHistoryRecord = {
+      contractId: row.contract_id,
+      tenantId: row.tenant_id,
+      name: row.tenant_name,
+      email: row.tenant_email,
+      phone: row.tenant_phone || null,
+      emergencyContact: row.emergency_contact || null,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      monthlyRent: parseFloat(row.agreed_rent || "0"),
+      contractStatus: row.contract_status,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : row.start_date,
+    };
+
+    const isEndDatePast = row.end_date && row.end_date < todayStr;
+    const isCurrent = row.contract_status === "signed" && !isEndDatePast;
+
+    if (isCurrent) {
+      currentTenants.push(item);
+    } else {
+      pastTenants.push(item);
+    }
+  }
+
+  return {
+    listingId: listing.id,
+    listingTitle: listing.title,
+    currentTenants,
+    pastTenants,
+  };
+}

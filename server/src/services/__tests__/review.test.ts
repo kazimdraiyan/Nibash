@@ -173,6 +173,7 @@ describe("Review Feature Service", () => {
     const updated = await updateReview(tenantId, existing.id, {
       rating: 4,
       description: "Updated: Decent apartment, friendly neighbors.",
+      keep_media_ids: undefined,
     });
 
     assert.equal(updated.rating, 4);

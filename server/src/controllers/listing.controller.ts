@@ -153,3 +153,17 @@ export async function isStarred(req: Request, res: Response) {
   const starred = await listingService.isListingStarred(req.params.id as string, req.user.id);
   res.json({ starred });
 }
+
+export async function getTenantsHistory(req: Request, res: Response) {
+  if (!req.user) {
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  const listingId = parseInt(req.params.id as string, 10);
+  if (isNaN(listingId) || listingId <= 0) {
+    res.status(400).json({ error: "invalid listing id" });
+    return;
+  }
+  const history = await listingService.getListingTenantHistory(req.user.id, listingId);
+  res.json(history);
+}

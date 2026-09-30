@@ -25,6 +25,7 @@ import { useAuth } from "./context/AuthContext";
 import { VerifyPortalPage } from "./pages/VerifyPortalPage";
 import { VerifierDashboardPage } from "./pages/VerifierDashboardPage";
 import { ChangePasswordPage } from "./pages/ChangePasswordPage";
+import { OwnerIncomePage } from "./pages/OwnerIncomePage";
 
 function HomePage() {
   const { user } = useAuth();
@@ -100,6 +101,14 @@ export default function App() {
             element={
               <ProtectedRoute blockVerifier>
                 <MyListingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/income"
+            element={
+              <ProtectedRoute blockVerifier>
+                <OwnerIncomePage />
               </ProtectedRoute>
             }
           />
