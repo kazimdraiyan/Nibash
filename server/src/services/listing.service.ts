@@ -165,17 +165,9 @@ export async function getListingById(
              t.security_deposit,
              (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS rating,
              (SELECT COUNT(r.id)::int FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS review_count,
-             CASE
-               WHEN $2::integer IS NOT NULL 
-                    AND l.owner_id <> $2::integer
-                    AND EXISTS (
-                      SELECT 1 FROM applies a
-                      WHERE a.listing_id = l.id
-                        AND a.tenant_id = $2::integer
-                        AND a.status <> 'rejected'
-                    )
-               THEN u.phone
-             END AS owner_phone
+             CASE WHEN $2::integer IS NULL OR l.owner_id <> $2::integer THEN u.name  END AS owner_name,
+             CASE WHEN $2::integer IS NULL OR l.owner_id <> $2::integer THEN u.email END AS owner_email,
+             CASE WHEN $2::integer IS NULL OR l.owner_id <> $2::integer THEN u.phone END AS owner_phone
      FROM listings l
      JOIN initial_terms it ON it.listing_id = l.id
      JOIN terms t ON t.id = it.terms_id

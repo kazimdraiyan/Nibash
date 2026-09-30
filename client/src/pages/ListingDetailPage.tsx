@@ -14,6 +14,8 @@ import { getAmenityIcon, getAmenityMeta } from "../utils/amenities";
 import { DocumentViewerModal } from "../components/DocumentViewerModal";
 
 interface OwnerPhoneListing extends BackendListing {
+  owner_name?: string | null;
+  owner_email?: string | null;
   owner_phone?: string | null;
 }
 
@@ -140,7 +142,6 @@ export function ListingDetailPage() {
 
   // Owner details state
   const [owner, setOwner] = useState<OwnerInfo | null>(null);
-  const [ownerLoading, setOwnerLoading] = useState(false);
 
   // Application state
   const [isTenant, setIsTenant] = useState<boolean>(() => {
@@ -345,40 +346,14 @@ export function ListingDetailPage() {
       }
       setListing(currentListing);
 
-      // Fetch owner details
+      // Seed owner info from listing fields (server omits name/email/phone for the owner themselves)
       const ownerId = currentListing.owner_id;
-      setOwnerLoading(true);
-      if (user && user.id === ownerId) {
-        setOwner({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-        });
-        setOwnerLoading(false);
-      } else {
-        try {
-          const res = await apiClient.get<{ user?: any; owner?: any }>(
-            `/users/${ownerId}`,
-          );
-          const ownerData = res.user || res.owner;
-          if (ownerData) {
-            setOwner({
-              id: ownerId,
-              name: ownerData.name,
-              email: ownerData.email,
-              phone: ownerData.phone,
-            });
-          } else {
-            setOwner({ id: ownerId });
-          }
-        } catch {
-          // Gracefully fallback to available listing owner ID
-          setOwner({ id: ownerId });
-        } finally {
-          setOwnerLoading(false);
-        }
-      }
+      setOwner({
+        id: ownerId,
+        name: currentListing.owner_name ?? undefined,
+        email: currentListing.owner_email ?? undefined,
+        phone: currentListing.owner_phone ?? undefined,
+      });
 
       // 2. Fetch reviews for this listing
       try {
@@ -1212,6 +1187,7 @@ export function ListingDetailPage() {
           )}
 
           {/* 4. Owner Information Section (order-6 on mobile) */}
+          {!isOwner && (
           <div className="order-6 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
               <div className="flex items-center gap-2.5">
@@ -1230,11 +1206,7 @@ export function ListingDetailPage() {
               </span>
             </div>
 
-            {ownerLoading ? (
-              <div className="py-4 text-center text-xs text-slate-400">
-                Loading owner information...
-              </div>
-            ) : owner ? (
+            {owner ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
                 <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
                   <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
@@ -1294,6 +1266,7 @@ export function ListingDetailPage() {
               </p>
             )}
           </div>
+          )}
 
           {/* 5. If Owner: Applications Received (order-7 on mobile) */}
           {isOwner && (
