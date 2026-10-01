@@ -260,7 +260,7 @@ export function ContractDetailPage() {
   if (loading) {
     return (
       <div className="py-24 text-center text-slate-400">
-        <div className="w-10 h-10 rounded-full border-2 border-[#d4b068]/60 border-t-transparent animate-spin mx-auto mb-4" />
+        <div className="w-10 h-10 rounded-full border-2 border-slate/60 border-t-transparent animate-spin mx-auto mb-4" />
         <p className="text-sm text-white font-medium mb-1">Loading digital contract details...</p>
         <p className="text-xs text-slate-500">Retrieving agreement terms, counterpart details, and payment logs</p>
       </div>
@@ -311,9 +311,6 @@ export function ContractDetailPage() {
             <span>{isOwner ? "Back to My Listings" : "Back to Listings"}</span>
           </Link>
           <span className="text-slate-600 text-xs">•</span>
-          <span className="text-xs font-mono text-[#d4b068] bg-[#d4b068]/15 border border-[#d4b068]/30 px-2 py-0.5 rounded">
-            Contract #{contract.contract_id}
-          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -348,17 +345,9 @@ export function ContractDetailPage() {
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#d4b068] block mb-1">
-                  Associated Property
-                </span>
                 <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                   {contract.listing_title || `Apartment #${contract.listing_id}`}
                 </h1>
-                <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                  <span>Listing ID: #{contract.listing_id}</span>
-                  <span>•</span>
-                  <span>Agreement #{contract.agreement_id}</span>
-                </p>
               </div>
 
               <Link
@@ -380,15 +369,11 @@ export function ContractDetailPage() {
             <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                  <span className="material-symbols-outlined text-xl text-slate">
                     person
                   </span>
                   <h2 className="text-base font-bold text-white">Tenant Information</h2>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-600/50">
-                  <span className="material-symbols-outlined text-xs">verified</span>
-                  <span>Verified Tenant</span>
-                </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
@@ -444,15 +429,6 @@ export function ContractDetailPage() {
                     </span>
                   </div>
                 )}
-
-                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Tenant Reference
-                  </span>
-                  <span className="font-mono text-slate-300 text-xs">
-                    User #{contract.tenant_id}
-                  </span>
-                </div>
               </div>
             </div>
           ) : (
@@ -460,7 +436,7 @@ export function ContractDetailPage() {
             <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                  <span className="material-symbols-outlined text-xl text-slate">
                     shield_person
                   </span>
                   <h2 className="text-base font-bold text-white">Property Owner</h2>
@@ -518,7 +494,7 @@ export function ContractDetailPage() {
           {/* 3. Lease Agreement (Terms) of this contract */}
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
             <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2 border-b border-slate-800/80 pb-4">
-              <span className="material-symbols-outlined text-lg text-[#d4b068]">
+              <span className="material-symbols-outlined text-lg text-slate">
                 receipt_long
               </span>
               <span>Agreement Terms & Financial Breakdown</span>
@@ -601,7 +577,7 @@ export function ContractDetailPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-4 mb-6">
               <div>
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                  <span className="material-symbols-outlined text-lg text-slate">
                     payments
                   </span>
                   <span>Payments</span>
@@ -857,7 +833,7 @@ export function ContractDetailPage() {
             <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4 mb-5">
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-xl text-[#d4b068]">
+                  <span className="material-symbols-outlined text-xl text-slate">
                     hotel_class
                   </span>
                   <div>
@@ -1024,7 +1000,7 @@ export function ContractDetailPage() {
           {/* Contract Status & Duration Card */}
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-sm">
             <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-base text-[#d4b068]">
+              <span className="material-symbols-outlined text-base text-slate">
                 assignment_turned_in
               </span>
               <span>Lease Status & Timeline</span>
@@ -1076,7 +1052,7 @@ export function ContractDetailPage() {
           {/* Monthly Obligations Breakdown */}
           <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-sm">
             <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-base text-[#d4b068]">
+              <span className="material-symbols-outlined text-base text-slate">
                 account_balance_wallet
               </span>
               <span>Financial Overview</span>
@@ -1103,7 +1079,7 @@ export function ContractDetailPage() {
 
             <div className="pt-3.5 flex items-center justify-between text-sm">
               <span className="font-bold text-white">Total Monthly</span>
-              <span className="font-extrabold text-[#d4b068] font-mono text-base">
+              <span className="font-extrabold text-slate font-mono text-base">
                 ৳{totalMonthlyCommitment.toLocaleString()}
               </span>
             </div>
@@ -1150,9 +1126,6 @@ export function ContractDetailPage() {
               <h3 className="text-sm font-semibold truncate max-w-xs sm:max-w-md text-white">
                 Review Photo {reviewPhotoViewer.selectedIndex + 1} of {reviewPhotoViewer.photos.length}
               </h3>
-              <p className="text-xs text-slate-400 font-mono">
-                {contract.listing_title || `Contract #${contract.contract_id}`}
-              </p>
             </div>
 
             <button

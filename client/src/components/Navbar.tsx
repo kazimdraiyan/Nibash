@@ -68,22 +68,22 @@ export function Navbar() {
                   to="/verify/dashboard"
                   className={`flex items-center gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-[11px] xl:text-xs uppercase tracking-wider font-label-sm transition-all border cursor-pointer whitespace-nowrap ${
                     location.pathname === "/verify/dashboard"
-                      ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm"
-                      : "bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-400/50 hover:text-white"
+                      ? "bg-slate-500/20 text-slate-300 border-slate-500/50 shadow-sm"
+                      : "bg-slate-500/10 text-slate-300 border-slate-500/30 hover:bg-slate-500/20 hover:border-slate-400/50 hover:text-white"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-base text-amber-400">monitoring</span>
+                  <span className="material-symbols-outlined text-base text-slate-400">monitoring</span>
                   <span className="hidden sm:inline">Dashboard</span>
                 </Link>
                 <Link
                   to="/listings?view=pending"
                   className={`flex items-center gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-[11px] xl:text-xs uppercase tracking-wider font-label-sm transition-all border cursor-pointer whitespace-nowrap ${
                     location.pathname === "/listings" && location.search.includes("view=pending")
-                      ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm"
-                      : "bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-400/50 hover:text-white"
+                      ? "bg-slate-500/20 text-slate-300 border-slate-500/50 shadow-sm"
+                      : "bg-slate-500/10 text-slate-300 border-slate-500/30 hover:bg-slate-500/20 hover:border-slate-400/50 hover:text-white"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-base text-amber-400">verified_user</span>
+                  <span className="material-symbols-outlined text-base text-slate-400">verified_user</span>
                   <span className="hidden sm:inline">Review Queue</span>
                 </Link>
               </>

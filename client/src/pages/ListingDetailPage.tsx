@@ -1419,7 +1419,7 @@ export function ListingDetailPage() {
                           <>
                             <Link
                               to={`/contracts/new?listingId=${id}&tenantId=${app.tenant_id}`}
-                              className="bg-slate hover:bg-[#c39f57] text-black font-semibold px-3.5 py-1.5 rounded-lg text-xs transition"
+                              className="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-200 px-3.5 py-1.5 rounded-lg text-xs transition cursor-pointer disabled:opacity-50"
                             >
                               Propose Contract
                             </Link>

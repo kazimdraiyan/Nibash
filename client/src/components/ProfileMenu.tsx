@@ -64,9 +64,9 @@ export function ProfileMenu() {
                     setOpen(false);
                     navigate("/verify/dashboard");
                   }}
-                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-amber-900 bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-colors cursor-pointer flex items-center gap-2 font-semibold mb-1"
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
                 >
-                  <span className="material-symbols-outlined text-base text-amber-700">monitoring</span>
+                  <span className="material-symbols-outlined text-base">monitoring</span>
                   <span>Verifier Dashboard</span>
                 </button>
                 <button
@@ -74,9 +74,9 @@ export function ProfileMenu() {
                     setOpen(false);
                     navigate("/listings?view=pending");
                   }}
-                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-amber-900 bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-colors cursor-pointer flex items-center gap-2 font-semibold mb-1"
+                  className="text-left px-3 py-2 rounded-xl text-xs uppercase tracking-wider text-[#334155] hover:text-[#0f172a] hover:bg-[#d0d5dc] transition-colors cursor-pointer flex items-center gap-2 font-medium"
                 >
-                  <span className="material-symbols-outlined text-base text-amber-700">verified_user</span>
+                  <span className="material-symbols-outlined text-base">verified_user</span>
                   <span>Review Queue</span>
                 </button>
                 <button
