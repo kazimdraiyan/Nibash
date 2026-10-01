@@ -41,8 +41,8 @@ function StatusBadge({ status, contractStatus }: { status: string; contractStatu
   }
   if (contractStatus === "proposed") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase font-mono bg-[#d4b068]/20 text-[#d4b068] border border-[#d4b068]/50 animate-pulse">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068]" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase font-mono bg-slate-700/60 text-slate-200 border border-slate-600/60">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
         Contract Proposed
       </span>
     );
@@ -65,8 +65,8 @@ function StatusBadge({ status, contractStatus }: { status: string; contractStatu
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase font-mono bg-amber-950/80 text-amber-300 border border-amber-700/60">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase font-mono bg-slate-800 text-slate-300 border border-slate-700/60">
+      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
       {status || "Waiting"}
     </span>
   );
@@ -117,23 +117,19 @@ function ApplicationDetailModal({ app, onClose }: ApplicationModalProps) {
           </button>
         </div>
 
-        {/* Property Overview */}
         <div className="mb-6 p-4 rounded-xl bg-[#090a0c] border border-slate-800">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="text-[11px] text-[#d4b068] font-mono uppercase">
-              Property #{app.listing_id}
-            </span>
             {areaName && (
-              <span className="text-[11px] text-slate-400 font-mono">
+              <span className="text-[11px] text-slate-400 font-mono uppercase">
                 {areaName}
               </span>
             )}
           </div>
           <h3 className="text-base font-semibold text-white mb-2">
-            {app.title || `Apartment #${app.listing_id}`}
+            {app.title || "Apartment"}
           </h3>
           {app.rent !== undefined && app.rent !== null && app.rent !== "" && !isNaN(Number(app.rent)) && (
-            <p className="text-sm font-mono font-bold text-[#d4b068]">
+            <p className="text-sm font-mono font-bold text-slate-200">
               ৳{Number(app.rent).toLocaleString()} / month
             </p>
           )}
@@ -149,7 +145,7 @@ function ApplicationDetailModal({ app, onClose }: ApplicationModalProps) {
           {app.contract_id && (
             <div className="flex items-center justify-between py-1.5">
               <span className="text-slate-400">Lease Contract</span>
-              <span className={`font-mono font-semibold uppercase text-xs ${app.contract_status === "signed" ? "text-emerald-400" : "text-[#d4b068]"}`}>
+              <span className={`font-mono font-semibold uppercase text-xs ${app.contract_status === "signed" ? "text-emerald-400" : "text-slate-300"}`}>
                 {app.contract_status === "signed" ? "Signed / Active" : "Proposed (Pending Signature)"}
               </span>
             </div>
@@ -210,7 +206,7 @@ function ApplicationDetailModal({ app, onClose }: ApplicationModalProps) {
             <Link
               to={`/contracts/${app.contract_id}`}
               onClick={onClose}
-              className="flex-1 bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold py-2.5 px-4 rounded-xl transition text-xs cursor-pointer text-center flex items-center justify-center gap-1.5"
+              className="flex-1 bg-white hover:bg-slate-200 text-slate-900 font-semibold py-2.5 px-4 rounded-xl transition text-xs cursor-pointer text-center flex items-center justify-center gap-1.5"
             >
               <span className="material-symbols-outlined text-sm">edit_document</span>
               <span>Review & Sign Contract</span>
@@ -245,8 +241,6 @@ export function MyApplicationsPage() {
   const [applications, setApplications] = useState<TenantApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedApp, setSelectedApp] = useState<TenantApplication | null>(null);
-  const [signingId, setSigningId] = useState<number | null>(null);
 
   const fetchMyApplications = useCallback(async () => {
     if (!token) return;
@@ -267,20 +261,6 @@ export function MyApplicationsPage() {
     fetchMyApplications();
   }, [fetchMyApplications]);
 
-  const handleSignContract = async (contractId: number) => {
-    if (signingId !== null) return;
-    if (!confirm("Are you sure you want to sign this digital lease contract?")) return;
-    setSigningId(contractId);
-    try {
-      await apiClient.patch(`/contracts/${contractId}`, { status: "signed" });
-      alert("Contract signed successfully! Your lease agreement is now active.");
-      fetchMyApplications();
-    } catch (err: any) {
-      alert(err.message || "Failed to sign contract.");
-    } finally {
-      setSigningId(null);
-    }
-  };
 
   if (!token || !user) {
     return (
@@ -322,7 +302,7 @@ export function MyApplicationsPage() {
               My Applications
             </h1>
             {!loading && (
-              <span className="text-xs font-semibold text-[#d4b068] bg-[#d4b068]/15 border border-[#d4b068]/30 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded-full">
                 {applications.length} {applications.length === 1 ? "Application" : "Applications"}
               </span>
             )}
@@ -351,7 +331,7 @@ export function MyApplicationsPage() {
       {/* Loading State */}
       {loading && (
         <div className="py-24 text-center text-slate-400">
-          <div className="w-10 h-10 rounded-full border-2 border-[#d4b068]/60 border-t-transparent animate-spin mx-auto mb-4" />
+          <div className="w-10 h-10 rounded-full border-2 border-slate-600 border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-sm text-white font-medium mb-1">Loading your applications...</p>
           <p className="text-xs text-slate-500">Checking current status with landlords</p>
         </div>
@@ -411,59 +391,30 @@ export function MyApplicationsPage() {
                 className="border border-slate-800 bg-[#12151c] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 hover:border-slate-700 transition"
               >
                 <div className="flex-1">
-                  {/* Status & Area row */}
+                  {/* Status row */}
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <StatusBadge status={app.status} contractStatus={app.contract_status} />
-                    {areaName && (
-                      <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700/60">
-                        {areaName}
-                      </span>
-                    )}
-                    <span className="text-xs text-slate-500 font-mono">
-                      #{app.listing_id}
-                    </span>
                   </div>
 
                   {/* Title */}
                   <h2 className="text-lg font-bold text-white mb-1">
-                    {app.title || `Apartment #${app.listing_id}`}
+                    {app.title || "Apartment"}
                   </h2>
 
                   {/* Rent and Specs */}
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 mb-2">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 mb-2">
                     {app.rent !== undefined && app.rent !== null && app.rent !== "" && !isNaN(Number(app.rent)) && (
-                      <span className="font-mono font-bold text-[#d4b068]">
+                      <span className="font-mono font-bold text-slate-200">
                         ৳{Number(app.rent).toLocaleString()} / month
                       </span>
                     )}
-                    {(app.bedroom_count !== undefined || app.bathroom_count !== undefined) && (
-                      <span className="text-slate-400">
-                        {[
-                          app.bedroom_count !== undefined ? `${app.bedroom_count} Bed` : null,
-                          app.bathroom_count !== undefined ? `${app.bathroom_count} Bath` : null,
-                          app.on_which_floor !== undefined ? `Floor ${app.on_which_floor}` : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" • ")}
-                      </span>
-                    )}
+                    {[
+                      app.bedroom_count !== undefined ? `${app.bedroom_count} Bed` : null,
+                      app.bathroom_count !== undefined ? `${app.bathroom_count} Bath` : null,
+                      app.on_which_floor !== undefined ? `Floor ${app.on_which_floor}` : null,
+                      areaName || null,
+                    ].filter(Boolean).join(" · ")}
                   </div>
-
-                  {/* Proposed Contract Alert */}
-                  {app.contract_id && app.contract_status === "proposed" && (
-                    <div className="my-2.5 p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-amber-200">
-                      <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-amber-400 text-base shrink-0">edit_document</span>
-                        <span><strong>Lease Agreement Proposed:</strong> Landlord has sent the digital contract for your signature.</span>
-                      </div>
-                      <Link
-                        to={`/contracts/${app.contract_id}`}
-                        className="shrink-0 bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold px-3 py-1 rounded-lg text-xs transition"
-                      >
-                        Review Terms
-                      </Link>
-                    </div>
-                  )}
 
                   {/* Applied timestamp */}
                   <p className="text-[11px] text-slate-500">
@@ -471,38 +422,16 @@ export function MyApplicationsPage() {
                   </p>
                 </div>
 
-                {/* Actions */}
-                <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto self-end sm:self-center">
-                  {app.contract_id && app.contract_status === "proposed" && (
-                    <button
-                      type="button"
-                      disabled={signingId === app.contract_id}
-                      onClick={() => handleSignContract(app.contract_id!)}
-                      className="bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold px-3.5 py-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
-                    >
-                      <span className="material-symbols-outlined text-sm">draw</span>
-                      <span>{signingId === app.contract_id ? "Signing..." : "Sign Contract"}</span>
-                    </button>
-                  )}
-
-                  {app.contract_id && app.contract_status === "signed" && (
+                <div className="flex items-center gap-2.5 w-full sm:w-auto self-end sm:self-center">
+                  {app.contract_id && (
                     <Link
                       to={`/contracts/${app.contract_id}`}
-                      className="bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 px-3.5 py-2 rounded-xl text-xs font-semibold transition text-center flex items-center gap-1.5"
+                      className="flex-1 sm:flex-none bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-semibold px-3.5 py-2 rounded-xl text-xs transition text-center flex items-center justify-center gap-1.5"
                     >
-                      <span className="material-symbols-outlined text-sm">verified</span>
+                      <span className="material-symbols-outlined text-sm">description</span>
                       <span>View Contract</span>
                     </Link>
                   )}
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedApp(app)}
-                    className="flex-1 sm:flex-none bg-slate-800 hover:bg-slate-700 text-white font-medium px-3.5 py-2 rounded-xl text-xs transition cursor-pointer text-center"
-                  >
-                    View Details
-                  </button>
-
                   <Link
                     to={`/listings/${app.listing_id}`}
                     className="flex-1 sm:flex-none bg-white text-slate-900 font-semibold px-3.5 py-2 rounded-xl text-xs hover:bg-slate-200 transition text-center flex items-center justify-center gap-1"
@@ -515,14 +444,6 @@ export function MyApplicationsPage() {
             );
           })}
         </div>
-      )}
-
-      {/* Application Details Modal */}
-      {selectedApp && (
-        <ApplicationDetailModal
-          app={selectedApp}
-          onClose={() => setSelectedApp(null)}
-        />
       )}
     </div>
   );

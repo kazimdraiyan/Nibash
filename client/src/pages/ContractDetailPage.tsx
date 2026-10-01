@@ -478,15 +478,6 @@ export function ContractDetailPage() {
                     </span>
                   </div>
                 )}
-
-                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Owner Reference
-                  </span>
-                  <span className="font-mono text-slate-300 text-xs">
-                    User #{contract.owner_id}
-                  </span>
-                </div>
               </div>
             </div>
           )}
@@ -757,11 +748,11 @@ export function ContractDetailPage() {
               </h3>
 
               {confirmedPayments.length === 0 ? (
-                <div className="py-10 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl bg-[#090a0c]/50">
-                  <span className="material-symbols-outlined text-2xl text-slate-600 block mb-1">
-                    receipt
+                <div className="py-10 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl bg-[#090a0c]/50 flex flex-row items-center justify-center">
+                  <span className="inline-block material-symbols-outlined text-2xl text-slate-600 mr-1">
+                  receipt
                   </span>
-                  No confirmed payments recorded for this contract yet.
+                  <span>No confirmed payments recorded for this contract yet.</span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2.5">
@@ -858,9 +849,6 @@ export function ContractDetailPage() {
                   <div className="max-w-md">
                     <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
                       <span>Rate Your Experience</span>
-                      <span className="text-[11px] font-mono text-amber-400 bg-amber-950/70 border border-amber-600/40 px-2 py-0.5 rounded">
-                        1–5 Stars
-                      </span>
                     </h3>
                     <p className="text-xs text-slate-400 leading-relaxed">
                       Your feedback on the apartment and tenancy will appear on the listing page. You can add a description and photos of the apartment.
