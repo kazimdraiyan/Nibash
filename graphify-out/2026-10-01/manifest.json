@@ -294,9 +294,9 @@
     "semantic_hash": ""
   },
   "client/src/App.tsx": {
-    "mtime": 1790845656.2134628,
-    "seen": 1790845758.8820667,
-    "ast_hash": "670e866d82b6202b1262486979d31c78",
+    "mtime": 1790849770.5463562,
+    "seen": 1790849915.9076316,
+    "ast_hash": "8d6b67d25b0991dc2acfd3bb50e7f5cf",
     "semantic_hash": ""
   },
   "client/src/api/client.ts": {
@@ -342,15 +342,15 @@
     "semantic_hash": ""
   },
   "client/src/components/Navbar.tsx": {
-    "mtime": 1790845668.9680684,
-    "seen": 1790845758.8820667,
-    "ast_hash": "fd3a079f5d087b51a0b28dce423e03ca",
+    "mtime": 1790850378.4483445,
+    "seen": 1790850413.31254,
+    "ast_hash": "cdd5317bfab7fd91398f18c64afa03d1",
     "semantic_hash": ""
   },
   "client/src/components/PopularLocations.tsx": {
-    "mtime": 1790840602.0548158,
-    "seen": 1790840621.982799,
-    "ast_hash": "446bb99de288284b015216502f305bbb",
+    "mtime": 1790851085.3208363,
+    "seen": 1790851150.8551707,
+    "ast_hash": "4be22f123bd905ff3efbc702e9f5e946",
     "semantic_hash": ""
   },
   "client/src/components/ProfileMenu.tsx": {
@@ -2123,12 +2123,6 @@
     "ast_hash": "9c1afecfcf3cfe818d32f526e4b45dd2",
     "semantic_hash": ""
   },
-  "server/src/controllers/area.controller.test.ts": {
-    "mtime": 1790840497.7391224,
-    "seen": 1790840621.982799,
-    "ast_hash": "ff4c88501f71c33a295ccd18095b3146",
-    "semantic_hash": ""
-  },
   "server/src/controllers/area.controller.ts": {
     "mtime": 1790840488.3906758,
     "seen": 1790840621.982799,
@@ -2141,34 +2135,22 @@
     "ast_hash": "ed7331fcf2d69110aafe5323c862ce14",
     "semantic_hash": ""
   },
-  "server/src/services/area.service.test.ts": {
-    "mtime": 1790840461.8785982,
-    "seen": 1790840621.982799,
-    "ast_hash": "aaea092d5a4c61b212af9767084419aa",
-    "semantic_hash": ""
-  },
   "server/src/services/area.service.ts": {
-    "mtime": 1790840469.7970014,
-    "seen": 1790840621.982799,
-    "ast_hash": "1c91e69272bf482d8cacd662126c5e1e",
+    "mtime": 1790851017.186066,
+    "seen": 1790851150.8551707,
+    "ast_hash": "60eaa0602eac95ff41f78dbd806b72b6",
     "semantic_hash": ""
   },
   "client/src/components/AboutUsSection.tsx": {
-    "mtime": 1790845618.6650884,
-    "seen": 1790845758.8820667,
-    "ast_hash": "e5c195b59151d1c54039e7b28192e21e",
+    "mtime": 1790851365.432361,
+    "seen": 1790851417.840134,
+    "ast_hash": "97be2c37ec750efd58d7aaf43e2022f0",
     "semantic_hash": ""
   },
   "client/src/pages/AboutUsPage.tsx": {
     "mtime": 1790846356.593839,
     "seen": 1790846397.5055919,
     "ast_hash": "65945168f292ef6323460e32af80e7bc",
-    "semantic_hash": ""
-  },
-  "docs/features/08-about-us-developers-page.md": {
-    "mtime": 1790846407.0571504,
-    "seen": 1790846843.685138,
-    "ast_hash": "ea2b5e94eaf0a5f996833af2baff6d7c",
     "semantic_hash": ""
   },
   "client/src/assets/developers/abid-hossain.jpg": {
@@ -2181,6 +2163,18 @@
     "mtime": 1790846558.0800984,
     "seen": 1790846843.685138,
     "ast_hash": "a62d10e5996110edd3b821b044cea6df",
+    "semantic_hash": ""
+  },
+  "server/src/controllers/area.controller.test.ts": {
+    "mtime": 1790851039.8112497,
+    "seen": 1790851150.8551707,
+    "ast_hash": "8771c0617bab9c07d3bf46fab9059fdf",
+    "semantic_hash": ""
+  },
+  "server/src/services/area.service.test.ts": {
+    "mtime": 1790851002.852052,
+    "seen": 1790851150.8551707,
+    "ast_hash": "3150589d033483a1ad0f7fd8e80bf5ba",
     "semantic_hash": ""
   }
 }

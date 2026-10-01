@@ -43,15 +43,8 @@ export function AboutUsSection() {
                 to="/about"
                 className="glass-button-silver inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-label-sm text-xs uppercase tracking-widest cursor-pointer shadow-lg hover:shadow-xl transition-all"
               >
-                <span>About Us</span>
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
-              <Link
-                to="/about"
-                className="glass-button-outline inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-label-sm text-xs uppercase tracking-widest hover:text-white transition-all cursor-pointer"
-              >
                 <span>Meet the Developers</span>
-                <span className="material-symbols-outlined text-sm">group</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </Link>
             </div>
           </div>

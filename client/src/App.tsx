@@ -1,6 +1,7 @@
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { HowItWorks } from "./components/HowItWorks";
+import { PopularLocations } from "./components/PopularLocations";
 import { AboutUsSection } from "./components/AboutUsSection";
 import { AboutUsPage } from "./pages/AboutUsPage";
 import { WhyChooseUs } from "./components/WhyChooseUs";
@@ -41,6 +42,9 @@ function HomePage() {
       <ActualListings />
       <div id="how-it-works">
         <HowItWorks />
+      </div>
+      <div id="locations">
+        <PopularLocations />
       </div>
       <div id="about-us">
         <AboutUsSection />

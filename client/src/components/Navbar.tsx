@@ -45,16 +45,12 @@ export function Navbar() {
             >
               How It Works
             </a>
-            <Link
-              to="/about"
-              className={`text-[11px] xl:text-xs uppercase tracking-wider font-label-sm transition-colors whitespace-nowrap ${
-                location.pathname === "/about"
-                  ? "text-white font-medium"
-                  : "text-[#94a3b8] hover:text-white"
-              }`}
+            <a
+              href="/#locations"
+              className="text-[11px] xl:text-xs uppercase tracking-wider font-label-sm text-[#94a3b8] hover:text-white transition-colors whitespace-nowrap"
             >
-              About Us
-            </Link>
+              Neighborhoods
+            </a>
             <a
               href="/#why-us"
               className="text-[11px] xl:text-xs uppercase tracking-wider font-label-sm text-[#94a3b8] hover:text-white transition-colors whitespace-nowrap"

@@ -7,6 +7,7 @@ interface AreaStatResponse {
   name: string;
   listing_count: number;
   min_rent: number | null;
+  image_url: string | null;
 }
 
 interface AreaItem {
@@ -124,7 +125,7 @@ export function PopularLocations() {
                 ? `৳${Number(area.min_rent).toLocaleString()}`
                 : "Contact for price",
             description: editorial.description,
-            imageUrl: editorial.imageUrl,
+            imageUrl: area.image_url || editorial.imageUrl,
           };
         });
         setLocations(formatted);
