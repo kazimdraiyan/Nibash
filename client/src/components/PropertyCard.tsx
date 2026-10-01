@@ -303,7 +303,7 @@ export function PropertyCard({
         </div>
 
         {/* Bottom CTA Row */}
-        <div className="flex items-center justify-between pt-1 border-t border-white/5">
+        <div className="flex items-center justify-between pt-1">
           {hasRating ? (
             <div className="flex items-center gap-1 text-xs text-[#d4b068]">
               <span>★</span>
