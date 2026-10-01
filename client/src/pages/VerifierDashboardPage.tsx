@@ -207,7 +207,7 @@ export function VerifierDashboardPage() {
             Verifier Intelligence <span className="font-serif italic font-normal text-silver-gradient-text">Dashboard</span>
           </h1>
           <p className="text-sm sm:text-base text-[#94a3b8] mt-2 max-w-2xl leading-relaxed">
-            Real-time platform metrics, growth velocity, and integrity signals to assist verifiers in maintaining listing quality and authenticity.
+            Real-time platform metrics, growth velocity, and integrity signals.
           </p>
         </div>
 
@@ -361,7 +361,7 @@ export function VerifierDashboardPage() {
         </div>
 
         {/* SVG Chart Container — Fixed Vertical Squeeze with h-80/h-96 */}
-        <div className="bg-[#111214] border border-white/10 rounded-2xl p-6 sm:p-8">
+        <div className="bg-[#111214] border border-white/10 rounded-2xl">
           {chartPoints.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-slate-500 text-xs">
               No historical data available in the last 8 weeks.
@@ -371,8 +371,7 @@ export function VerifierDashboardPage() {
               <div className="min-w-[650px]">
                 <svg
                   viewBox="0 0 800 360"
-                  className="w-full h-80 sm:h-96 overflow-visible"
-                  preserveAspectRatio="none"
+                  className="w-full max-h-120 overflow-visible"
                 >
                   <defs>
                     <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
