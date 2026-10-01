@@ -2,30 +2,27 @@ export function HowItWorks() {
   const steps = [
     {
       step: "01",
-      title: "Search & Curate",
-      subtitle: "Filter verified apartments tailored to your lifestyle",
+      title: "Search",
       description:
-        "Browse high-definition architectural photography, precise floor plans, verified pricing breakdown, and 3D virtual walkthroughs without misleading advertisements.",
+        "Browse verified apartments, with images and pricing breakdown, without misleading advertisements.",
       icon: "travel_explore",
-      highlight: "100% Authentic Imagery",
+      highlight: "Authentic Imagery",
     },
     {
       step: "02",
-      title: "Inspect & Apply",
-      subtitle: "Seamless private viewings & verified identity",
+      title: "Apply",
       description:
-        "Book private viewings with our dedicated leasing concierge and submit rental applications verified via secure National ID (NID) integration.",
+        "Apply to your favorite apartment, negotiate with the owner on WhatsApp",
       icon: "fingerprint",
-      highlight: "NID-Protected Identity",
+      highlight: "Negotiable",
     },
     {
       step: "03",
       title: "Sign & Move In",
-      subtitle: "Legally structured online agreements & escrow",
       description:
-        "Execute government-compliant digital tenancy contracts with electronic signatures, instant rent receipts, and security deposit escrow safeguards.",
+        "Execute government-compliant digital tenancy contracts with electronic signatures and instant rent receipts",
       icon: "history_edu",
-      highlight: "Instant Digital Contracts",
+      highlight: "Digital Contracts",
     },
   ];
 
@@ -44,7 +41,7 @@ export function HowItWorks() {
             </span>
           </h2>
           <p className="text-[#94a3b8] text-base leading-relaxed">
-            From discovering your ideal sanctuary to signing legal agreements,
+            From discovering your ideal home to signing legal agreements,
             we have elevated every step of residential leasing.
           </p>
         </div>
@@ -75,9 +72,6 @@ export function HowItWorks() {
                 <h3 className="text-xl font-medium text-white mb-2 group-hover:text-[#e2e8f0] transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-xs font-label-sm uppercase tracking-wider text-[#cbd5e1] mb-4">
-                  {item.subtitle}
-                </p>
                 <p className="text-sm text-[#94a3b8] leading-relaxed mb-6 font-normal">
                   {item.description}
                 </p>
@@ -86,11 +80,7 @@ export function HowItWorks() {
               {/* Bottom pill */}
               <div className="pt-4 border-t border-white/5 flex items-center justify-between">
                 <span className="text-xs text-[#94a3b8] flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068]" />
                   {item.highlight}
-                </span>
-                <span className="material-symbols-outlined text-sm text-[#cbd5e1] opacity-0 group-hover:opacity-100 transition-opacity">
-                  check_circle
                 </span>
               </div>
             </div>

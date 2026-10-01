@@ -58,13 +58,6 @@ export function LoginPage() {
           {/* Left Column: Branding Panel */}
           <div className="lg:col-span-5 hidden lg:flex flex-col justify-between p-8 sm:p-10 rounded-2xl border border-slate-800 bg-[#12151c]">
             <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-800 border border-slate-700 mb-6 w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068] animate-pulse" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#cbd5e1] font-label-sm font-medium">
-                  Resident & Owner Portal
-                </span>
-              </div>
-
               <h2 className="text-3xl lg:text-4xl font-light text-white tracking-tight leading-snug mb-4">
                 Welcome back to{" "}
                 <span className="font-serif italic font-normal text-silver-gradient-text block sm:inline">
@@ -72,9 +65,8 @@ export function LoginPage() {
                 </span>
               </h2>
 
-              <p className="text-sm text-[#94a3b8] leading-relaxed max-w-sm font-normal">
-                Access your curated luxury apartments, oversee legally structured digital contracts,
-                and manage verified rental leases with seamless bank-grade protection.
+              <p className="text-m text-[#94a3b8] leading-relaxed max-w-sm">
+                Access and manage all your apartments from one place. Oversee legally structured digital contracts, track rental agreements and lease terms, monitor payments and due dates, and keep your rental operations organized throughout the entire leasing process.
               </p>
             </div>
 
@@ -82,26 +74,17 @@ export function LoginPage() {
             <div className="pt-8 mt-8 border-t border-slate-800">
               <div className="grid grid-cols-2 gap-6">
                 <div>
+                  {/* // TODO: Query needed */}
                   <span className="block font-serif text-3xl text-white font-light">1,200+</span>
                   <span className="text-[11px] uppercase tracking-widest text-[#94a3b8] font-label-sm mt-1 block">
                     Verified Apartments
                   </span>
                 </div>
                 <div>
-                  <span className="block font-serif text-3xl text-white font-light">25+</span>
+                  <span className="block font-serif text-3xl text-white font-light">12+</span>
                   <span className="text-[11px] uppercase tracking-widest text-[#94a3b8] font-label-sm mt-1 block">
-                    Prime Neighborhoods
+                    Areas Covered
                   </span>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-[#d4b068] shrink-0">
-                  <span className="material-symbols-outlined text-xl">verified_user</span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-white">Bank-Grade Verification</p>
-                  <p className="text-[11px] text-[#94a3b8]">256-bit encrypted authentication & NID checks</p>
                 </div>
               </div>
             </div>
@@ -119,7 +102,7 @@ export function LoginPage() {
                   </span>
                 </h1>
                 <p className="text-xs text-[#94a3b8] mt-1.5 font-normal">
-                  Enter your verified credentials to continue to your dashboard
+                  Enter your credentials to continue to your dashboard
                 </p>
               </div>
 
@@ -153,7 +136,7 @@ export function LoginPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. resident@nibash.com"
+                      placeholder="Enter your email"
                       className="w-full bg-[#090a0c] text-white border border-slate-700 rounded-xl py-3.5 pl-11 pr-4 text-sm font-medium focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all placeholder:text-slate-600"
                     />
                   </div>

@@ -15,13 +15,6 @@ export function CallToAction() {
           <div className="pointer-events-none absolute inset-0 opacity-[0.04] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:32px_32px]" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center gap-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel-subtle border border-white/10">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068] animate-ping" />
-              <span className="font-label-sm text-[11px] uppercase tracking-[0.2em] text-[#cbd5e1]">
-                Start Your Journey
-              </span>
-            </div>
-
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-tight leading-tight">
               Ready to Experience{" "}
               <span className="font-serif italic font-normal text-silver-gradient-text block sm:inline">

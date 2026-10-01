@@ -89,33 +89,26 @@ export function RegisterPage() {
             <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 mb-6 w-fit shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068] animate-pulse" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#cbd5e1] font-label-sm font-medium">
-                  Verified Membership
-                </span>
-              </div>
-
               <h2 className="text-3xl lg:text-4xl font-light text-white tracking-tight leading-snug mb-4">
                 Join <span className="font-serif italic font-normal text-silver-gradient-text">Nibash</span>
               </h2>
 
               <p className="text-sm text-[#94a3b8] leading-relaxed mb-6 font-normal">
-                Register as a resident or property owner to discover, lease, and manage premium properties across Bangladesh.
+                Register as a resident or property owner to discover, lease, and manage properties across Bangladesh.
               </p>
             </div>
 
             <div className="relative z-10 flex flex-col gap-5 pt-6 border-t border-white/10">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[#d4b068] shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="material-symbols-outlined text-lg">verified_user</span>
                 </div>
                 <div>
                   <span className="block text-sm font-semibold text-white">
-                    NID Authentication
+                    Verified apartments
                   </span>
                   <span className="text-xs text-[#94a3b8] leading-relaxed">
-                    Verified national identification prevents impersonation and double-listings.
+                    Apartment verification to prevent fraud.
                   </span>
                 </div>
               </div>
@@ -129,7 +122,7 @@ export function RegisterPage() {
                     Digital Contracts
                   </span>
                   <span className="text-xs text-[#94a3b8] leading-relaxed">
-                    Legally structured online lease agreements with verifiable digital records.
+                    Legally structured online lease agreements with digital records.
                   </span>
                 </div>
               </div>
@@ -162,7 +155,7 @@ export function RegisterPage() {
                   Create Your <span className="font-serif italic font-normal text-silver-gradient-text">Account</span>
                 </h1>
                 <p className="text-xs text-[#94a3b8] mt-1.5 font-normal">
-                  Fill in your official credentials to establish your verified Nibash profile
+                  Fill in your official credentials to establish your Nibash profile
                 </p>
               </div>
 
@@ -220,7 +213,7 @@ export function RegisterPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="e.g. user@domain.com"
+                        placeholder="Enter your email"
                         className="w-full bg-[#090a0c]/90 text-white border border-white/20 rounded-xl py-3 pl-11 pr-4 text-sm font-medium focus:outline-none focus:border-white/70 focus:ring-1 focus:ring-white/40 transition-all placeholder:text-[#64748b] shadow-inner"
                       />
                     </div>
@@ -313,7 +306,7 @@ export function RegisterPage() {
                 </div>
 
                 {/* Agreement Checkbox */}
-                <div className="flex items-start gap-2.5 py-1">
+                {/* <div className="flex items-start gap-2.5 py-1">
                   <input
                     id="reg-terms"
                     type="checkbox"
@@ -329,7 +322,7 @@ export function RegisterPage() {
                     <span className="text-white underline">Nibash Terms of Service</span> and{" "}
                     <span className="text-white underline">Privacy Policy</span>.
                   </label>
-                </div>
+                </div> */}
 
                 {/* Submit Button */}
                 <button

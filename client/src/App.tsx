@@ -19,7 +19,7 @@ import { MyContractPage } from "./pages/MyContractPage";
 import { StarredListingsPage } from "./pages/StarredListingsPage";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { ActualListings } from "./components/ActualListings";
+import { ActualListings } from "./components/Listings";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { VerifyPortalPage } from "./pages/VerifyPortalPage";

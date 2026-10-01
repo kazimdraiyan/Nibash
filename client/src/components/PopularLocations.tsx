@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
+// TODO: Query needed to fetch areas ordered by listing count desc
 export function PopularLocations() {
   const navigate = useNavigate();
   const locations = [
     {
-      name: "Gulshan 1 & 2",
-      city: "Dhaka North",
+      name: "Gulshan",
       listingsCount: 142,
       priceFrom: "৳75,000",
       description: "Diplomatic enclaves, fine dining, and elite high-rise penthouses.",
@@ -68,16 +68,10 @@ export function PopularLocations() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel-subtle border border-white/10 mb-3.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068]" />
-              <span className="font-label-sm text-[11px] uppercase tracking-[0.2em] text-[#cbd5e1]">
-                Prime Neighborhoods
-              </span>
-            </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#f8f9fa] tracking-tight">
               Explore By{" "}
               <span className="font-serif italic font-normal text-silver-gradient-text">
-                Prestigious Location
+                Location
               </span>
             </h2>
             <p className="text-[#94a3b8] text-sm md:text-base max-w-xl mt-2 font-normal">
@@ -116,9 +110,6 @@ export function PopularLocations() {
 
               {/* Top Meta Badges */}
               <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-10">
-                <span className="glass-panel-subtle px-3 py-1 rounded-full text-xs font-label-sm uppercase tracking-wider text-white/90 border border-white/15">
-                  {loc.city}
-                </span>
                 <span className="glass-panel-silver px-3 py-1 rounded-full text-xs font-label-sm font-semibold text-[#f8fafc] border border-white/20">
                   {loc.listingsCount} Apartments
                 </span>

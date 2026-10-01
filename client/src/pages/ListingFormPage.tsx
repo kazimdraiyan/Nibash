@@ -12,49 +12,42 @@ const DOCUMENT_TYPES = [
     id: "electricity_bill_receipt",
     label: "Electricity Bill Receipt",
     shortLabel: "Electricity Bill",
-    icon: "⚡",
     hint: "Recent DPDC, DESCO, or NESCO bill receipt",
   },
   {
     id: "holding_tax_receipt",
     label: "Holding Tax Receipt",
     shortLabel: "Holding Tax",
-    icon: "🏛",
     hint: "City Corporation holding tax payment challan",
   },
   {
     id: "water_bill_receipt",
     label: "Water Bill (WASA)",
     shortLabel: "Water Bill",
-    icon: "💧",
     hint: "Recent DWASA bill receipt or bank stamp",
   },
   {
     id: "trade_license",
     label: "Trade License",
     shortLabel: "Trade License",
-    icon: "📋",
     hint: "Valid business or municipal trade license copy",
   },
   {
     id: "nid",
     label: "National ID (NID)",
     shortLabel: "NID Card",
-    icon: "🪪",
     hint: "Clear photo or scan of front and back of NID",
   },
   {
     id: "passport",
     label: "Passport",
     shortLabel: "Passport",
-    icon: "🛂",
     hint: "Information page and validity stamp",
   },
   {
     id: "driving_license",
     label: "Driving License",
     shortLabel: "Driving License",
-    icon: "🚗",
     hint: "BRTA smart driving license front and back",
   },
 ] as const;
@@ -460,23 +453,10 @@ export function ListingFormPage() {
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
-      <div className="mb-6">
-        <Link
-          to="/listings"
-          className="text-xs text-slate-400 hover:text-white"
-        >
-          ← Back to Listings
-        </Link>
-      </div>
-
       <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-white mb-1">
+        <h1 className="text-2xl font-bold text-white mb-6">
           {isEdit ? "Edit Property Listing" : "Create New Apartment Listing"}
         </h1>
-        <p className="text-xs text-slate-400 mb-6">
-          Fill in the architectural specifications and monthly lease financial
-          terms.
-        </p>
 
         {error && (
           <div className="p-3 mb-6 rounded bg-red-950/60 border border-red-800 text-red-300 text-xs">
@@ -488,7 +468,7 @@ export function ListingFormPage() {
           {/* Section 1: Basic Information */}
           <div>
             <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 border-b border-slate-800 pb-1">
-              1. Apartment Details
+              Apartment Details
             </h2>
 
             <div className="flex flex-col gap-4">
@@ -505,7 +485,7 @@ export function ListingFormPage() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. The Imperial Apartment, Road 79"
+                  placeholder="The Imperial Apartment, Road 79"
                   className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                 />
               </div>
@@ -547,24 +527,9 @@ export function ListingFormPage() {
                     required
                     value={rent}
                     onChange={(e) => setRent(e.target.value)}
-                    placeholder="e.g. 35000"
                     className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase font-medium text-slate-300 mb-1">
-                  Location *
-                </label>
-                <LocationPicker
-                  latitude={latitude}
-                  longitude={longitude}
-                  onChange={(lat, lng) => {
-                    setLatitude(lat);
-                    setLongitude(lng);
-                  }}
-                />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -620,6 +585,20 @@ export function ListingFormPage() {
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-xs uppercase font-medium text-slate-300 mb-1">
+                  Location *
+                </label>
+                <LocationPicker
+                  latitude={latitude}
+                  longitude={longitude}
+                  onChange={(lat, lng) => {
+                    setLatitude(lat);
+                    setLongitude(lng);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -650,9 +629,6 @@ export function ListingFormPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-                <span>
-                  {showAdditionalTerms ? "Collapse" : "Expand to Add"}
-                </span>
                 <span
                   className={`material-symbols-outlined text-lg transition-transform duration-200 ${
                     showAdditionalTerms ? "rotate-180" : ""
@@ -673,16 +649,86 @@ export function ListingFormPage() {
                     >
                       Security Deposit (BDT)
                     </label>
-                    <input
-                      id="terms-deposit"
-                      type="number"
-                      min="0"
-                      step="500"
-                      value={securityDeposit}
-                      onChange={(e) => setSecurityDeposit(e.target.value)}
-                      placeholder="e.g. 70000 (Optional)"
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
+                        ৳
+                      </span>
+                      <input
+                        id="terms-deposit"
+                        type="number"
+                        min="0"
+                        step="500"
+                        value={securityDeposit}
+                        onChange={(e) => setSecurityDeposit(e.target.value)}
+                        className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-electricity"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Electricity Bill Est. (BDT)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
+                        ৳
+                      </span>
+                      <input
+                        id="terms-electricity"
+                        type="number"
+                        min="0"
+                        value={electricityBill}
+                        onChange={(e) => setElectricityBill(e.target.value)}
+                        className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-water"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Water Bill (BDT)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
+                        ৳
+                      </span>
+                      <input
+                        id="terms-water"
+                        type="number"
+                        min="0"
+                        value={waterBill}
+                        onChange={(e) => setWaterBill(e.target.value)}
+                        className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="terms-service"
+                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
+                    >
+                      Service Charge (BDT)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">
+                        ৳
+                      </span>
+                      <input
+                        id="terms-service"
+                        type="number"
+                        min="0"
+                        value={serviceCharge}
+                        onChange={(e) => setServiceCharge(e.target.value)}
+                        className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg pl-8 pr-3.5 py-2.5 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -699,61 +745,7 @@ export function ListingFormPage() {
                       max="28"
                       value={monthlyDueDate}
                       onChange={(e) => setMonthlyDueDate(e.target.value)}
-                      placeholder="e.g. 5 (Optional)"
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="terms-electricity"
-                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                    >
-                      Electricity Bill Est. (BDT)
-                    </label>
-                    <input
-                      id="terms-electricity"
-                      type="number"
-                      min="0"
-                      value={electricityBill}
-                      onChange={(e) => setElectricityBill(e.target.value)}
-                      placeholder="e.g. 3500 (Optional)"
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="terms-water"
-                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                    >
-                      Water Bill (BDT)
-                    </label>
-                    <input
-                      id="terms-water"
-                      type="number"
-                      min="0"
-                      value={waterBill}
-                      onChange={(e) => setWaterBill(e.target.value)}
-                      placeholder="e.g. 1200 (Optional)"
-                      className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="terms-service"
-                      className="block text-xs uppercase font-medium text-slate-300 mb-1"
-                    >
-                      Service Charge (BDT)
-                    </label>
-                    <input
-                      id="terms-service"
-                      type="number"
-                      min="0"
-                      value={serviceCharge}
-                      onChange={(e) => setServiceCharge(e.target.value)}
-                      placeholder="e.g. 5000 (Optional)"
+                      placeholder="5"
                       className="w-full bg-[#0d1017] text-white border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 placeholder:text-slate-500"
                     />
                   </div>
@@ -782,7 +774,7 @@ export function ListingFormPage() {
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
               <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
-                3. Amenities & Facilities
+                Amenities
               </h2>
               <span className="text-[11px] font-mono text-slate-500">
                 {selectedAmenities.length} selected
@@ -847,7 +839,7 @@ export function ListingFormPage() {
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
               <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
-                4. Property Media & Photos
+                Photos
               </h2>
               <span className="text-[11px] font-mono text-slate-500">
                 {images.length} / 10 selected
@@ -1066,7 +1058,6 @@ export function ListingFormPage() {
             )}
 
             <p className="mt-3 text-[11px] text-slate-400 leading-relaxed flex items-center gap-1.5">
-              <span className="text-amber-400">💡</span>
               <span>
                 Tip: Clean, well-lit photos of the interior and view make your
                 listing stand out to prospective tenants.
@@ -1079,11 +1070,8 @@ export function ListingFormPage() {
               <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-xs uppercase font-mono tracking-wider text-slate-400">
-                    5. Verification Documents
+                    Verification Documents
                   </h2>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                    Optional
-                  </span>
                 </div>
                 <span className="text-[11px] font-mono text-slate-500">
                   {stagedDocs.length}{" "}
@@ -1091,9 +1079,8 @@ export function ListingFormPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mb-4">
-                Attach proof documents (utility receipts, holding tax, trade
-                license, NID) for the verification team. Verified listings gain
-                trust and rank higher.
+                Attach proof documents for the verification team. Verified
+                listings gain trust and rank higher.
               </p>
 
               {/* Quick Type Selection Pills */}
@@ -1114,7 +1101,6 @@ export function ListingFormPage() {
                           : "bg-[#0d1017] border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
                       }`}
                     >
-                      <span>{dt.icon}</span>
                       <span>{dt.shortLabel}</span>
                       {count > 0 && (
                         <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
@@ -1138,9 +1124,6 @@ export function ListingFormPage() {
                   <div className="bg-[#0d1017] border border-slate-800 rounded-xl p-3.5 mb-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-base">
-                          {currentTypeInfo.icon}
-                        </span>
                         <span className="text-xs font-semibold text-white">
                           {currentTypeInfo.label}
                         </span>
@@ -1150,7 +1133,6 @@ export function ListingFormPage() {
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                      <span className="text-amber-400">💡</span>
                       <span>{currentTypeInfo.hint}</span>
                     </p>
                   </div>
@@ -1255,7 +1237,6 @@ export function ListingFormPage() {
                       >
                         <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800/80">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm">{dt.icon}</span>
                             <span className="text-xs font-semibold text-white">
                               {dt.label}
                             </span>

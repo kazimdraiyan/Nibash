@@ -12,6 +12,7 @@ export function Hero() {
   const [maxRent, setMaxRent] = useState("all");
 
   // The 3 showcase properties
+  // TODO: Query needed
   const showcaseItems = mockListings.slice(0, 3);
   const itemCount = showcaseItems.length;
 
@@ -66,7 +67,7 @@ export function Hero() {
       if (diff === -2) diff = 1;
       setActiveIndex((prev) => prev + diff);
     },
-    [activeIndex, itemCount]
+    [activeIndex, itemCount],
   );
 
   // Continuous auto-swipe every 4.5 seconds with rock-solid timer cleanup
@@ -119,7 +120,6 @@ export function Hero() {
   // Stable 7-slot offset window centered around activeIndex: [-3, -2, -1, 0, 1, 2, 3]
   const windowOffsets = [-3, -2, -1, 0, 1, 2, 3];
 
-
   return (
     <div className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#090a0c] pt-8 pb-20">
       {/* Ambient background glows with subtle silver and cool metallic radial gradients */}
@@ -143,8 +143,8 @@ export function Hero() {
 
           {/* Subtitle */}
           <p className="text-base sm:text-lg text-[#94a3b8] max-w-xl font-normal leading-relaxed">
-            Discover and rent handpicked luxury apartments, panoramic sky penthouses,
-            and bespoke homes with verified authenticity and seamless digital contracts.
+            Discover and rent apartments, with verified authenticity and
+            seamless digital contracts.
           </p>
 
           {/* Prominent Glass-style Property Search Component */}
@@ -155,26 +155,25 @@ export function Hero() {
             {/* Subtle silver top border highlight */}
             <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {/* Query Text Input */}
-              <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="material-symbols-outlined text-sm text-[#cbd5e1]">
-                    search
-                  </span>
-                  <span className="font-label-sm text-[11px] uppercase tracking-wider text-[#94a3b8]">
-                    Keywords
-                  </span>
-                </div>
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="e.g. South facing, spacious..."
-                  className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none placeholder:text-slate-500"
-                />
+            {/* Query Text Input */}
+            <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="material-symbols-outlined text-sm text-[#cbd5e1]">
+                  search
+                </span>
+                <span className="font-label-sm text-[11px] uppercase tracking-wider text-[#94a3b8]">
+                  Keywords
+                </span>
               </div>
-
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="South facing, spacious..."
+                className="w-full bg-transparent text-sm font-medium text-[#f8f9fa] focus:outline-none placeholder:text-slate-500"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
               {/* Area / Location Selector */}
               <div className="glass-panel-subtle rounded-xl p-3 hover:border-white/30 transition-colors group">
                 <div className="flex items-center gap-2 mb-1">
@@ -194,7 +193,11 @@ export function Hero() {
                     All Areas
                   </option>
                   {DHAKA_AREAS.map((area) => (
-                    <option key={area.id} value={area.name} className="bg-[#12151c] text-white">
+                    <option
+                      key={area.id}
+                      value={area.name}
+                      className="bg-[#12151c] text-white"
+                    >
                       {area.name}
                     </option>
                   ))}
@@ -275,10 +278,21 @@ export function Hero() {
                   </option>
                 </select>
               </div>
+
+              {/* Luminous Silver CTA with Subtle Gold Glow on Hover */}
+              <button
+                type="submit"
+                className="w-full sm:w-auto h-15 glass-button-silver py-3.5 px-6 rounded-xl flex items-center justify-center gap-2.5 cursor-pointer font-label-sm text-xs uppercase tracking-widest"
+              >
+                <span className="material-symbols-outlined text-lg">
+                  search
+                </span>
+                <span>Search</span>
+              </button>
             </div>
 
             {/* Bottom row: Search CTA and Quick Trending Chips */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+            {/* <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
               <div className="flex items-center gap-2 text-xs text-[#94a3b8] overflow-x-auto w-full sm:w-auto">
                 <span className="text-[#cbd5e1] font-medium">Trending Areas:</span>
                 <button
@@ -305,22 +319,14 @@ export function Hero() {
                   Dhanmondi
                 </button>
               </div>
-
-              {/* Luminous Silver CTA with Subtle Gold Glow on Hover */}
-              <button
-                type="submit"
-                className="w-full sm:w-auto min-w-[160px] glass-button-silver py-3.5 px-6 rounded-xl flex items-center justify-center gap-2.5 cursor-pointer font-label-sm text-xs uppercase tracking-widest"
-              >
-                <span className="material-symbols-outlined text-lg">search</span>
-                <span>Search Homes</span>
-              </button>
-            </div>
+            </div> */}
           </form>
 
           {/* Social Proof / Metrics Row */}
           <div className="grid grid-cols-3 gap-6 pt-2 border-t border-white/10">
             <div>
               <div className="text-2xl lg:text-3xl font-light text-[#f8f9fa] font-serif">
+                {/* // TODO: Query needed  */}
                 1,200<span className="text-[#cbd5e1] font-sans">+</span>
               </div>
               <p className="text-xs text-[#94a3b8] uppercase tracking-wider font-label-sm mt-0.5">
@@ -337,10 +343,10 @@ export function Hero() {
             </div>
             <div>
               <div className="text-2xl lg:text-3xl font-light text-[#f8f9fa] font-serif">
-                4.96<span className="text-[#d4b068] text-xl ml-1">★</span>
+                12<span className="text-[#cbd5e1] font-sans">+</span>
               </div>
               <p className="text-xs text-[#94a3b8] uppercase tracking-wider font-label-sm mt-0.5">
-                Tenant Satisfaction
+                Areas Covered
               </p>
             </div>
           </div>
@@ -377,7 +383,8 @@ export function Hero() {
               {/* Continuous, Indestructible Relative-Offset Horizontal Slider */}
               {windowOffsets.map((relOffset) => {
                 const k = activeIndex + relOffset;
-                const listing = showcaseItems[((k % itemCount) + itemCount) % itemCount];
+                const listing =
+                  showcaseItems[((k % itemCount) + itemCount) % itemCount];
                 const isCenter = relOffset === 0;
                 const isVisible = Math.abs(relOffset) <= 1;
 
@@ -540,6 +547,3 @@ export function Hero() {
     </div>
   );
 }
-
-
-

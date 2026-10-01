@@ -168,11 +168,8 @@ export function PropertyCard({
         {/* Top Badges */}
         <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
           <div className="flex items-center gap-2">
-            {isOwner && (
+            {/* {isOwner && (
               <>
-                <span className="glass-panel-subtle px-3 py-1 rounded-full text-[11px] font-label-sm uppercase tracking-wider text-[#d4b068] border border-[#d4b068]/40 shadow-md">
-                  Your Listing
-                </span>
                 <span
                   className={`glass-panel-subtle px-3 py-1 rounded-full text-[11px] font-label-sm uppercase tracking-wider shadow-md flex items-center gap-1.5 border ${
                     isApproved
@@ -194,7 +191,7 @@ export function PropertyCard({
                   Status: {statusDisplay}
                 </span>
               </>
-            )}
+            )} */}
             {!isOwner && user?.is_verifier && isWaiting && (
               <span className="glass-panel-subtle px-3 py-1 rounded-full text-[11px] font-label-sm uppercase tracking-wider shadow-md flex items-center gap-1.5 border text-amber-300 border-amber-500/40 bg-amber-950/50">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -222,8 +219,8 @@ export function PropertyCard({
             )}
           </div>
 
-          {/* Star Button — only for logged-in non-owners */}
-          {user && !isOwner && (
+          {/* Star Button - only for logged-in users */}
+          {user && (
             <button
               type="button"
               onClick={async (e) => {
@@ -259,9 +256,6 @@ export function PropertyCard({
         {/* Floating Quick Price Tag */}
         {priceFormatted && (
           <div className="absolute bottom-3 left-3.5 z-10">
-            <div className="text-[10px] text-[#94a3b8] font-label-sm uppercase tracking-wider mb-0.5">
-              Monthly Rent
-            </div>
             <div className="text-2xl font-serif text-white font-normal flex items-baseline gap-1">
               <span>{priceFormatted}</span>
               <span className="text-xs text-[#94a3b8] font-sans">/mo</span>
@@ -287,23 +281,23 @@ export function PropertyCard({
         {/* Specs Grid */}
         <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-xl glass-panel-subtle border border-white/5 text-center">
           <div className="flex flex-col items-center">
-            <span className="text-xs font-semibold text-white">{beds}</span>
+            <span className="text-s font-semibold text-white">{beds}</span>
             <span className="text-[10px] uppercase font-label-sm text-[#94a3b8]">
               Bedrooms
             </span>
           </div>
           <div className="flex flex-col items-center border-x border-white/10">
-            <span className="text-xs font-semibold text-white">{baths}</span>
+            <span className="text-s font-semibold text-white">{baths}</span>
             <span className="text-[10px] uppercase font-label-sm text-[#94a3b8]">
               Baths
             </span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-xs font-semibold text-white">
-              {sqft ? `${sqft} sqft` : floor ? `Floor ${floor}` : "Standard"}
+            <span className="text-s font-semibold text-white">
+              {floor}
             </span>
             <span className="text-[10px] uppercase font-label-sm text-[#94a3b8]">
-              {sqft ? "Sq Ft" : "Floor Level"}
+              {sqft ? "Sq Ft" : "Floor"}
             </span>
           </div>
         </div>
@@ -356,7 +350,7 @@ export function PropertyCard({
                       : "bg-slate-400"
                   }`}
                 />
-                <span>Status: {statusDisplay}</span>
+                <span>{statusDisplay}</span>
               </span>
             ) : isUserApplied ? (
               <button

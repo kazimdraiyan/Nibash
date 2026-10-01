@@ -61,7 +61,9 @@ export function ActualListings() {
   useEffect(() => {
     async function fetchListings() {
       try {
-        const data = await apiClient.get<{ listings: BackendListing[] }>("/listings");
+        const data = await apiClient.get<{ listings: BackendListing[] }>(
+          "/listings",
+        );
         setListings(data.listings || []);
       } catch (err: any) {
         setError(err.message || "Failed to load listings.");
@@ -77,7 +79,9 @@ export function ActualListings() {
     async function fetchMyListings() {
       if (!token) return;
       try {
-        const data = await apiClient.get<{ listings: BackendListing[] }>("/listings/my");
+        const data = await apiClient.get<{ listings: BackendListing[] }>(
+          "/listings/my",
+        );
         setMyListings(data.listings || []);
       } catch (err: any) {
         console.error("Failed to load user's listings:", err);
@@ -117,7 +121,9 @@ export function ActualListings() {
       <section id="featured-properties" className="py-20 bg-[#090a0c]">
         <div className="max-w-[1440px] mx-auto px-container-padding text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Apartments</h2>
-          <p className="text-sm text-slate-400">No approved apartments from the database yet.</p>
+          <p className="text-sm text-slate-400">
+            No approved apartments from the database yet.
+          </p>
         </div>
       </section>
     );
@@ -134,34 +140,27 @@ export function ActualListings() {
     : listings;
 
   return (
-    <section id="featured-properties" className="py-20 bg-[#090a0c] border-t border-slate-800">
+    <section
+      id="featured-properties"
+      className="py-20 bg-[#090a0c] border-t border-slate-800"
+    >
       <div className="max-w-[1440px] mx-auto px-container-padding">
-        {/* Section Header - Removed "Live from database" chip */}
-        <div className="mb-10">
-          <h2 className="text-3xl font-bold text-white mb-1">Available Apartments</h2>
-          <p className="text-sm text-slate-400">
-            Approved properties fetched from the backend.
-          </p>
-        </div>
+        <h2 className="text-3xl mb-10 md:text-4xl lg:text-5xl font-light text-[#f8f9fa] tracking-tight">
+          Browse Apartments
+        </h2>
 
         {/* My Listings - Only appears when user is logged in */}
         {Boolean(token && user) && (
           <div className="mb-12">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-[#d4b068]">
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
                   My Listings
                 </h3>
                 <span className="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
                   {myListings.length}
                 </span>
               </div>
-              <Link
-                to="/listings/new"
-                className="text-xs text-slate-400 hover:text-white transition"
-              >
-                + Post New
-              </Link>
             </div>
 
             {myListings.length > 0 ? (
@@ -178,10 +177,12 @@ export function ActualListings() {
               </div>
             ) : (
               <div className="border border-dashed border-slate-800 bg-[#12151c]/40 rounded-xl p-6 text-center">
-                <p className="text-xs text-slate-400 mb-2">You haven't posted any property listings yet.</p>
+                <p className="text-xs text-slate-400 mb-2">
+                  You haven't posted any property listings yet.
+                </p>
                 <Link
                   to="/listings/new"
-                  className="inline-block bg-white text-slate-900 font-medium px-3.5 py-1.5 rounded-lg text-xs hover:bg-slate-200 transition"
+                  className="inline-block bg-white text-slate-900 font-medium px-3.5 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-[11px] xl:text-xs uppercase tracking-wider font-label-sm glass-button-silver text-[#090a0c] font-semibold hover:scale-105 transition-all shadow-sm cursor-pointer whitespace-nowrap"
                 >
                   Post an Apartment
                 </Link>
@@ -205,7 +206,9 @@ export function ActualListings() {
           {publicListings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {publicListings.map((item) => {
-                const isApplied = Boolean(user && hasUserApplied(user.id, item.id));
+                const isApplied = Boolean(
+                  user && hasUserApplied(user.id, item.id),
+                );
                 return (
                   <PropertyCard
                     key={item.id}
@@ -219,7 +222,9 @@ export function ActualListings() {
             </div>
           ) : (
             <div className="text-center py-10 border border-dashed border-slate-800 rounded-xl">
-              <p className="text-xs text-slate-400">No approved public listings available.</p>
+              <p className="text-xs text-slate-400">
+                No approved public listings available.
+              </p>
             </div>
           )}
         </div>
@@ -231,7 +236,9 @@ export function ActualListings() {
           listing={selectedApp.listing}
           application={
             selectedApp.application ||
-            (user ? getUserApplication(user.id, selectedApp.listing.id) : null) || {
+            (user
+              ? getUserApplication(user.id, selectedApp.listing.id)
+              : null) || {
               listingId: selectedApp.listing.id,
               listingTitle: selectedApp.listing.title,
               appliedAt: new Date().toISOString(),

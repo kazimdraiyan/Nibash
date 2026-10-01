@@ -38,12 +38,6 @@ export function WhyChooseUs() {
       <div className="max-w-[1440px] mx-auto px-container-padding relative z-10">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel-subtle border border-white/10 mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068]" />
-            <span className="font-label-sm text-[11px] uppercase tracking-[0.2em] text-[#cbd5e1]">
-              Uncompromising Trust
-            </span>
-          </div>
           <h2 className="text-3xl md:text-5xl font-light text-[#f8f9fa] tracking-tight mb-4">
             Why Discerning Renters{" "}
             <span className="font-serif italic font-normal text-silver-gradient-text">

@@ -23,28 +23,17 @@ export function Footer() {
               <span className="text-2xl font-serif font-bold text-white tracking-wide block leading-none">
                 Nibash
               </span>
-              <span className="text-[9px] uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm block mt-1">
-                Luxury Apartments
-              </span>
             </div>
           </Link>
 
           <p className="text-sm text-[#94a3b8] leading-relaxed max-w-sm font-normal">
             Dhaka's premier residential leasing platform. Redefining modern renting
-            through verified properties, digital contracts, and white-glove security.
+            through verified properties, digital contracts, and security.
           </p>
-
-          <div className="flex items-center gap-3 pt-2">
-            <span className="glass-panel-subtle px-3 py-1 rounded-full text-xs text-[#cbd5e1] border border-white/10">
-              100% NID Verified
-            </span>
-            <span className="glass-panel-subtle px-3 py-1 rounded-full text-xs text-white/80 border border-white/10">
-              Digital Leases
-            </span>
-          </div>
         </div>
 
         {/* Column 2: Apartments */}
+        {/* // TODO: Query needed */}
         <div className="md:col-span-3 flex flex-col gap-4">
           <span className="font-label-sm text-xs uppercase tracking-widest text-[#cbd5e1] font-semibold">
             Featured Areas
@@ -52,27 +41,27 @@ export function Footer() {
           <ul className="flex flex-col gap-2.5 text-sm text-[#94a3b8]">
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Gulshan Diplomatic Enclave
+                Gulshan
               </a>
             </li>
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Banani Lifestyle Suites
+                Banani
               </a>
             </li>
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Dhanmondi Lakeside Apartments
+                Dhanmondi
               </a>
             </li>
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Baridhara DOHS Duplexes
+                Baridhara
               </a>
             </li>
             <li>
               <a href="#featured-properties" className="hover:text-white transition-colors">
-                Bashundhara R/A Penthouses
+                Bashundhara
               </a>
             </li>
           </ul>
@@ -95,22 +84,12 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <a href="#why-us" className="hover:text-white transition-colors">
-                Trust & Verification
-              </a>
-            </li>
-            <li>
               <Link
                 to={token ? "/listings/new" : "/login"}
                 state={!token ? { from: { pathname: "/listings/new" } } : undefined}
                 className="hover:text-white transition-colors"
               >
                 Post a Listing
-              </Link>
-            </li>
-            <li>
-              <Link to="/login" className="hover:text-white transition-colors">
-                Tenant Portal
               </Link>
             </li>
           </ul>
@@ -124,23 +103,18 @@ export function Footer() {
           <ul className="flex flex-col gap-2.5 text-sm text-[#94a3b8]">
             <li>
               <span className="hover:text-white transition-colors cursor-pointer">
-                Terms of Tenancy Service
+                Terms of Service
               </span>
             </li>
             <li>
               <span className="hover:text-white transition-colors cursor-pointer">
-                NID Privacy & Encryption Policy
-              </span>
-            </li>
-            <li>
-              <span className="hover:text-white transition-colors cursor-pointer">
-                Digital Agreement Standards
+                Privacy Policy
               </span>
             </li>
             <li>
               <span className="text-white/80 flex items-center gap-2 mt-2">
                 <span className="material-symbols-outlined text-sm text-[#cbd5e1]">mail</span>
-                concierge@nibash.com
+                support@nibash.com
               </span>
             </li>
           </ul>
@@ -150,7 +124,7 @@ export function Footer() {
       {/* Bottom Copyright Row */}
       <div className="max-w-[1440px] mx-auto px-container-padding pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#94a3b8] font-label-sm">
         <div>
-          © {new Date().getFullYear()} Nibash. All rights reserved. Crafted for modern luxury living.
+          © {new Date().getFullYear()} Nibash. All rights reserved.
         </div>
         <button
           onClick={scrollToTop}

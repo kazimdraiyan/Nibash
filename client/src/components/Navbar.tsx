@@ -23,9 +23,6 @@ export function Navbar() {
             <span className="text-2xl font-serif font-bold text-[#f8f9fa] tracking-wide block leading-none">
               Nibash
             </span>
-            <span className="text-[9px] uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm block mt-1">
-              Luxury Apartments
-            </span>
           </div>
         </Link>
 
@@ -97,11 +94,11 @@ export function Navbar() {
                     to="/my-contract"
                     className={`flex items-center gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-[11px] xl:text-xs uppercase tracking-wider font-label-sm transition-all border cursor-pointer whitespace-nowrap ${
                       location.pathname === "/my-contract" || location.pathname.startsWith("/contracts/")
-                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/40"
+                        ? "bg-white/15 text-white-400 border-white-500/40"
                         : "bg-white/5 text-slate-300 border-white/10 hover:text-white hover:border-white/30 hover:bg-white/10"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-base text-emerald-400">description</span>
+                    <span className="material-symbols-outlined text-base">description</span>
                     <span className="hidden sm:inline">My Contract</span>
                   </Link>
                 )}
@@ -109,11 +106,11 @@ export function Navbar() {
                   to="/my-listings"
                   className={`flex items-center gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-[11px] xl:text-xs uppercase tracking-wider font-label-sm transition-all border cursor-pointer whitespace-nowrap ${
                     location.pathname === "/my-listings"
-                      ? "bg-[#d4b068]/15 text-[#d4b068] border-[#d4b068]/40"
+                      ? "bg-white/15 text-white-400 border-white-500/40"
                       : "bg-white/5 text-slate-300 border-white/10 hover:text-white hover:border-white/30 hover:bg-white/10"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-base text-[#d4b068]">real_estate_agent</span>
+                  <span className="material-symbols-outlined text-base">real_estate_agent</span>
                   <span className="hidden sm:inline">My Listings</span>
                 </Link>
                 <Link
@@ -121,7 +118,7 @@ export function Navbar() {
                   className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-2 rounded-xl text-[11px] xl:text-xs uppercase tracking-wider font-label-sm glass-button-silver text-[#090a0c] font-semibold hover:scale-105 transition-all shadow-sm cursor-pointer whitespace-nowrap"
                 >
                   <span className="material-symbols-outlined text-base">add_circle</span>
-                  <span>Post a Listing</span>
+                  <span>Post an Apartment</span>
                 </Link>
               </>
             )}
