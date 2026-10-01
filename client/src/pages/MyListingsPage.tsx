@@ -313,7 +313,7 @@ export function MyListingsPage() {
             type="button"
             onClick={fetchMyListingsAndApplications}
             disabled={loading}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-700 bg-[#12151c] text-xs font-medium text-slate-300 hover:text-white hover:border-slate-500 transition disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-500/10 text-xs font-medium text-slate-300 hover:bg-slate-500/20  hover:text-white hover:border-slate-500 transition disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
             title="Refresh Listings"
           >
             <span className={`material-symbols-outlined text-sm ${loading ? "animate-spin" : ""}`}>
@@ -324,10 +324,10 @@ export function MyListingsPage() {
 
           <Link
             to="/owner/income"
-            className="px-3.5 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-white text-xs font-semibold uppercase tracking-wider transition text-center flex items-center gap-1.5 shadow-sm cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-slate-500/40 bg-slate-500/10 text-slate-300 hover:bg-slate-500/20 hover:text-white text-xs font-semibold uppercase tracking-wider transition text-center flex items-center gap-1.5 shadow-sm cursor-pointer"
             title="View Rental Income"
           >
-            <span className="material-symbols-outlined text-base text-amber-400">payments</span>
+            <span className="material-symbols-outlined text-base">payments</span>
             <span>Rental Income</span>
           </Link>
         </div>
@@ -382,11 +382,10 @@ export function MyListingsPage() {
           {/* Section 0: Ongoing Contracts (Occupied Listings) */}
           <div>
             <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               <h2 className="text-xl font-bold text-white tracking-tight">
                 Ongoing Contracts
               </h2>
-              <span className="text-xs font-semibold text-emerald-300 bg-emerald-950/70 border border-emerald-600/60 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-slate-300 bg-slate-950/70 border border-slate-600/60 px-2.5 py-0.5 rounded-full">
                 {occupiedListings.length}
               </span>
             </div>
@@ -406,11 +405,10 @@ export function MyListingsPage() {
           {/* Section 1: Waiting for Approval */}
           <div>
             <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
               <h2 className="text-xl font-bold text-white tracking-tight">
                 Waiting for Approval
               </h2>
-              <span className="text-xs font-semibold text-amber-300 bg-amber-950/70 border border-amber-600/60 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-slate-300 bg-slate-950/70 border border-slate-600/60 px-2.5 py-0.5 rounded-full">
                 {waitingListings.length}
               </span>
             </div>
@@ -431,11 +429,10 @@ export function MyListingsPage() {
           {/* Section 2: Approved */}
           <div>
             <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               <h2 className="text-xl font-bold text-white tracking-tight">
                 Approved
               </h2>
-              <span className="text-xs font-semibold text-emerald-300 bg-emerald-950/70 border border-emerald-600/60 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-slate-300 bg-slate-950/70 border border-slate-600/60 px-2.5 py-0.5 rounded-full">
                 {approvedListings.length}
               </span>
             </div>

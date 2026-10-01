@@ -73,17 +73,9 @@ export function ChangePasswordPage() {
   return (
     <div className="min-h-[calc(100vh-80px-240px)] flex items-center justify-center py-12 md:py-20 px-container-padding">
       <div className="max-w-[1280px] mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
           {/* Left Column: Branding Panel */}
-          <div className="lg:col-span-5 hidden lg:flex flex-col justify-between p-8 sm:p-10 rounded-2xl border border-slate-800 bg-[#12151c]">
+          {/* <div className="lg:col-span-5 hidden lg:flex flex-col justify-between p-8 sm:p-10 rounded-2xl border border-slate-800 bg-[#12151c]">
             <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-800 border border-slate-700 mb-6 w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068] animate-pulse" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#cbd5e1] font-label-sm font-medium">
-                  Account Protection
-                </span>
-              </div>
-
               <h2 className="text-3xl lg:text-4xl font-light text-white tracking-tight leading-snug mb-4">
                 Update Your{" "}
                 <span className="font-serif italic font-normal text-silver-gradient-text block sm:inline">
@@ -97,7 +89,6 @@ export function ChangePasswordPage() {
               </p>
             </div>
 
-            {/* Stats & Trust Indicators */}
             <div className="pt-8 mt-8 border-t border-slate-800">
               <div className="grid grid-cols-2 gap-6">
                 <div>
@@ -124,7 +115,7 @@ export function ChangePasswordPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Right Column: Change Password Form */}
           <div className="lg:col-span-7 flex flex-col justify-center">
@@ -301,22 +292,9 @@ export function ChangePasswordPage() {
                   )}
                 </button>
               </form>
-
-              {/* Cancel / Back Link */}
-              <div className="mt-8 text-center pt-6 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="text-xs sm:text-sm text-[#94a3b8] hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1.5"
-                >
-                  <span className="material-symbols-outlined text-base">arrow_back</span>
-                  <span>Back to previous page</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -410,14 +410,6 @@ export function ListingsPage() {
             Real approved properties stored in PostgreSQL database.
           </p>
         </div>
-        {!isVerifier && (
-          <Link
-            to="/listings/new"
-            className="w-full sm:w-auto bg-white text-slate-900 font-medium px-4 py-2.5 rounded-lg text-sm hover:bg-slate-200 transition text-center"
-          >
-            + Post a Listing
-          </Link>
-        )}
       </div>
 
       {/* Comprehensive Search & Filter Widget */}
@@ -654,7 +646,7 @@ export function ListingsPage() {
             <button
               type="button"
               onClick={handleClearAll}
-              className="text-[#d4b068] hover:underline font-medium ml-1 cursor-pointer"
+              className="hover:underline text-slate-400 font-medium ml-1 cursor-pointer"
             >
               Reset all filters
             </button>
@@ -820,19 +812,13 @@ export function ListingsPage() {
             <div className="mb-10">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-[#d4b068]">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest">
                     My Listings
                   </h2>
                   <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
                     {filteredMyListings.length}
                   </span>
                 </div>
-                <Link
-                  to="/listings/new"
-                  className="text-xs text-slate-400 hover:text-white transition"
-                >
-                  + Post New
-                </Link>
               </div>
 
               {filteredMyListings.length > 0 ? (

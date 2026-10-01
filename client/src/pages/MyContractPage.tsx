@@ -49,7 +49,7 @@ export function MyContractPage() {
   return (
     <div className="max-w-2xl mx-auto py-16 px-4 text-center">
       <div className="border border-slate-800 bg-[#12151c] rounded-2xl p-8 sm:p-10 shadow-xl">
-        <div className="w-16 h-16 rounded-2xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 mx-auto mb-5 shadow-inner">
+        <div className="w-16 h-16 rounded-2xl bg-slate-950/60 border border-slate-800/60 flex items-center justify-center text-slate-400 mx-auto mb-5 shadow-inner">
           <span className="material-symbols-outlined text-3xl">description</span>
         </div>
 

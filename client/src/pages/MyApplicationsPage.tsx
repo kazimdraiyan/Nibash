@@ -328,7 +328,7 @@ export function MyApplicationsPage() {
             )}
           </div>
           <p className="text-sm text-slate-400 mt-1">
-            Applications you have submitted as a prospective tenant.
+            Applications you have submitted as a tenant.
           </p>
         </div>
 
@@ -345,13 +345,6 @@ export function MyApplicationsPage() {
             </span>
             <span>Refresh</span>
           </button>
-
-          <Link
-            to="/listings"
-            className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-medium transition"
-          >
-            Browse Listings
-          </Link>
         </div>
       </div>
 
