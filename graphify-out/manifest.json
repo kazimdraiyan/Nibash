@@ -2087,34 +2087,10 @@
     "ast_hash": "6c36f0676cd62cd8180d03b3caabed64",
     "semantic_hash": ""
   },
-  "server/src/middleware/rateLimit.test.ts": {
-    "mtime": 1790837329.8347013,
-    "seen": 1790837792.6022024,
-    "ast_hash": "1e4659eea76c5bce7143d1d5f6da48f1",
-    "semantic_hash": ""
-  },
   "server/src/middleware/rateLimit.ts": {
     "mtime": 1790837319.308296,
     "seen": 1790837792.6022024,
     "ast_hash": "e554e4057523b4d23c8b152ccafc35e3",
-    "semantic_hash": ""
-  },
-  "server/src/scripts/runMigration013.ts": {
-    "mtime": 1790837115.2809515,
-    "seen": 1790837792.6022024,
-    "ast_hash": "d71e391033b6621b5203ecc9fab030ae",
-    "semantic_hash": ""
-  },
-  "server/src/scripts/verifyExplainAnalyze.ts": {
-    "mtime": 1790838996.3169534,
-    "seen": 1790839062.4290414,
-    "ast_hash": "d1f19633c18c94457ded886bafe34106",
-    "semantic_hash": ""
-  },
-  "server/src/services/search/fuzzyMatchArea.test.ts": {
-    "mtime": 1790837181.9010158,
-    "seen": 1790837792.6022024,
-    "ast_hash": "e641efdb8538616ba97435b393591e9b",
     "semantic_hash": ""
   },
   "server/src/services/search/fuzzyMatchArea.ts": {
@@ -2135,22 +2111,10 @@
     "ast_hash": "177d80da1bfbe471d93fd05beb398f69",
     "semantic_hash": ""
   },
-  "server/src/services/search/parseSearchQuery.test.ts": {
-    "mtime": 1790838861.0239582,
-    "seen": 1790839062.4290414,
-    "ast_hash": "2c4c056bee1614d4fa8cd3b5b7d600e3",
-    "semantic_hash": ""
-  },
   "server/src/services/search/parseSearchQuery.ts": {
     "mtime": 1790838848.9131894,
     "seen": 1790839062.4290414,
     "ast_hash": "812ba0a63cf92481126db8a3c6058320",
-    "semantic_hash": ""
-  },
-  "server/src/services/search/searchListings.test.ts": {
-    "mtime": 1790838810.0574028,
-    "seen": 1790839062.4290414,
-    "ast_hash": "51ab09bbd542521db2bf04da82ff7862",
     "semantic_hash": ""
   },
   "server/src/services/search/searchListings.ts": {

@@ -1,17 +1,17 @@
 # Graph Report - Nibash  (2026-10-01)
 
 ## Corpus Check
-- 325 files · ~411,838 words
+- 319 files · ~410,519 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 107 file(s) not represented in the graph (top: .ttf 54, .csv 45, (none) 4)
 
 ## Summary
-- 3632 nodes · 5149 edges · 301 communities (235 shown, 66 thin omitted)
+- 3624 nodes · 5121 edges · 310 communities (242 shown, 68 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `70af40ba`
+- Built from commit: `a0355759`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,7 @@
 - server/package.json
 - TailwindConfigGenerator
 - express
-- AppError
+- pool.ts
 - generate-slide.py
 - fetch-background.py
 - detect_domain
@@ -44,7 +44,7 @@
 - TestThresholdGate
 - _normalize
 - CatalogRefreshTest
-- application.controller.ts
+- AppError
 - compilerOptions
 - fontSize
 - TestShadcnInstaller
@@ -52,7 +52,7 @@
 - TestGeneratedConfigIsValidJs
 - design-tokens-starter.json
 - payment.service.ts
-- pool.ts
+- searchListings.ts
 - validate-tokens.cjs
 - card
 - Tailwind CSS Utility Reference
@@ -298,9 +298,14 @@
 - .check_shadcn_config
 - Example: TDD Skill Bulletproofing
 - .test_add_all_components_success
+- listing.route.ts
+- devDependencies
 - split_values
 - test_design_system_mode.py
+- dependencies
+- document.controller.ts
 - .temp_project
+- auth.ts
 - Gemini CLI Tool Mapping
 - .test_add_components_no_config
 - .test_add_components_already_installed
@@ -310,6 +315,10 @@
 - .test_init_default_project_root
 - .test_get_installed_components_empty
 - .test_add_components_no_components
+- createVerifier.ts
+- scripts
+- ref_node_fs
+- ref_node_path
 
 ## God Nodes (most connected - your core abstractions)
 1. `TailwindConfigGenerator` - 58 edges
@@ -320,8 +329,8 @@
 6. `search_stack()` - 35 edges
 7. `DesignSystemGenerator` - 35 edges
 8. `ShadcnInstaller` - 34 edges
-9. `pool` - 31 edges
-10. `react-router-dom` - 29 edges
+9. `react-router-dom` - 29 edges
+10. `react` - 28 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Subagent support` --references--> `prompt()`  [INFERRED]
@@ -338,7 +347,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (301 total, 66 thin omitted)
+## Communities (310 total, 68 thin omitted)
 
 ### Community 0 - "App.tsx"
 Cohesion: 0.11
@@ -350,7 +359,7 @@ Nodes (33): format_context(), format_result(), main(), Format a single search re
 
 ### Community 2 - "validate_data.py"
 Cohesion: 0.07
-Nodes (50): Semantic quality contracts for the core UI/UX datasets., read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _catalog_date(), _check_app_interface_contract() (+42 more)
+Nodes (51): Semantic quality contracts for the core UI/UX datasets., read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _catalog_date(), _check_app_interface_contract() (+43 more)
 
 ### Community 3 - "gray"
 Cohesion: 0.05
@@ -385,24 +394,24 @@ Cohesion: 0.10
 Nodes (8): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestDiagnosticsContracts, TestSearchDomains, read_rows(), TestStyleTaxonomy
 
 ### Community 11 - "core.py"
-Cohesion: 0.10
-Nodes (29): _contains_phrase(), _domain_keywords(), _file_signature(), _get_bm25(), _load_csv(), _load_csv_snapshot(), _load_product_keywords(), _load_rows_or_empty() (+21 more)
+Cohesion: 0.11
+Nodes (28): _contains_phrase(), _domain_keywords(), _file_signature(), _get_bm25(), _load_csv(), _load_csv_snapshot(), _load_product_keywords(), _load_rows_or_empty() (+20 more)
 
 ### Community 12 - "server/package.json"
-Cohesion: 0.04
-Nodes (46): multer, node-cron, pg, tsx, @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken (+38 more)
+Cohesion: 0.10
+Nodes (19): node-cron, pg, tsx, @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken, @types/multer (+11 more)
 
 ### Community 13 - "TailwindConfigGenerator"
 Cohesion: 0.09
 Nodes (13): main(), Add custom font families. Args: fonts: Dict of font_type: [font_names] e.g.,…, Add custom spacing values. Args: spacing: Dict of name: value e.g., {'18':…, Add custom breakpoints. Args: breakpoints: Dict of name: width e.g., {'3xl':…, Add plugin requirements. Args: plugins: List of plugin names e.g.,…, Get plugin recommendations based on configuration. Returns: List of recommended…, Generate Tailwind CSS configuration files., Validate configuration. Returns: Tuple of (valid, message) (+5 more)
 
 ### Community 14 - "express"
-Cohesion: 0.12
-Nodes (27): cors, dotenv, express, app, AuthenticatedUser, authMiddleware(), getOptionalUser(), optionalAuthMiddleware() (+19 more)
+Cohesion: 0.20
+Nodes (16): cors, dotenv, express, app, authMiddleware(), requireVerifier(), router, router (+8 more)
 
-### Community 15 - "AppError"
-Cohesion: 0.13
-Nodes (29): ref_crypto, create(), getForContract(), getForListing(), remove(), update(), AppError, CreateReviewInput (+21 more)
+### Community 15 - "pool.ts"
+Cohesion: 0.15
+Nodes (24): ref_crypto, create(), getForContract(), getForListing(), remove(), update(), pool, CreateReviewInput (+16 more)
 
 ### Community 16 - "generate-slide.py"
 Cohesion: 0.12
@@ -421,16 +430,16 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 20 - "listing.service.ts"
-Cohesion: 0.07
-Nodes (40): create(), getAll(), getAmenities(), getById(), getMy(), getStarred(), getTenantsHistory(), isStarred() (+32 more)
+Cohesion: 0.06
+Nodes (45): ref_node_assert_strict, ref_node_test, create(), getAll(), getAmenities(), getById(), getMy(), getStarred() (+37 more)
 
 ### Community 21 - "color"
 Cohesion: 0.11
 Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
 
 ### Community 22 - "auth.controller.ts"
-Cohesion: 0.08
-Nodes (29): bcrypt, jsonwebtoken, ref_node_process, ref_node_readline_promises, becomeOwner(), becomeTenant(), changePassword(), login() (+21 more)
+Cohesion: 0.13
+Nodes (17): becomeOwner(), becomeTenant(), changePassword(), login(), logout(), me(), BecomeOwnerInput, becomeOwnerSchema (+9 more)
 
 ### Community 23 - "dashboard.service.ts"
 Cohesion: 0.16
@@ -444,9 +453,9 @@ Nodes (58): bootstrapPage(), brandMarkup(), broadcast(), browserLauncherForPlatf
 Cohesion: 0.22
 Nodes (9): _exact_match_diagnostic(), _legacy_successor_guidance(), _normalize(), Apply longest-first synonym substitution at token boundaries., Whether a stack query explicitly targets an older framework generation., Choose one coherent applicability generation for stack retrieval., Prefer the explicit successor row for a brand-new app on legacy-only stacks., _stack_query_requests_legacy() (+1 more)
 
-### Community 28 - "application.controller.ts"
-Cohesion: 0.11
-Nodes (18): zod, apply(), getAll(), getForListing(), getMy(), reject(), list(), upload() (+10 more)
+### Community 28 - "AppError"
+Cohesion: 0.12
+Nodes (22): bcrypt, apply(), getAll(), getForListing(), getMy(), reject(), register(), AppError (+14 more)
 
 ### Community 29 - "compilerOptions"
 Cohesion: 0.12
@@ -473,12 +482,12 @@ Cohesion: 0.15
 Nodes (12): component, $type, $value, dark, semantic, $schema, $type, $value (+4 more)
 
 ### Community 35 - "payment.service.ts"
-Cohesion: 0.18
-Nodes (14): create(), getForContract(), payByCash(), rejectCash(), resolve(), CreatePaymentInput, createPaymentSchema, UpdatePaymentInput (+6 more)
+Cohesion: 0.16
+Nodes (15): zod, create(), getForContract(), payByCash(), rejectCash(), resolve(), CreatePaymentInput, createPaymentSchema (+7 more)
 
-### Community 36 - "pool.ts"
-Cohesion: 0.10
-Nodes (22): ref_node_assert_strict, ref_node_fs, ref_node_path, ref_node_test, pool, Area, AreaFinder, MockablePool (+14 more)
+### Community 36 - "searchListings.ts"
+Cohesion: 0.18
+Nodes (14): searchListings(), fuzzyMatchArea(), MatchedArea, logSearchMiss(), KNOWN_AREAS, ParsedSearchQuery, parseSearchQuery(), attachMediaToListingResults() (+6 more)
 
 ### Community 37 - "validate-tokens.cjs"
 Cohesion: 0.24
@@ -709,7 +718,7 @@ Cohesion: 0.11
 Nodes (17): Accent, Applying Semantic Tokens, Background & Foreground, Border & Ring, Color Semantics, Dark Mode Overrides, Destructive, Interactive States (+9 more)
 
 ### Community 102 - "income.service.ts"
-Cohesion: 0.19
+Cohesion: 0.20
 Nodes (16): getContracts(), getListings(), getOverall(), getPayments(), incomePeriodEnum, IncomeQueryParams, incomeQuerySchema, PaginationParams (+8 more)
 
 ### Community 103 - "Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)"
@@ -1268,6 +1277,14 @@ Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1
 Cohesion: 0.22
 Nodes (5): Test successful component addition., Test component addition with subprocess error., Test component addition when npx is not found., Test successful addition of all components., patch
 
+### Community 287 - "listing.route.ts"
+Cohesion: 0.24
+Nodes (6): multer, RateLimitOptions, searchRateLimiter, upload, router, router
+
+### Community 288 - "devDependencies"
+Cohesion: 0.18
+Nodes (11): devDependencies, tsx, @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken, @types/multer, @types/node (+3 more)
+
 ### Community 289 - "split_values"
 Cohesion: 0.47
 Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
@@ -1276,24 +1293,44 @@ Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
 Cohesion: 0.07
 Nodes (25): _contrast_ratio(), _derive_dark_palette(), _filter_anti_patterns_for_mode(), _palette_is_dark(), _query_wants_dark(), WCAG relative luminance of a #RRGGBB string, or None if unparseable., True when a colors.csv row's Background is a dark surface., WCAG contrast ratio for two hex colors, or None if either is invalid. (+17 more)
 
+### Community 291 - "dependencies"
+Cohesion: 0.20
+Nodes (10): dependencies, bcrypt, cors, dotenv, express, jsonwebtoken, multer, node-cron (+2 more)
+
+### Community 292 - "document.controller.ts"
+Cohesion: 0.25
+Nodes (7): list(), upload(), verify(), documentTypeEnum, UploadDocumentInput, uploadDocumentSchema, verifyDocument()
+
+### Community 294 - "auth.ts"
+Cohesion: 0.33
+Nodes (6): jsonwebtoken, AuthenticatedUser, getOptionalUser(), optionalAuthMiddleware(), RevocationCheck, isTokenRevoked()
+
 ### Community 296 - "Gemini CLI Tool Mapping"
 Cohesion: 0.29
 Nodes (7): Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file, Parallel dispatch, Personal skills directory, Prompt filling, Subagent support
 
+### Community 306 - "createVerifier.ts"
+Cohesion: 0.40
+Nodes (5): ref_node_process, ref_node_readline_promises, main(), prompt(), rl
+
+### Community 307 - "scripts"
+Cohesion: 0.40
+Nodes (5): scripts, build, dev, start, test
+
 ## Knowledge Gaps
 - **1627 isolated node(s):** `crypto`, `http`, `fs`, `path`, `OPCODES` (+1622 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2067 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2066 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **68 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `prompt()` connect `auth.controller.ts` to `Gemini CLI Tool Mapping`, `Gemini CLI Tool Mapping`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Why does `TailwindConfigGenerator` connect `TailwindConfigGenerator` to `.test_add_fonts`, `.test_init_framework`, `.test_full_configuration_javascript`, `TestTailwindConfigGenerator`, `.test_default_output_path_javascript`, `.test_default_content_paths_nextjs`, `.test_add_colors`, `.test_validate_config_valid`, `TestGeneratedConfigIsValidJs`, `.generate_config_string`, `design_system.py`, `._base_config`, `.test_validate_config_empty_theme`, `.test_add_breakpoints`, `.test_recommend_plugins`, `.test_add_plugins_no_duplicates`, `.test_recommend_plugins_nextjs`, `.test_generate_typescript_config`, `.test_init_default_typescript`, `.test_write_config`, `.test_write_config_invalid_path`?**
+- **Why does `prompt()` connect `createVerifier.ts` to `Gemini CLI Tool Mapping`, `Gemini CLI Tool Mapping`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `Subagent support` connect `Gemini CLI Tool Mapping` to `createVerifier.ts`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
-- **Why does `Subagent support` connect `Gemini CLI Tool Mapping` to `auth.controller.ts`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `Gemini CLI Tool Mapping` connect `Gemini CLI Tool Mapping` to `.claude/skills/using-superpowers/references/codex-tools.md`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `crypto`, `http`, `fs` to the rest of the system?**
