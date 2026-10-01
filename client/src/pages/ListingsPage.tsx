@@ -520,7 +520,7 @@ export function ListingsPage() {
                 <span className="material-symbols-outlined text-[18px] text-slate-400">hotel_class</span>
                 <span className="font-medium">Filter by Amenities</span>
                 {selectedAmenities.length > 0 && (
-                  <span className="bg-[#d4b068]/20 text-[#d4b068] border border-[#d4b068]/40 text-[11px] font-mono px-2 py-0.5 rounded-full">
+                  <span className="bg-slate-700/60 text-slate-300 border border-slate-600/60 text-[11px] font-mono px-2 py-0.5 rounded-full">
                     {selectedAmenities.length} selected
                   </span>
                 )}
@@ -542,7 +542,7 @@ export function ListingsPage() {
                         onClick={() => toggleAmenity(amenity.name)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-[#d4b068]/15 text-[#d4b068] border-[#d4b068]/50"
+                            ? "bg-slate-700/60 text-slate-100 border-slate-500"
                             : "bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200"
                         }`}
                       >
@@ -629,7 +629,7 @@ export function ListingsPage() {
             {selectedAmenities.map((name) => (
               <span
                 key={name}
-                className="inline-flex items-center gap-1.5 bg-[#d4b068]/10 text-[#d4b068] border border-[#d4b068]/40 px-2.5 py-1 rounded-full"
+                className="inline-flex items-center gap-1.5 bg-slate-800 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-full"
               >
                 <span className="material-symbols-outlined text-[13px]">hotel_class</span>
                 <span>{name}</span>
@@ -656,23 +656,20 @@ export function ListingsPage() {
 
       {/* Verifier Review Queue Switcher */}
       {isVerifier && (
-        <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#12151c] border border-amber-500/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg">
+        <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#12151c] border border-slate-700/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+            <div className="w-11 h-11 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0">
               <span className="material-symbols-outlined text-2xl">verified_user</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs uppercase font-label-sm tracking-wider font-semibold text-amber-400">
+                <span className="text-xs uppercase font-label-sm tracking-wider font-semibold text-slate-300">
                   Verifier Review Mode
                 </span>
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-medium">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-300 font-mono font-medium border border-slate-600/50">
                   {unverifiedListings.length} awaiting review
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Browse listings using standard luxury cards and review authentic verification documents.
-              </p>
             </div>
           </div>
 
@@ -687,7 +684,7 @@ export function ListingsPage() {
               }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-label-sm uppercase tracking-wider font-medium transition cursor-pointer flex items-center gap-1.5 ${
                 verifierView === "pending"
-                  ? "bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm"
+                  ? "bg-slate-700/80 text-slate-100 border border-slate-600 shadow-sm"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -740,10 +737,10 @@ export function ListingsPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-400">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
                     Listings Pending Verification
                   </h2>
-                  <span className="text-xs text-amber-300 bg-amber-950/70 border border-amber-800/60 px-2 py-0.5 rounded font-mono">
+                  <span className="text-xs text-slate-300 bg-slate-950/70 border border-slate-800/60 px-2 py-0.5 rounded font-mono">
                     {displayedPendingListings.length}
                   </span>
                 </div>
@@ -761,7 +758,7 @@ export function ListingsPage() {
             </div>
           ) : (
             <div className="py-20 text-center border border-dashed border-slate-800 rounded-2xl p-8 my-4">
-              <span className="material-symbols-outlined text-4xl text-amber-400 mb-2">
+              <span className="material-symbols-outlined text-4xl text-slate-400 mb-2">
                 task_alt
               </span>
               <h3 className="text-lg font-medium text-white mb-1">No Pending Listings</h3>
