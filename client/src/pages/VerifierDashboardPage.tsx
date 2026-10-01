@@ -134,7 +134,7 @@ export function VerifierDashboardPage() {
   if (loading) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-white">
-        <div className="w-12 h-12 rounded-full border-2 border-[#d4b068] border-t-transparent animate-spin mb-4" />
+        <div className="w-12 h-12 rounded-full border-2 border-slate-600 border-t-transparent animate-spin mb-4" />
         <span className="text-xs uppercase tracking-[0.25em] text-[#cbd5e1] font-label-sm">
           Loading Verifier Intelligence...
         </span>
@@ -203,12 +203,6 @@ export function VerifierDashboardPage() {
       {/* Top Header — Landing Page Luxury Aesthetic */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
         <div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel-subtle border border-white/10 mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#d4b068]" />
-            <span className="font-label-sm text-[11px] uppercase tracking-[0.2em] text-[#cbd5e1]">
-              Trust & Safety Operations
-            </span>
-          </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#f8f9fa] tracking-tight">
             Verifier Intelligence <span className="font-serif italic font-normal text-silver-gradient-text">Dashboard</span>
           </h1>
@@ -220,7 +214,7 @@ export function VerifierDashboardPage() {
         {/* Quick Review Queue Navigation Button */}
         <button
           onClick={() => navigate("/listings?view=pending")}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#d4b068] hover:bg-[#c29d55] text-[#090a0c] font-semibold text-xs uppercase tracking-widest font-label-sm shadow-lg hover:shadow-[#d4b068]/20 transition-all cursor-pointer group"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-200 hover:bg-white text-[#090a0c] font-semibold text-xs uppercase tracking-widest font-label-sm shadow-lg transition-all cursor-pointer group"
         >
           <span>Review New Listings ({overview.listings_waiting})</span>
           <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
@@ -229,13 +223,11 @@ export function VerifierDashboardPage() {
         </button>
       </div>
 
-      {/* ========================================================================= */}
       {/* PLATFORM OVERVIEW                                                         */}
-      {/* ========================================================================= */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-blue-400">monitoring</span>
+            <span className="material-symbols-outlined text-base text-slate-400">monitoring</span>
             <h2 className="text-xs uppercase tracking-widest font-label-sm text-slate-300 font-semibold">
               Platform Overview
             </h2>
@@ -247,7 +239,7 @@ export function VerifierDashboardPage() {
           <div className="bg-[#111214] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all">
             <div className="flex items-center justify-between text-slate-400 mb-3">
               <span className="text-xs uppercase tracking-wider font-label-sm">Total Users</span>
-              <span className="material-symbols-outlined text-blue-400 text-xl">group</span>
+              <span className="material-symbols-outlined text-slate-400 text-xl">group</span>
             </div>
             <div className="text-3xl font-serif font-light text-white">{overview.total_users}</div>
             <p className="text-[11px] text-slate-500 mt-1">Platform registered</p>
@@ -256,16 +248,16 @@ export function VerifierDashboardPage() {
           <div className="bg-[#111214] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all">
             <div className="flex items-center justify-between text-slate-400 mb-3">
               <span className="text-xs uppercase tracking-wider font-label-sm">Owners</span>
-              <span className="material-symbols-outlined text-amber-400 text-xl">real_estate_agent</span>
+              <span className="material-symbols-outlined text-slate-400 text-xl">real_estate_agent</span>
             </div>
             <div className="text-3xl font-serif font-light text-white">{overview.total_owners}</div>
-            <p className="text-[11px] text-slate-500 mt-1">Landlord profiles</p>
+            <p className="text-[11px] text-slate-500 mt-1">Owner profiles</p>
           </div>
 
           <div className="bg-[#111214] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all">
             <div className="flex items-center justify-between text-slate-400 mb-3">
               <span className="text-xs uppercase tracking-wider font-label-sm">Tenants</span>
-              <span className="material-symbols-outlined text-emerald-400 text-xl">person</span>
+              <span className="material-symbols-outlined text-slate-400 text-xl">person</span>
             </div>
             <div className="text-3xl font-serif font-light text-white">{overview.total_tenants}</div>
             <p className="text-[11px] text-slate-500 mt-1">Tenant profiles</p>
@@ -274,7 +266,7 @@ export function VerifierDashboardPage() {
           <div className="bg-[#111214] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all">
             <div className="flex items-center justify-between text-slate-400 mb-3">
               <span className="text-xs uppercase tracking-wider font-label-sm">Approved</span>
-              <span className="material-symbols-outlined text-green-400 text-xl">domain_verification</span>
+              <span className="material-symbols-outlined text-slate-400 text-xl">domain_verification</span>
             </div>
             <div className="text-3xl font-serif font-light text-white">{overview.listings_approved}</div>
             <p className="text-[11px] text-slate-500 mt-1">Active on catalog</p>
@@ -283,7 +275,7 @@ export function VerifierDashboardPage() {
           <div className="bg-[#111214] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all col-span-2 sm:col-span-1">
             <div className="flex items-center justify-between text-slate-400 mb-3">
               <span className="text-xs uppercase tracking-wider font-label-sm">Active Contracts</span>
-              <span className="material-symbols-outlined text-purple-400 text-xl">handshake</span>
+              <span className="material-symbols-outlined text-slate-400 text-xl">handshake</span>
             </div>
             <div className="text-3xl font-serif font-light text-white">{overview.active_contracts}</div>
             <p className="text-[11px] text-slate-500 mt-1">Signed leases</p>
@@ -294,10 +286,10 @@ export function VerifierDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Link
             to="/listings?view=pending"
-            className="bg-[#111214]/80 hover:bg-amber-500/10 border border-amber-500/20 hover:border-amber-400/50 rounded-xl px-4 py-3 flex items-center justify-between transition-all group cursor-pointer shadow-sm hover:shadow-amber-500/10"
+            className="bg-[#111214]/80 hover:bg-slate-800/60 border border-slate-700/50 hover:border-slate-500/70 rounded-xl px-4 py-3 flex items-center justify-between transition-all group cursor-pointer shadow-sm"
           >
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-amber-400 text-base group-hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined text-slate-400 text-base group-hover:scale-110 transition-transform">
                 hourglass_top
               </span>
               <span className="text-xs text-slate-300 group-hover:text-white transition-colors">
@@ -305,36 +297,34 @@ export function VerifierDashboardPage() {
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-amber-400 font-mono">
+              <span className="text-sm font-bold text-slate-200 font-mono">
                 {overview.listings_waiting}
               </span>
-              <span className="material-symbols-outlined text-xs text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all">
+              <span className="material-symbols-outlined text-xs text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all">
                 arrow_forward
               </span>
             </div>
           </Link>
 
-          <div className="bg-[#111214]/60 border border-blue-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="bg-[#111214]/60 border border-slate-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-blue-400 text-base">home_work</span>
+              <span className="material-symbols-outlined text-slate-400 text-base">home_work</span>
               <span className="text-xs text-slate-300">Occupied Units</span>
             </div>
-            <span className="text-sm font-bold text-blue-400 font-mono">{overview.listings_occupied}</span>
+            <span className="text-sm font-bold text-slate-400 font-mono">{overview.listings_occupied}</span>
           </div>
 
-          <div className="bg-[#111214]/60 border border-red-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="bg-[#111214]/60 border border-slate-500/20 rounded-xl px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-red-400 text-base">cancel</span>
+              <span className="material-symbols-outlined text-slate-400 text-base">cancel</span>
               <span className="text-xs text-slate-300">Rejected Listings</span>
             </div>
-            <span className="text-sm font-bold text-red-400 font-mono">{overview.listings_rejected}</span>
+            <span className="text-sm font-bold text-slate-400 font-mono">{overview.listings_rejected}</span>
           </div>
         </div>
       </section>
 
-      {/* ========================================================================= */}
       {/* PLATFORM GROWTH TRENDS (EXPANDED DUAL/TRIPLE SERIES)                      */}
-      {/* ========================================================================= */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -662,9 +652,7 @@ export function VerifierDashboardPage() {
         </div>
       </section>
 
-      {/* ========================================================================= */}
       {/* INTEGRITY & RISK SIGNALS (CLEAN NON-TECHNICAL PRESENTATION)               */}
-      {/* ========================================================================= */}
       <section className="space-y-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -678,16 +666,14 @@ export function VerifierDashboardPage() {
           </p>
         </div>
 
-        {/* ----------------------------------------------------------------------- */}
         {/* RENT OUTLIERS BY NEIGHBORHOOD (CLEAN NON-OUTLIER AVERAGE)               */}
-        {/* ----------------------------------------------------------------------- */}
         <div className="bg-[#111214] border border-white/10 rounded-2xl overflow-hidden transition-all">
           <button
             onClick={() => toggleSection("outliers")}
             className="w-full px-6 py-4 flex items-center justify-between bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
           >
             <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-amber-400 text-xl">query_stats</span>
+              <span className="material-symbols-outlined text-red-400 text-xl">query_stats</span>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-serif font-bold text-base text-white">
@@ -695,7 +681,7 @@ export function VerifierDashboardPage() {
                   </span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold ${
                     fraud.rent_outliers.length > 0
-                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                      ? "bg-slate-700/60 text-slate-300 border border-slate-600/60"
                       : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
                   }`}>
                     {fraud.rent_outliers.length} Flagged
@@ -725,7 +711,7 @@ export function VerifierDashboardPage() {
                       <tr className="border-b border-white/10 text-slate-400 font-label-sm uppercase tracking-wider">
                         <th className="pb-3 font-semibold">Property</th>
                         <th className="pb-3 font-semibold">Neighborhood</th>
-                        <th className="pb-3 font-semibold">Landlord</th>
+                        <th className="pb-3 font-semibold">Owner</th>
                         <th className="pb-3 font-semibold text-right">Listed Rent</th>
                         <th className="pb-3 font-semibold text-right">Typical Market Rent</th>
                         <th className="pb-3 font-semibold text-right">Deviation</th>
@@ -738,7 +724,7 @@ export function VerifierDashboardPage() {
                           <td className="py-3 pr-4">
                             <Link
                               to={`/listings/${row.listing_id}`}
-                              className="font-medium text-white hover:text-amber-400 flex items-center gap-1 transition-colors"
+                              className="font-medium text-white hover:text-slate-300 flex items-center gap-1 transition-colors"
                             >
                               <span>{row.title}</span>
                               <span className="material-symbols-outlined text-xs text-slate-500">open_in_new</span>
@@ -747,7 +733,7 @@ export function VerifierDashboardPage() {
                           </td>
                           <td className="py-3 px-2 text-slate-300">{row.area_name}</td>
                           <td className="py-3 px-2 text-slate-300">{row.owner_name}</td>
-                          <td className="py-3 px-2 text-right font-bold text-amber-300 font-mono">
+                          <td className="py-3 px-2 text-right font-bold text-slate-200 font-mono">
                             ৳{row.rent.toLocaleString()}
                           </td>
                           <td className="py-3 px-2 text-right text-slate-300 font-mono">
@@ -757,7 +743,7 @@ export function VerifierDashboardPage() {
                             <span className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-mono font-bold ${
                               row.difference_pct >= 100 || row.difference_pct <= -60
                                 ? "bg-red-500/20 text-red-300 border border-red-500/40"
-                                : "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                                : "bg-slate-700/60 text-slate-300 border border-slate-600/60"
                             }`}>
                               {row.difference_pct > 0 ? `+${row.difference_pct}%` : `${row.difference_pct}%`}
                             </span>
@@ -780,16 +766,14 @@ export function VerifierDashboardPage() {
           )}
         </div>
 
-        {/* ----------------------------------------------------------------------- */}
         {/* DUPLICATE LOCATION DETECTION                                            */}
-        {/* ----------------------------------------------------------------------- */}
         <div className="bg-[#111214] border border-white/10 rounded-2xl overflow-hidden transition-all">
           <button
             onClick={() => toggleSection("duplicates")}
             className="w-full px-6 py-4 flex items-center justify-between bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
           >
             <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-orange-400 text-xl">share_location</span>
+              <span className="material-symbols-outlined text-red-400 text-xl">share_location</span>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-serif font-bold text-base text-white">
@@ -797,7 +781,7 @@ export function VerifierDashboardPage() {
                   </span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold ${
                     fraud.duplicate_locations.length > 0
-                      ? "bg-orange-500/20 text-orange-300 border border-orange-500/40"
+                      ? "bg-slate-700/60 text-slate-300 border border-slate-600/60"
                       : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
                   }`}>
                     {fraud.duplicate_locations.length} Suspect Pairs
@@ -825,11 +809,10 @@ export function VerifierDashboardPage() {
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 font-label-sm uppercase tracking-wider">
-                        <th className="pb-3 font-semibold">Listing A (Landlord A)</th>
-                        <th className="pb-3 font-semibold">Listing B (Landlord B)</th>
+                        <th className="pb-3 font-semibold">Listing A (Owner A)</th>
+                        <th className="pb-3 font-semibold">Listing B (Owner B)</th>
                         <th className="pb-3 font-semibold">Area</th>
                         <th className="pb-3 font-semibold text-right">Est. Distance</th>
-                        <th className="pb-3 font-semibold text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -840,7 +823,7 @@ export function VerifierDashboardPage() {
                             <td className="py-3 pr-4">
                               <Link
                                 to={`/listings/${row.listing_1_id}`}
-                                className="font-medium text-white hover:text-amber-400 flex items-center gap-1 transition-colors"
+                                className="font-medium text-white hover:text-slate-300 flex items-center gap-1 transition-colors"
                               >
                                 <span>{row.listing_1_title}</span>
                                 <span className="material-symbols-outlined text-xs text-slate-500">open_in_new</span>
@@ -853,7 +836,7 @@ export function VerifierDashboardPage() {
                             <td className="py-3 pr-4">
                               <Link
                                 to={`/listings/${row.listing_2_id}`}
-                                className="font-medium text-white hover:text-amber-400 flex items-center gap-1 transition-colors"
+                                className="font-medium text-white hover:text-slate-300 flex items-center gap-1 transition-colors"
                               >
                                 <span>{row.listing_2_title}</span>
                                 <span className="material-symbols-outlined text-xs text-slate-500">open_in_new</span>
@@ -865,25 +848,9 @@ export function VerifierDashboardPage() {
                             </td>
                             <td className="py-3 px-2 text-slate-300">{row.area_name}</td>
                             <td className="py-3 px-2 text-right">
-                              <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">
+                              <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-700/60 text-slate-300 border border-slate-600/60">
                                 ~{estMeters} meters
                               </span>
-                            </td>
-                            <td className="py-3 pl-4 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
-                                <Link
-                                  to={`/listings/${row.listing_1_id}`}
-                                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-white text-[11px] border border-white/10"
-                                >
-                                  View A
-                                </Link>
-                                <Link
-                                  to={`/listings/${row.listing_2_id}`}
-                                  className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-white text-[11px] border border-white/10"
-                                >
-                                  View B
-                                </Link>
-                              </div>
                             </td>
                           </tr>
                         );
@@ -934,7 +901,7 @@ export function VerifierDashboardPage() {
               {fraud.concurrent_tenants.length === 0 ? (
                 <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
                   <span className="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
-                  <span>No concurrent tenant leases detected. All active lease agreements maintain 1:1 occupancy integrity.</span>
+                  <span>No concurrent tenant leases detected.</span>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -965,7 +932,7 @@ export function VerifierDashboardPage() {
                                 <Link
                                   key={id}
                                   to={`/listings/${id}`}
-                                  className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-amber-300 border border-white/10 font-mono text-[11px]"
+                                  className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 font-mono text-[11px]"
                                 >
                                   #{id}
                                 </Link>
@@ -991,18 +958,18 @@ export function VerifierDashboardPage() {
             className="w-full px-6 py-4 flex items-center justify-between bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
           >
             <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-blue-400 text-xl">leaderboard</span>
+              <span className="material-symbols-outlined text-slate-400 text-xl">leaderboard</span>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-serif font-bold text-base text-white">
                     Owners Ranked by Listing Count
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 font-mono font-semibold">
-                    {fraud.owners_by_listing_count.length} Registered Landlords
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-300 border border-slate-600/60 font-mono font-semibold">
+                    {fraud.owners_by_listing_count.length} Registered Owners
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Landlords ordered by number of registered properties
+                  Owners ordered by number of registered properties
                 </p>
               </div>
             </div>
@@ -1034,7 +1001,7 @@ export function VerifierDashboardPage() {
                         <td className="py-3 pl-4 text-right">
                           <span className={`inline-block font-mono font-bold px-2 py-0.5 rounded ${
                             row.listing_count >= 10
-                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                              ? "bg-slate-700/60 text-slate-200 border border-slate-600/60"
                               : "text-white"
                           }`}>
                             {row.listing_count} properties
@@ -1049,9 +1016,7 @@ export function VerifierDashboardPage() {
           )}
         </div>
 
-        {/* ----------------------------------------------------------------------- */}
         {/* LISTINGS WITH ZERO PHOTOS                                               */}
-        {/* ----------------------------------------------------------------------- */}
         <div className="bg-[#111214] border border-white/10 rounded-2xl overflow-hidden transition-all">
           <button
             onClick={() => toggleSection("noPhotos")}
@@ -1066,7 +1031,7 @@ export function VerifierDashboardPage() {
                   </span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold ${
                     fraud.listings_no_photos.length > 0
-                      ? "bg-amber-500/10 text-amber-300 border border-amber-500/30"
+                      ? "bg-slate-700/60 text-slate-300 border border-slate-600/60"
                       : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
                   }`}>
                     {fraud.listings_no_photos.length} Photo-less
@@ -1108,7 +1073,7 @@ export function VerifierDashboardPage() {
                           <td className="py-3 pr-4">
                             <Link
                               to={`/listings/${row.listing_id}`}
-                              className="font-medium text-white hover:text-amber-400 flex items-center gap-1 transition-colors"
+                              className="font-medium text-white hover:text-slate-300 flex items-center gap-1 transition-colors"
                             >
                               <span>{row.title}</span>
                               <span className="material-symbols-outlined text-xs text-slate-500">open_in_new</span>
@@ -1149,9 +1114,9 @@ export function VerifierDashboardPage() {
       {/* ========================================================================= */}
       {/* ACTION CALLOUT                                                            */}
       {/* ========================================================================= */}
-      <section className="bg-gradient-to-r from-[#d4b068]/15 via-[#111214] to-[#111214] border border-[#d4b068]/30 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+      <section className="bg-[#111214] border border-slate-700/50 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
         <div className="space-y-1 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-2 text-[#d4b068]">
+          <div className="flex items-center justify-center md:justify-start gap-2 text-slate-300">
             <span className="material-symbols-outlined text-xl">verified</span>
             <span className="text-xs uppercase tracking-widest font-label-sm font-semibold">
               Ready for Verification
@@ -1160,14 +1125,11 @@ export function VerifierDashboardPage() {
           <h3 className="text-2xl sm:text-3xl font-serif font-light text-white">
             {overview.listings_waiting} Listing{overview.listings_waiting === 1 ? "" : "s"} Awaiting Verification
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
-            Review landlord identity credentials, ownership deed documentation, and approve properties directly into the public Nibash catalog.
-          </p>
         </div>
 
         <button
           onClick={() => navigate("/listings?view=pending")}
-          className="px-8 py-3.5 rounded-xl bg-[#d4b068] hover:bg-[#c29d55] text-[#090a0c] font-semibold text-xs uppercase tracking-widest font-label-sm shadow-xl hover:shadow-[#d4b068]/30 transition-all cursor-pointer flex items-center gap-2 group whitespace-nowrap"
+          className="px-8 py-3.5 rounded-xl bg-slate-200 hover:bg-white text-[#090a0c] font-semibold text-xs uppercase tracking-widest font-label-sm shadow-xl transition-all cursor-pointer flex items-center gap-2 group whitespace-nowrap"
         >
           <span>Review New Listings</span>
           <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
