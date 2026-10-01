@@ -1,7 +1,8 @@
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { HowItWorks } from "./components/HowItWorks";
-import { PopularLocations } from "./components/PopularLocations";
+import { AboutUsSection } from "./components/AboutUsSection";
+import { AboutUsPage } from "./pages/AboutUsPage";
 import { WhyChooseUs } from "./components/WhyChooseUs";
 import { CallToAction } from "./components/CallToAction";
 import { Footer } from "./components/Footer";
@@ -41,8 +42,8 @@ function HomePage() {
       <div id="how-it-works">
         <HowItWorks />
       </div>
-      <div id="locations">
-        <PopularLocations />
+      <div id="about-us">
+        <AboutUsSection />
       </div>
       <div id="why-us">
         <WhyChooseUs />
@@ -76,6 +77,8 @@ export default function App() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/about-us" element={<Navigate to="/about" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify" element={<VerifyPortalPage />} />

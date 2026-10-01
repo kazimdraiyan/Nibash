@@ -32,36 +32,25 @@ export function Footer() {
           </p>
         </div>
 
-        {/* Column 2: Apartments */}
-        {/* // TODO: Query needed */}
+        {/* Column 2: Company */}
         <div className="md:col-span-3 flex flex-col gap-4">
           <span className="font-label-sm text-xs uppercase tracking-widest text-[#cbd5e1] font-semibold">
-            Featured Areas
+            Company
           </span>
           <ul className="flex flex-col gap-2.5 text-sm text-[#94a3b8]">
             <li>
-              <a href="#featured-properties" className="hover:text-white transition-colors">
-                Gulshan
+              <Link to="/about" className="hover:text-white transition-colors">
+                About Us
+              </Link>
+            </li>
+            <li>
+              <a href="/#how-it-works" className="hover:text-white transition-colors">
+                How It Works
               </a>
             </li>
             <li>
-              <a href="#featured-properties" className="hover:text-white transition-colors">
-                Banani
-              </a>
-            </li>
-            <li>
-              <a href="#featured-properties" className="hover:text-white transition-colors">
-                Dhanmondi
-              </a>
-            </li>
-            <li>
-              <a href="#featured-properties" className="hover:text-white transition-colors">
-                Baridhara
-              </a>
-            </li>
-            <li>
-              <a href="#featured-properties" className="hover:text-white transition-colors">
-                Bashundhara
+              <a href="/#why-us" className="hover:text-white transition-colors">
+                Why Nibash
               </a>
             </li>
           </ul>
@@ -74,14 +63,9 @@ export function Footer() {
           </span>
           <ul className="flex flex-col gap-2.5 text-sm text-[#94a3b8]">
             <li>
-              <a href="#featured-properties" className="hover:text-white transition-colors">
+              <Link to="/listings" className="hover:text-white transition-colors">
                 Browse Apartments
-              </a>
-            </li>
-            <li>
-              <a href="#how-it-works" className="hover:text-white transition-colors">
-                How It Works
-              </a>
+              </Link>
             </li>
             <li>
               <Link
