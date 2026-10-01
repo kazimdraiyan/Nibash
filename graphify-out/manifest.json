@@ -2148,9 +2148,9 @@
     "semantic_hash": ""
   },
   "client/src/pages/AboutUsPage.tsx": {
-    "mtime": 1790851558.6616304,
-    "seen": 1790851642.001477,
-    "ast_hash": "cf118ee04462cae72ca9a4488f30db7a",
+    "mtime": 1790853815.837245,
+    "seen": 1790853865.8976095,
+    "ast_hash": "d69a5343312d41f50e478bf88671dcf6",
     "semantic_hash": ""
   },
   "client/src/assets/developers/abid-hossain.jpg": {
@@ -2181,6 +2181,18 @@
     "mtime": 1790851595.3321867,
     "seen": 1790851642.001477,
     "ast_hash": "8f26fab3a912114d9c22bb6511620b55",
+    "semantic_hash": ""
+  },
+  "client/src/assets/developers/team-working-merged.jpg": {
+    "mtime": 1790852459.1706688,
+    "seen": 1790852548.467633,
+    "ast_hash": "2576fbf366cac2f3d013d395fe9494d3",
+    "semantic_hash": ""
+  },
+  "client/src/assets/developers/team-working.jpg": {
+    "mtime": 1790853048.6398225,
+    "seen": 1790853157.0986984,
+    "ast_hash": "d4b270cc44dc2d45d40f32ca7e9e4ece",
     "semantic_hash": ""
   }
 }
