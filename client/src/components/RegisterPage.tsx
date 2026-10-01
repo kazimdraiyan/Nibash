@@ -306,7 +306,7 @@ export function RegisterPage() {
                 </div>
 
                 {/* Agreement Checkbox */}
-                {/* <div className="flex items-start gap-2.5 py-1">
+                <div className="flex items-start gap-2.5 py-1">
                   <input
                     id="reg-terms"
                     type="checkbox"
@@ -322,7 +322,7 @@ export function RegisterPage() {
                     <span className="text-white underline">Nibash Terms of Service</span> and{" "}
                     <span className="text-white underline">Privacy Policy</span>.
                   </label>
-                </div> */}
+                </div>
 
                 {/* Submit Button */}
                 <button

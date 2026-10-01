@@ -115,6 +115,8 @@ export function ListingsPage() {
 
   // Search execution states
   const [searchResults, setSearchResults] = useState<BackendListing[] | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
@@ -214,6 +216,7 @@ export function ListingsPage() {
 
     if (!hasFilters) {
       setSearchResults(null);
+      setNextCursor(null);
       setSearchError(null);
       setIsSearching(false);
       return;
@@ -230,13 +233,11 @@ export function ListingsPage() {
         const params = new URLSearchParams();
         if (trimmed) params.set("q", trimmed);
 
-        // Map area name (frontend representation) to areaId (backend requirement)
         if (trimmedArea) {
+          params.set("area", trimmedArea);
           const areaId = getAreaIdByName(trimmedArea);
           if (areaId !== null) {
             params.set("areaId", areaId.toString());
-          } else if (!trimmed) {
-            params.set("q", trimmedArea);
           }
         }
 
@@ -253,13 +254,14 @@ export function ListingsPage() {
           params.set("amenities", selectedAmenities.join(","));
         }
 
-        const data = await apiClient.get<{ listings: BackendListing[] }>(
+        const data = await apiClient.get<{ listings: BackendListing[]; nextCursor?: string | null }>(
           `/listings/search?${params.toString()}`,
           { signal: abortController.signal }
         );
 
         if (isActive) {
           setSearchResults(data.listings || []);
+          setNextCursor(data.nextCursor || null);
         }
       } catch (err: any) {
         if (err.name === "AbortError" || !isActive) return;
@@ -277,6 +279,34 @@ export function ListingsPage() {
       abortController.abort();
     };
   }, [searchTerm, areaName, bedrooms, maxRent, selectedAmenities]);
+
+  const handleLoadMore = async () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const params = new URLSearchParams();
+      if (searchTerm.trim()) params.set("q", searchTerm.trim());
+      if (areaName.trim()) {
+        params.set("area", areaName.trim());
+        const areaId = getAreaIdByName(areaName.trim());
+        if (areaId !== null) params.set("areaId", areaId.toString());
+      }
+      if (bedrooms !== null && !isNaN(bedrooms)) params.set("bedrooms", bedrooms.toString());
+      if (maxRent !== null && !isNaN(maxRent)) params.set("maxRent", maxRent.toString());
+      if (selectedAmenities.length > 0) params.set("amenities", selectedAmenities.join(","));
+      params.set("cursor", nextCursor);
+
+      const data = await apiClient.get<{ listings: BackendListing[]; nextCursor?: string | null }>(
+        `/listings/search?${params.toString()}`
+      );
+      setSearchResults((prev) => [...(prev || []), ...(data.listings || [])]);
+      setNextCursor(data.nextCursor || null);
+    } catch (err: any) {
+      console.error("Failed to load more listings:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // Handlers for modifying filters
   const handleKeywordChange = (newVal: string) => {
@@ -870,7 +900,8 @@ export function ListingsPage() {
                 </button>
               </div>
             ) : displayedPublicListings.length > 0 ? (
-              /* Public Listings Grid */
+              <>
+              {/* Public Listings Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayedPublicListings.map((item) => {
                   const isApplied = Boolean(user && hasUserApplied(user.id, item.id));
@@ -885,6 +916,28 @@ export function ListingsPage() {
                   );
                 })}
               </div>
+
+              {/* Keyset Pagination Load More Button */}
+              {nextCursor && (
+                <div className="mt-8 text-center">
+                  <button
+                    type="button"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm transition cursor-pointer disabled:opacity-50 inline-flex items-center gap-2"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-transparent animate-spin" />
+                        <span>Loading more...</span>
+                      </>
+                    ) : (
+                      <span>Load More Listings</span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
             ) : (
               /* Empty Search Results State */
               <div className="py-20 text-center border border-dashed border-slate-800 rounded-2xl p-8 my-4">

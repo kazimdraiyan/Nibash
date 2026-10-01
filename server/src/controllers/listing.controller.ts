@@ -4,6 +4,7 @@ import {
   updateListingSchema,
 } from "../schemas/listing.schema.js";
 import * as listingService from "../services/listing.service.js";
+import * as searchService from "../services/search/index.js";
 import * as mediaService from "../services/media.service.js";
 import { ensureOwner } from "../services/user.service.js";
 
@@ -28,11 +29,24 @@ export async function search(req: Request, res: Response) {
   const bedroom_raw = parseInt(req.query.bedrooms as string, 10);
   const bedrooms = isNaN(bedroom_raw) ? null : bedroom_raw;
 
+  const bathroom_raw = parseInt(req.query.bathrooms as string, 10);
+  const bathrooms = isNaN(bathroom_raw) ? null : bathroom_raw;
+
+  const floor_raw = parseInt(req.query.floor as string, 10);
+  const floor = isNaN(floor_raw) ? null : floor_raw;
+
   const areaId_raw = parseInt(req.query.areaId as string, 10);
   const areaId = isNaN(areaId_raw) ? null : areaId_raw;
 
+  const areaName = (req.query.area as string) || (req.query.areaName as string) || null;
+
   const maxRent_raw = parseInt(req.query.maxRent as string, 10);
   const maxRent = isNaN(maxRent_raw) ? null : maxRent_raw;
+
+  const limit_raw = parseInt(req.query.limit as string, 10);
+  const limit = isNaN(limit_raw) ? undefined : limit_raw;
+
+  const cursor = (req.query.cursor as string) ?? null;
 
   // Comma-separated amenity names, e.g. ?amenities=Parking,Gym
   const amenitiesRaw = (req.query.amenities as string) ?? "";
@@ -40,14 +54,19 @@ export async function search(req: Request, res: Response) {
     ? amenitiesRaw.split(",").map((s) => s.trim()).filter(Boolean)
     : [];
 
-  const listings = await listingService.searchListings(
+  const result = await searchService.searchListings({
     q,
     bedrooms,
+    bathrooms,
+    floor,
     areaId,
+    areaName,
     maxRent,
     amenityNames,
-  );
-  res.json({ listings });
+    limit,
+    cursor,
+  });
+  res.json(result);
 }
 
 

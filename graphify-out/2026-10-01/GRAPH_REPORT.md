@@ -1,17 +1,17 @@
 # Graph Report - Nibash  (2026-10-01)
 
 ## Corpus Check
-- 315 files · ~413,029 words
+- 325 files · ~411,447 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 107 file(s) not represented in the graph (top: .ttf 54, .csv 45, (none) 4)
 
 ## Summary
-- 3651 nodes · 5122 edges · 306 communities (240 shown, 66 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 73 edges (avg confidence: 0.88)
+- 3630 nodes · 5145 edges · 300 communities (237 shown, 63 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0d59afcc`
+- Built from commit: `70af40ba`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -23,15 +23,15 @@
 - client/package.json
 - spacing
 - search_stack
-- 005_triggers.sql
+- listings
 - html-token-validator.py
 - TestTailwindConfigGenerator
 - search
 - core.py
 - server/package.json
 - TailwindConfigGenerator
-- index.ts
-- AppError
+- express
+- review.service.ts
 - generate-slide.py
 - fetch-background.py
 - detect_domain
@@ -41,35 +41,35 @@
 - auth.controller.ts
 - dashboard.service.ts
 - .claude/skills/brainstorming/scripts/server.cjs
-- TestThresholdGate
-- 06-tenant-history.md
+- test_relevance_evaluator.py
+- _normalize
 - CatalogRefreshTest
-- Feature: Rental Income Tracking
+- dependencies
 - compilerOptions
 - fontSize
 - TestShadcnInstaller
-- Feature: Change Password
+- BM25
 - TestGeneratedConfigIsValidJs
 - design-tokens-starter.json
-- application.controller.ts
-- payment.controller.ts
+- AppError
+- pool.ts
 - validate-tokens.cjs
 - card
 - Tailwind CSS Utility Reference
 - .generate_config_string
 - .agents/skills/brainstorming/scripts/server.cjs
 - devDependencies
-- react
+- ContractDetailPage.tsx
 - embed-tokens.cjs
 - duration
-- test_data_contracts.py
-- test_design_system_mode.py
+- test_core.py
+- _palette_is_dark
 - Canvas Design System
-- LocationPicker.tsx
+- OwnerIncomePage.tsx
 - generate-tokens.cjs
 - button
 - ._base_config
-- _run
+- test_catalog_summary_line_endings.py
 - Form & Input Components
 - .test_add_breakpoints
 - input
@@ -106,7 +106,7 @@
 - Design System
 - Tailwind CSS Customization
 - BM25
-- client.ts
+- react
 - Visual Companion Guide
 - Design Audit
 - Creation Log: Systematic Debugging Skill
@@ -116,7 +116,7 @@
 - .test_add_plugins_no_duplicates
 - .test_recommend_plugins_nextjs
 - .test_generate_typescript_config
-- review.controller.ts
+- read_rows
 - Color Semantics
 - income.service.ts
 - Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)
@@ -238,14 +238,14 @@
 - graphify reference: add a URL and watch a folder
 - graphify reference: commit hook and native CLAUDE.md integration
 - graphify reference: incremental update and cluster-only
-- _normalize
+- _row_identities
 - Pi Tool Mapping
 - Evaluation and iteration
 - Checklist for effective Skills
 - Core principles
 - File Organization
 - Skill Types
-- scripts
+- _select_palette_for_mode
 - Pi Tool Mapping
 - Evaluation and iteration
 - Checklist for effective Skills
@@ -261,7 +261,7 @@
 - VerifierDashboardPage.tsx
 - .test_write_config
 - .test_write_config_invalid_path
-- parse_decision_rules
+- TestLandingAndStackContract
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - Antigravity CLI (`agy`) Tool Mapping
@@ -282,7 +282,7 @@
 - .test_validate_config_valid
 - .test_default_content_paths_nextjs
 - .test_add_colors
-- contract.controller.ts
+- scripts
 - ShadcnInstaller
 - .agents/skills/writing-plans/plan-document-reviewer-prompt.md
 - workflows/graphify.md
@@ -294,16 +294,12 @@
 - .claude/skills/systematic-debugging/test-academic.md
 - .claude/skills/writing-plans/plan-document-reviewer-prompt.md
 - 006_revoked_tokens.sql
-- _row_identities
 - .check_shadcn_config
-- dependencies
+- Example: TDD Skill Bulletproofing
 - .test_add_all_components_success
 - split_values
-- _style_is_dark_primary
-- BM25
-- CatalogSummaryLineEndingsTest
+- test_design_system_mode.py
 - .temp_project
-- TestTextLayoutRetrieval
 - createVerifier.ts
 - .test_add_components_no_config
 - .test_add_components_already_installed
@@ -313,8 +309,6 @@
 - .test_init_default_project_root
 - .test_get_installed_components_empty
 - .test_add_components_no_components
-- TestMetricMath
-- TestFixtureValidation
 
 ## God Nodes (most connected - your core abstractions)
 1. `TailwindConfigGenerator` - 58 edges
@@ -325,29 +319,29 @@
 6. `search_stack()` - 35 edges
 7. `DesignSystemGenerator` - 35 edges
 8. `ShadcnInstaller` - 34 edges
-9. `react-router-dom` - 29 edges
-10. `react` - 28 edges
+9. `pool` - 31 edges
+10. `react-router-dom` - 29 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `7. Frontend Integration` --references--> `ProfileMenu()`  [INFERRED]
-  docs/features/04-change-password.md → client/src/components/ProfileMenu.tsx
-- `2. Existing Authentication Architecture` --references--> `authMiddleware()`  [INFERRED]
-  docs/features/04-change-password.md → server/src/middleware/auth.ts
-- `Authentication & Authorization` --references--> `authMiddleware()`  [INFERRED]
-  docs/features/04-change-password.md → server/src/middleware/auth.ts
-- `Architectural Fit` --references--> `authMiddleware()`  [INFERRED]
-  docs/features/05-rental-income-tracking.md → server/src/middleware/auth.ts
-- `9. Security, Authorization & Data Isolation` --references--> `validateOwnerResourceAccess()`  [INFERRED]
-  docs/features/05-rental-income-tracking.md → server/src/services/income.service.ts
+- `Subagent support` --references--> `prompt()`  [INFERRED]
+  .claude/skills/using-superpowers/references/gemini-tools.md → server/src/scripts/createVerifier.ts
+- `Subagent support` --references--> `prompt()`  [INFERRED]
+  .agents/skills/using-superpowers/references/gemini-tools.md → server/src/scripts/createVerifier.ts
+- `TestShadcnInstaller` --uses--> `ShadcnInstaller`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py → .agents/skills/ui-styling/scripts/shadcn_add.py
+- `TestGeneratedConfigIsValidJs` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
+- `TestTailwindConfigGenerator` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (306 total, 66 thin omitted)
+## Communities (300 total, 63 thin omitted)
 
 ### Community 0 - "App.tsx"
-Cohesion: 0.12
-Nodes (25): App(), HomePage(), CallToAction(), Footer(), HowItWorks(), LoginPage(), Navbar(), PopularLocations() (+17 more)
+Cohesion: 0.11
+Nodes (27): App(), HomePage(), CallToAction(), Footer(), HowItWorks(), LoginPage(), Navbar(), PopularLocations() (+19 more)
 
 ### Community 1 - "slide_search_core.py"
 Cohesion: 0.11
@@ -355,7 +349,7 @@ Nodes (33): format_context(), format_result(), main(), Format a single search re
 
 ### Community 2 - "validate_data.py"
 Cohesion: 0.07
-Nodes (51): Semantic quality contracts for the core UI/UX datasets., read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _catalog_date(), _check_app_interface_contract() (+43 more)
+Nodes (50): Semantic quality contracts for the core UI/UX datasets., read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _catalog_date(), _check_app_interface_contract() (+42 more)
 
 ### Community 3 - "gray"
 Cohesion: 0.05
@@ -370,12 +364,12 @@ Cohesion: 0.09
 Nodes (22): $type, $value, $type, $value, $type, $value, $type, $value (+14 more)
 
 ### Community 6 - "search_stack"
-Cohesion: 0.10
-Nodes (10): _exact_stack_identifier(), Resolve a standalone API identifier even when its BM25 IDF is low., Search stack-specific guidelines, search_stack(), _rows(), TestNativeDesktopStackFreshness, Freshness and generation-isolation contracts for web stack guidance., _rows() (+2 more)
-
-### Community 7 - "005_triggers.sql"
 Cohesion: 0.08
-Nodes (42): areas, owners, tenants, users, verifiers, agreements, amenities, documents (+34 more)
+Nodes (10): _exact_stack_identifier(), Resolve a standalone API identifier even when its BM25 IDF is low., Search stack-specific guidelines, search_stack(), TestDiagnosticsContracts, _rows(), TestNativeDesktopStackFreshness, TestTextLayoutRetrieval (+2 more)
+
+### Community 7 - "listings"
+Cohesion: 0.05
+Nodes (59): areas, owners, tenants, users, verifiers, agreements, amenities, documents (+51 more)
 
 ### Community 8 - "html-token-validator.py"
 Cohesion: 0.11
@@ -386,12 +380,12 @@ Cohesion: 0.07
 Nodes (15): Test adding colors multiple times., Test adding full color palette., Test adding custom spacing., Test TailwindConfigGenerator class., Test generating JavaScript configuration., Test generating config with custom colors., Test generating config with plugins., Test validating config with no content paths. (+7 more)
 
 ### Community 10 - "search"
-Cohesion: 0.10
-Nodes (8): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestDiagnosticsContracts, TestSearchDomains, read_rows(), TestStyleTaxonomy
+Cohesion: 0.12
+Nodes (7): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestSearchDomains, read_rows(), TestStyleTaxonomy
 
 ### Community 11 - "core.py"
-Cohesion: 0.11
-Nodes (28): _contains_phrase(), _domain_keywords(), _file_signature(), _get_bm25(), _load_csv(), _load_csv_snapshot(), _load_product_keywords(), _load_rows_or_empty() (+20 more)
+Cohesion: 0.10
+Nodes (29): _contains_phrase(), _domain_keywords(), _file_signature(), _get_bm25(), _load_csv(), _load_csv_snapshot(), _load_product_keywords(), _load_rows_or_empty() (+21 more)
 
 ### Community 12 - "server/package.json"
 Cohesion: 0.09
@@ -401,13 +395,13 @@ Nodes (22): cors, dotenv, multer, node-cron, pg, tsx, @types/bcrypt, @types/cors
 Cohesion: 0.09
 Nodes (13): main(), Add custom font families. Args: fonts: Dict of font_type: [font_names] e.g.,…, Add custom spacing values. Args: spacing: Dict of name: value e.g., {'18':…, Add custom breakpoints. Args: breakpoints: Dict of name: width e.g., {'3xl':…, Add plugin requirements. Args: plugins: List of plugin names e.g.,…, Get plugin recommendations based on configuration. Returns: List of recommended…, Generate Tailwind CSS configuration files., Validate configuration. Returns: Tuple of (valid, message) (+5 more)
 
-### Community 14 - "index.ts"
-Cohesion: 0.16
-Nodes (22): express, app, AuthenticatedUser, authMiddleware(), getOptionalUser(), optionalAuthMiddleware(), RevocationCheck, upload (+14 more)
-
-### Community 15 - "AppError"
+### Community 14 - "express"
 Cohesion: 0.13
-Nodes (32): ref_crypto, apply(), pool, AppError, applyToListing(), getAllApplications(), getApplicationsForListing(), rejectApplication() (+24 more)
+Nodes (25): express, app, AuthenticatedUser, authMiddleware(), getOptionalUser(), optionalAuthMiddleware(), RevocationCheck, createRateLimiter() (+17 more)
+
+### Community 15 - "review.service.ts"
+Cohesion: 0.10
+Nodes (32): ref_crypto, zod, list(), upload(), verify(), uploadMedia(), create(), getForContract() (+24 more)
 
 ### Community 16 - "generate-slide.py"
 Cohesion: 0.12
@@ -426,16 +420,16 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 20 - "listing.service.ts"
-Cohesion: 0.07
-Nodes (46): ref_node_assert_strict, ref_node_test, create(), getAll(), getAmenities(), getById(), getMy(), getStarred() (+38 more)
+Cohesion: 0.08
+Nodes (38): create(), getAll(), getAmenities(), getById(), getMy(), getStarred(), getTenantsHistory(), isStarred() (+30 more)
 
 ### Community 21 - "color"
 Cohesion: 0.11
 Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
 
 ### Community 22 - "auth.controller.ts"
-Cohesion: 0.10
-Nodes (24): Backend Files, jsonwebtoken, becomeOwner(), becomeTenant(), changePassword(), login(), logout(), me() (+16 more)
+Cohesion: 0.11
+Nodes (23): jsonwebtoken, becomeOwner(), becomeTenant(), changePassword(), login(), logout(), me(), register() (+15 more)
 
 ### Community 23 - "dashboard.service.ts"
 Cohesion: 0.16
@@ -445,13 +439,17 @@ Nodes (16): getDashboard(), ConcurrentTenant, DuplicateLocation, getConcurrentTe
 Cohesion: 0.06
 Nodes (57): bootstrapPage(), brandMarkup(), broadcast(), browserLauncherForPlatform(), chmodOwnerOnly(), RFC-6455, clients, companionUrl() (+49 more)
 
-### Community 26 - "06-tenant-history.md"
+### Community 25 - "test_relevance_evaluator.py"
 Cohesion: 0.12
-Nodes (16): 1. Feature Overview, 1. `MyListingsPage.tsx`, 2. `ListingDetailPage.tsx`, 2. Tenancy Classification & Business Rules, 3. Data Privacy & Confidentiality Safeguards, 4. API Specification, 5. Frontend Architecture & UI Components, 6. Database Schema Impact (+8 more)
+Nodes (5): Unit tests for metric math and relevance fixture validation., TestFixtureValidation, TestMetricMath, TestThresholdGate, importlib_util
 
-### Community 28 - "Feature: Rental Income Tracking"
-Cohesion: 0.07
-Nodes (29): 10. Architectural Limitations, 11. Testing & Verification Results, 12. Files Created & Modified, 1. Feature Overview, 2. Existing Architecture & Integration Points, 3. Income Definitions & Accounting Rules, 4. Financial Calculations & Formulas, 5.1. Overall Income Summary (+21 more)
+### Community 26 - "_normalize"
+Cohesion: 0.22
+Nodes (9): _exact_match_diagnostic(), _legacy_successor_guidance(), _normalize(), Apply longest-first synonym substitution at token boundaries., Whether a stack query explicitly targets an older framework generation., Choose one coherent applicability generation for stack retrieval., Prefer the explicit successor row for a brand-new app on legacy-only stacks., _stack_query_requests_legacy() (+1 more)
+
+### Community 28 - "dependencies"
+Cohesion: 0.20
+Nodes (10): dependencies, bcrypt, cors, dotenv, express, jsonwebtoken, multer, node-cron (+2 more)
 
 ### Community 29 - "compilerOptions"
 Cohesion: 0.12
@@ -465,9 +463,9 @@ Nodes (16): $type, $value, $type, $value, $type, $value, $type, $value (+8 more)
 Cohesion: 0.12
 Nodes (9): Test adding components with overwrite flag., Test ShadcnInstaller class., Test listing installed components without config., Test listing installed components when they exist., Test initialization with custom project root., Test initialization with dry run mode., Test checking for existing shadcn config., Test getting installed components when files exist. (+1 more)
 
-### Community 32 - "Feature: Change Password"
-Cohesion: 0.08
-Nodes (24): 10. Testing, 11. Files Changed, 1. Feature Overview, 2. Existing Authentication Architecture, 3. API Contract, 4. Password Validation, 5. Password Update Process, 6. Session Handling (+16 more)
+### Community 32 - "BM25"
+Cohesion: 0.28
+Nodes (5): BM25, BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query
 
 ### Community 33 - "TestGeneratedConfigIsValidJs"
 Cohesion: 0.25
@@ -477,13 +475,13 @@ Nodes (7): Reduce a generated TS/JS config to a bare assignable object so it can
 Cohesion: 0.15
 Nodes (12): component, $type, $value, dark, semantic, $schema, $type, $value (+4 more)
 
-### Community 35 - "application.controller.ts"
-Cohesion: 0.22
-Nodes (9): getAll(), getForListing(), getMy(), reject(), ApplyInput, applySchema, UpdateApplicationInput, updateApplicationSchema (+1 more)
+### Community 35 - "AppError"
+Cohesion: 0.07
+Nodes (42): apply(), getAll(), getForListing(), getMy(), reject(), create(), getActive(), getById() (+34 more)
 
-### Community 36 - "payment.controller.ts"
-Cohesion: 0.22
-Nodes (9): create(), getForContract(), payByCash(), rejectCash(), resolve(), CreatePaymentInput, createPaymentSchema, UpdatePaymentInput (+1 more)
+### Community 36 - "pool.ts"
+Cohesion: 0.10
+Nodes (23): ref_node_assert_strict, ref_node_fs, ref_node_path, ref_node_test, pool, searchListings(), Area, AreaFinder (+15 more)
 
 ### Community 37 - "validate-tokens.cjs"
 Cohesion: 0.24
@@ -509,9 +507,9 @@ Nodes (39): bootstrapPage(), brandMarkup(), RFC-6455, clients, CONTENT_DIR, cryp
 Cohesion: 0.18
 Nodes (11): devDependencies, tsx, @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken, @types/multer, @types/node (+3 more)
 
-### Community 43 - "react"
-Cohesion: 0.15
-Nodes (15): DeleteConfirmModal(), DeleteConfirmModalProps, RATING_LABELS, ReviewData, ReviewMedia, ReviewModal(), ReviewModalProps, ScrollToTop() (+7 more)
+### Community 43 - "ContractDetailPage.tsx"
+Cohesion: 0.17
+Nodes (13): DeleteConfirmModal(), DeleteConfirmModalProps, RATING_LABELS, ReviewData, ReviewMedia, ReviewModal(), ReviewModalProps, ContractData (+5 more)
 
 ### Community 44 - "embed-tokens.cjs"
 Cohesion: 0.18
@@ -521,21 +519,21 @@ Nodes (8): args, fs, minimal, MINIMAL_TOKENS, path, projectRoot, tokensPath, wra
 Cohesion: 0.20
 Nodes (10): fast, normal, slow, $type, $value, $type, $value, duration (+2 more)
 
-### Community 46 - "test_data_contracts.py"
-Cohesion: 0.09
-Nodes (31): main(), Slide Token Validator (Legacy Wrapper) Now delegates to html-token-validator.py…, Delegate to unified html-token-validator.py with --type slides., Regression tests for validate-tokens.cjs. The validator used to skip any line…, shadcn/ui Component Installer Add shadcn/ui components to project with…, Tailwind CSS Configuration Generator Generate tailwind.config.js/ts with custom…, Tests for shadcn_add.py, Tests for tailwind_config_gen.py (+23 more)
+### Community 46 - "test_core.py"
+Cohesion: 0.11
+Nodes (23): main(), Slide Token Validator (Legacy Wrapper) Now delegates to html-token-validator.py…, Delegate to unified html-token-validator.py with --type slides., shadcn/ui Component Installer Add shadcn/ui components to project with…, Tailwind CSS Configuration Generator Generate tailwind.config.js/ts with custom…, Tests for shadcn_add.py, Tests for tailwind_config_gen.py, Offline contract tests for deterministic upstream catalog refreshes. (+15 more)
 
-### Community 47 - "test_design_system_mode.py"
-Cohesion: 0.09
-Nodes (18): _contrast_ratio(), _derive_dark_palette(), _filter_anti_patterns_for_mode(), _palette_is_dark(), WCAG relative luminance of a #RRGGBB string, or None if unparseable., True when a colors.csv row's Background is a dark surface., WCAG contrast ratio for two hex colors, or None if either is invalid., Keep product brand tokens while deriving accessible dark surfaces. (+10 more)
+### Community 47 - "_palette_is_dark"
+Cohesion: 0.18
+Nodes (7): _palette_is_dark(), WCAG relative luminance of a #RRGGBB string, or None if unparseable., True when a colors.csv row's Background is a dark surface., _relative_luminance(), The exact reproduction from issue #428., TestEndToEndCoherence, TestLuminance
 
 ### Community 48 - "Canvas Design System"
 Cohesion: 0.06
 Nodes (35): 1. Visual Communication First, 2. Minimal Text Integration, 3. Expert Craftsmanship, 4. Systematic Patterns, Analog Meditation, Approach, Canvas Boundaries, Canvas Design System (+27 more)
 
-### Community 49 - "LocationPicker.tsx"
-Cohesion: 0.16
-Nodes (12): ensureConfigured(), GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_MAP_ID, ListingMapPreview(), ListingMapPreviewProps, ensureConfigured(), GOOGLE_MAPS_API_KEY, LocationPicker() (+4 more)
+### Community 49 - "OwnerIncomePage.tsx"
+Cohesion: 0.22
+Nodes (8): ContractIncomeItem, ListingIncomeItem, OverallIncomeSummary, OwnerIncomePage(), PaginationMeta, PaymentLedgerItem, PeriodType, TabType
 
 ### Community 50 - "generate-tokens.cjs"
 Cohesion: 0.36
@@ -549,9 +547,9 @@ Nodes (10): fg, font-size, hover-bg, button, $type, $value, $type, $value (+2 mo
 Cohesion: 0.22
 Nodes (6): Path, Initialize generator. Args: typescript: If True, generate .ts config, else .js…, Determine default output path., Create base configuration structure., Get default content paths for framework., Any
 
-### Community 53 - "_run"
-Cohesion: 0.29
-Nodes (7): Path, A hardcoded hex on the same line as a var() token is still a violation., A line that references only tokens produces no false positives., _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation(), CompletedProcess
+### Community 53 - "test_catalog_summary_line_endings.py"
+Cohesion: 0.13
+Nodes (14): Path, Regression tests for validate-tokens.cjs. The validator used to skip any line…, A hardcoded hex on the same line as a var() token is still a violation., A line that references only tokens produces no false positives., _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation(), CatalogSummaryLineEndingsTest (+6 more)
 
 ### Community 54 - "Form & Input Components"
 Cohesion: 0.06
@@ -570,8 +568,8 @@ Cohesion: 0.06
 Nodes (32): 1. Mobile-First Design, 2. Consistent Breakpoint Usage, 3. Test at Breakpoint Boundaries, 4. Use Container for Content Width, 5. Progressive Enhancement, 6. Avoid Too Many Breakpoints, Best Practices, Breakpoint System (+24 more)
 
 ### Community 59 - "design_system.py"
-Cohesion: 0.07
-Nodes (34): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+26 more)
+Cohesion: 0.06
+Nodes (41): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+33 more)
 
 ### Community 60 - "Subagent-Driven Development"
 Cohesion: 0.06
@@ -677,9 +675,9 @@ Nodes (22): @apply Directive, Best Practices, Color Customization, Complete Tail
 Cohesion: 0.13
 Nodes (8): BM25, BM25 ranking algorithm for text search, Lowercase, normalize synonyms, split, remove punctuation, filter stopwords, Build BM25 index from documents, Score all documents against query, All indexed terms, for suggestion/typo-recovery purposes., TestBm25CoreBehavior, TestTokenizer
 
-### Community 90 - "client.ts"
-Cohesion: 0.10
-Nodes (19): apiClient, ApiError, makeowner, TODO: Learn more, request(), uploadListingDocuments(), uploadListingImages(), ChangePasswordPage() (+11 more)
+### Community 90 - "react"
+Cohesion: 0.12
+Nodes (18): apiClient, ApiError, makeowner, TODO: Learn more, request(), uploadListingDocuments(), uploadListingImages(), ensureConfigured() (+10 more)
 
 ### Community 91 - "Visual Companion Guide"
 Cohesion: 0.10
@@ -705,17 +703,17 @@ Nodes (19): Browser Events Format, Cards (visual designs), Cleaning Up, CSS Clas
 Cohesion: 0.10
 Nodes (19): Bulletproofing Elements, Creation Log: Systematic Debugging Skill, Enhancement 1: TDD Reference, Extraction Decisions, Final Outcome, Initial Version, Iterations, Key Insight (+11 more)
 
-### Community 100 - "review.controller.ts"
-Cohesion: 0.22
-Nodes (9): create(), getForContract(), getForListing(), remove(), update(), CreateReviewInput, createReviewSchema, UpdateReviewInput (+1 more)
+### Community 100 - "read_rows"
+Cohesion: 0.13
+Nodes (7): _object_without_duplicates(), parse_decision_rules(), Parse the canonical condition -> action-array representation., _validate_action(), read_rows(), TestGeneratedCatalogContract, TestReasoningContract
 
 ### Community 101 - "Color Semantics"
 Cohesion: 0.11
 Nodes (17): Accent, Applying Semantic Tokens, Background & Foreground, Border & Ring, Color Semantics, Dark Mode Overrides, Destructive, Interactive States (+9 more)
 
 ### Community 102 - "income.service.ts"
-Cohesion: 0.20
-Nodes (17): Backend Automated Test Suite, getContracts(), getListings(), getOverall(), getPayments(), incomePeriodEnum, IncomeQueryParams, incomeQuerySchema (+9 more)
+Cohesion: 0.19
+Nodes (16): getContracts(), getListings(), getOverall(), getPayments(), incomePeriodEnum, IncomeQueryParams, incomeQuerySchema, PaginationParams (+8 more)
 
 ### Community 103 - "Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)"
 Cohesion: 0.11
@@ -826,8 +824,8 @@ Cohesion: 0.14
 Nodes (13): 1. Identify Independent Domains, 2. Create Focused Agent Tasks, 3. Dispatch in Parallel, 4. Review and Integrate, Agent Prompt Structure, Common Mistakes, Dispatching Parallel Agents, Overview (+5 more)
 
 ### Community 134 - "ListingDetailPage.tsx"
-Cohesion: 0.11
-Nodes (21): DocumentMediaItem, DocumentViewerModal(), DocumentViewerModalProps, Application, formatDocumentType(), formatDueDate(), formatPhoneForWhatsApp(), ListingDetailPage() (+13 more)
+Cohesion: 0.08
+Nodes (27): DocumentMediaItem, DocumentViewerModal(), DocumentViewerModalProps, ensureConfigured(), GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_MAP_ID, ListingMapPreview(), ListingMapPreviewProps (+19 more)
 
 ### Community 135 - "Token Architecture"
 Cohesion: 0.15
@@ -842,8 +840,8 @@ Cohesion: 0.15
 Nodes (12): 10. Charts & Data (LOW), 1. Accessibility (CRITICAL), 2. Touch & Interaction (CRITICAL), 3. Performance (HIGH), 4. Style Selection (HIGH), 5. Layout & Responsive (HIGH), 6. Typography & Color (MEDIUM), 7. Animation (MEDIUM) (+4 more)
 
 ### Community 138 - "Testing Skills With Subagents"
-Cohesion: 0.12
-Nodes (17): Common Mistakes (Same as TDD), Example: TDD Skill Bulletproofing, GREEN Phase: Write Minimal Skill (Make It Pass), Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle, Meta-Testing (When GREEN Isn't Working), Overview (+9 more)
+Cohesion: 0.15
+Nodes (13): Common Mistakes (Same as TDD), GREEN Phase: Write Minimal Skill (Make It Pass), Meta-Testing (When GREEN Isn't Working), Overview, Quick Reference (TDD Cycle), Real-World Impact, RED Phase: Baseline Testing (Watch It Fail), TDD Mapping for Skill Testing (+5 more)
 
 ### Community 139 - "Testing Skills With Subagents"
 Cohesion: 0.15
@@ -882,8 +880,8 @@ Cohesion: 0.17
 Nodes (12): Advanced: Skills with executable code, [Analysis Title], Anti-patterns to avoid, Avoid offering too many options, Avoid Windows-style paths, Conditional workflow pattern, Examples pattern, Executive summary (+4 more)
 
 ### Community 148 - "MyApplicationsPage.tsx"
-Cohesion: 0.21
-Nodes (8): ApplicationDetailModal(), ApplicationModalProps, MyApplicationsPage(), TenantApplication, ListingWithApplications, MyListingCard(), MyListingsPage(), getAreaName()
+Cohesion: 0.13
+Nodes (14): Hero(), TODO: Query needed, mockListings, ApplicationDetailModal(), ApplicationModalProps, MyApplicationsPage(), TenantApplication, ListingWithApplications (+6 more)
 
 ### Community 149 - "Nibash"
 Cohesion: 0.17
@@ -1110,8 +1108,8 @@ Cohesion: 0.40
 Nodes (4): Choose A, B, or C, Pressure Test 3: Authority + Social Pressure, Scenario, Your Options
 
 ### Community 207 - "DesignSystemGenerator"
-Cohesion: 0.07
-Nodes (14): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation. variance/motion/density are…, Bucket a 1-10 dial value into its tier config. Returns None if value is None. (+6 more)
+Cohesion: 0.11
+Nodes (12): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+4 more)
 
 ### Community 208 - ".agents/skills/writing-skills/anthropic-best-practices.md"
 Cohesion: 0.40
@@ -1181,9 +1179,9 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
-### Community 225 - "_normalize"
-Cohesion: 0.22
-Nodes (9): _exact_match_diagnostic(), _legacy_successor_guidance(), _normalize(), Apply longest-first synonym substitution at token boundaries., Whether a stack query explicitly targets an older framework generation., Choose one coherent applicability generation for stack retrieval., Prefer the explicit successor row for a brand-new app on legacy-only stacks., _stack_query_requests_legacy() (+1 more)
+### Community 225 - "_row_identities"
+Cohesion: 0.25
+Nodes (8): _exact_row_identity(), Suggest complete public identities so a retry can bypass score thresholds., Return non-empty public identities from ordinary and alias fields., Resolve an explicit style identity without opening generic variant ranking., Return one row whose stable public identity exactly matches the query., _row_identities(), _style_identity(), _suggest_identities()
 
 ### Community 226 - "Pi Tool Mapping"
 Cohesion: 0.50
@@ -1209,9 +1207,9 @@ Nodes (4): File Organization, Self-Contained Skill, Skill with Heavy Reference, 
 Cohesion: 0.50
 Nodes (4): Pattern, Reference, Skill Types, Technique
 
-### Community 232 - "scripts"
-Cohesion: 0.40
-Nodes (5): scripts, build, dev, start, test
+### Community 232 - "_select_palette_for_mode"
+Cohesion: 0.22
+Nodes (7): _contrast_ratio(), _derive_dark_palette(), WCAG contrast ratio for two hex colors, or None if either is invalid., Keep product brand tokens while deriving accessible dark surfaces., Pick the highest-ranked palette matching the resolved mode. Only the dark case…, _select_palette_for_mode(), TestPaletteSelection
 
 ### Community 233 - "Pi Tool Mapping"
 Cohesion: 0.50
@@ -1246,8 +1244,8 @@ Cohesion: 0.50
 Nodes (3): Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
 ### Community 241 - "ListingsPage.tsx"
-Cohesion: 0.13
-Nodes (22): ActualListings(), ApplicationInfoModal(), ApplicationInfoModalProps, Hero(), PropertyCard(), PropertyCardItem, PropertyCardProps, mockListings (+14 more)
+Cohesion: 0.18
+Nodes (17): ApplicationInfoModal(), ApplicationInfoModalProps, ActualListings(), PropertyCard(), PropertyCardItem, PropertyCardProps, BackendListing, ListingsPage() (+9 more)
 
 ### Community 242 - "8"
 Cohesion: 0.67
@@ -1257,29 +1255,21 @@ Nodes (3): $type, $value, 8
 Cohesion: 0.18
 Nodes (10): ConcurrentTenant, DashboardData, DuplicateLocation, GrowthTrendItem, GrowthTrends, ListingNoPhotos, OwnerListingCount, PlatformOverview (+2 more)
 
-### Community 248 - "parse_decision_rules"
-Cohesion: 0.19
-Nodes (9): Find matching reasoning rule for a category., Apply reasoning rules to search results., apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), Return deterministic mutations and an audit trail; never execute data., Closed, non-executable grammar for design-system decision rules., Parse the canonical condition -> action-array representation. (+1 more)
-
-### Community 269 - "contract.controller.ts"
-Cohesion: 0.12
-Nodes (15): zod, create(), getActive(), getById(), sign(), list(), upload(), verify() (+7 more)
+### Community 269 - "scripts"
+Cohesion: 0.40
+Nodes (5): scripts, build, dev, start, test
 
 ### Community 270 - "ShadcnInstaller"
 Cohesion: 0.17
 Nodes (8): main(), Path, Handle shadcn/ui component installation., Initialize installer. Args: project_root: Project root directory (default:…, ShadcnInstaller, Test adding all components without config., Test checking for non-existent shadcn config., Test getting installed components without config.
 
-### Community 281 - "_row_identities"
-Cohesion: 0.25
-Nodes (8): _exact_row_identity(), Suggest complete public identities so a retry can bypass score thresholds., Return non-empty public identities from ordinary and alias fields., Resolve an explicit style identity without opening generic variant ranking., Return one row whose stable public identity exactly matches the query., _row_identities(), _style_identity(), _suggest_identities()
-
 ### Community 284 - ".check_shadcn_config"
 Cohesion: 0.21
 Nodes (6): Add all available shadcn/ui components. Args: overwrite: If True, overwrite…, List installed components. Returns: Tuple of (success, message with component…, Check if shadcn is initialized in project. Returns: True if components.json…, Get list of already installed components. Returns: List of installed component…, Read shadcn version from project package.json; fall back to a pinned default., Add shadcn/ui components. Args: components: List of component names to add…
 
-### Community 285 - "dependencies"
-Cohesion: 0.20
-Nodes (10): dependencies, bcrypt, cors, dotenv, express, jsonwebtoken, multer, node-cron (+2 more)
+### Community 285 - "Example: TDD Skill Bulletproofing"
+Cohesion: 0.50
+Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle
 
 ### Community 286 - ".test_add_all_components_success"
 Cohesion: 0.22
@@ -1289,41 +1279,33 @@ Nodes (5): Test successful component addition., Test component addition with sub
 Cohesion: 0.47
 Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
 
-### Community 290 - "_style_is_dark_primary"
-Cohesion: 0.24
-Nodes (7): _query_wants_dark(), True when a styles.csv row describes itself as dark-first., True when the query explicitly asks for a dark theme., Resolve the mode the rest of the output has to agree with., _resolve_color_mode(), _style_is_dark_primary(), TestModeResolution
-
-### Community 291 - "BM25"
-Cohesion: 0.28
-Nodes (5): BM25, BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query
-
-### Community 292 - "CatalogSummaryLineEndingsTest"
-Cohesion: 0.40
-Nodes (3): CatalogSummaryLineEndingsTest, _load_generator(), Simulate a Windows checkout: the recorded hashes must still validate.
+### Community 290 - "test_design_system_mode.py"
+Cohesion: 0.14
+Nodes (11): _filter_anti_patterns_for_mode(), _query_wants_dark(), True when a styles.csv row describes itself as dark-first., True when the query explicitly asks for a dark theme., Resolve the mode the rest of the output has to agree with., Drop "avoid dark mode" advice once dark mode is the resolved answer., _resolve_color_mode(), _style_is_dark_primary() (+3 more)
 
 ### Community 296 - "createVerifier.ts"
 Cohesion: 0.22
 Nodes (9): Parallel dispatch, Prompt filling, Subagent support, bcrypt, ref_node_process, ref_node_readline_promises, main(), prompt() (+1 more)
 
 ## Knowledge Gaps
-- **1662 isolated node(s):** `crypto`, `http`, `fs`, `path`, `OPCODES` (+1657 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2096 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **1627 isolated node(s):** `crypto`, `http`, `fs`, `path`, `OPCODES` (+1622 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2067 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **63 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `prompt()` connect `createVerifier.ts` to `Gemini CLI Tool Mapping`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `authMiddleware()` connect `index.ts` to `Feature: Change Password`, `06-tenant-history.md`, `Feature: Rental Income Tracking`, `auth.controller.ts`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Why does `Subagent support` connect `createVerifier.ts` to `.agents/skills/using-superpowers/references/codex-tools.md`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `TailwindConfigGenerator` connect `TailwindConfigGenerator` to `.test_add_fonts`, `.test_init_framework`, `.test_full_configuration_javascript`, `TestTailwindConfigGenerator`, `.test_default_output_path_javascript`, `.test_default_content_paths_nextjs`, `.test_add_colors`, `.test_validate_config_valid`, `TestGeneratedConfigIsValidJs`, `.generate_config_string`, `test_core.py`, `._base_config`, `.test_validate_config_empty_theme`, `.test_add_breakpoints`, `.test_recommend_plugins`, `.test_add_plugins_no_duplicates`, `.test_recommend_plugins_nextjs`, `.test_generate_typescript_config`, `.test_init_default_typescript`, `.test_write_config`, `.test_write_config_invalid_path`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Why does `Subagent support` connect `Gemini CLI Tool Mapping` to `createVerifier.ts`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `crypto`, `http`, `fs` to the rest of the system?**
-  _1662 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1627 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `App.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.1173054587688734 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10707070707070707 - nodes in this community are weakly interconnected._
 - **Should `slide_search_core.py` be split into smaller, more focused modules?**
   _Cohesion score 0.10588235294117647 - nodes in this community are weakly interconnected._

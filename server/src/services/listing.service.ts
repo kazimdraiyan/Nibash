@@ -5,6 +5,7 @@ import {
   UpdateListingInput,
 } from "../schemas/listing.schema.js";
 import { getPublicUrl } from "./media.service.js";
+import { searchListings as runSearch } from "./search/index.js";
 
 export async function getAllListings() {
   const result = await pool.query(
@@ -30,65 +31,14 @@ export async function searchListings(
   // Optional amenity names — listing must have ALL of them (AND behavior).
   amenityNames: string[],
 ) {
-  // Every search is limited to publicly approved listings.
-  const conditions = ["l.status = 'approved'"];
-  // Store values separately so PostgreSQL can bind them safely to placeholders.
-  const params: Array<string | number | string[]> = [];
-
-  // Add a value to the parameters array and return its numbered SQL placeholder.
-  const addParam = (value: string | number | string[]) => {
-    // Append the value that will be bound by the database driver.
-    params.push(value);
-    // PostgreSQL placeholders are one-based, so use the new array length.
-    return `$${params.length}`;
-  };
-
-  // Ignore a missing or whitespace-only text query.
-  const searchTerm = q?.trim();
-  if (searchTerm) {
-    // Bind the search text with wildcards for a partial match.
-    const placeholder = addParam(`%${searchTerm}%`);
-    // Match the text in either searchable listing field, without case sensitivity.
-    conditions.push(
-      `(l.title ILIKE ${placeholder} OR l.description ILIKE ${placeholder})`,
-    );
-  }
-  if (bedrooms !== null) {
-    // Require the listing to have the requested number of bedrooms.
-    conditions.push(`l.bedroom_count = ${addParam(bedrooms)}`);
-  }
-  if (areaId !== null) {
-    // Require the listing to belong to the requested area.
-    conditions.push(`l.area_id = ${addParam(areaId)}`);
-  }
-  if (maxRent !== null) {
-    // Exclude listings whose rent is above the requested maximum.
-    conditions.push(`t.rent <= ${addParam(maxRent)}`);
-  }
-  if (amenityNames.length > 0) {
-    // AND behavior: the listing must have every requested amenity.
-    // For each amenity name, require at least one matching row in listing_amenities joined with amenities.
-    const placeholder = addParam(amenityNames);
-    conditions.push(
-      `(SELECT COUNT(DISTINCT a.name) FROM listing_amenities la JOIN amenities a ON a.id = la.amenity_id WHERE la.listing_id = l.id AND a.name = ANY(${placeholder})) = ${amenityNames.length}`
-    );
-  }
-
-  // Select listing data and rent after joining each listing to its initial terms.
-  const query = `
-    SELECT l.*, t.rent,
-      (SELECT ROUND(AVG(r.rating)::numeric, 1) FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS rating,
-      (SELECT COUNT(r.id)::int FROM reviews r JOIN contracts c ON c.id = r.contract_id WHERE c.listing_id = l.id) AS review_count
-    FROM listings l
-    JOIN initial_terms it ON it.listing_id = l.id
-    JOIN terms t ON t.id = it.terms_id
-    -- Combine the approval condition with any supplied filters.
-    WHERE ${conditions.join(" AND ")}
-  `;
-  // Execute the parameterized query using the generated placeholders and values.
-  const result = await pool.query(query, params);
-  // Add public media URLs before returning the matching listings.
-  return attachMediaToListingResults(result.rows);
+  const result = await runSearch({
+    q,
+    bedrooms,
+    areaId,
+    maxRent,
+    amenityNames,
+  });
+  return result.listings;
 }
 export async function getMylistings(owner: number) {
   const result = await pool.query(
