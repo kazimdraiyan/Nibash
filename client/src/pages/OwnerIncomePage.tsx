@@ -199,43 +199,21 @@ export function OwnerIncomePage() {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 min-h-[80vh]">
-      {/* Breadcrumb & Navigation */}
-      <div className="flex items-center gap-2 mb-3">
-        <Link
-          to="/my-listings"
-          className="text-xs text-slate-400 hover:text-white transition flex items-center gap-1"
-        >
-          <span className="material-symbols-outlined text-xs">arrow_back</span>
-          <span>My Listings</span>
-        </Link>
-        <span className="text-xs text-slate-600">/</span>
-        <span className="text-xs text-amber-400 font-medium">Rental Income</span>
-      </div>
-
       {/* Page Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-serif font-bold text-white tracking-wide">
+            <h1 className="text-3xl font-bold text-white tracking-tight">
               Rental Income Tracking
             </h1>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs">verified</span>
-              <span>Confirmed Payments Only</span>
-            </span>
           </div>
           <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">
             Track confirmed rent received across your properties, individual leases, and payment history.
           </p>
         </div>
 
-        {/* Currency & Refresh Action */}
+        {/* Refresh Action */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-xs font-mono text-slate-300 shadow-sm">
-            <span className="text-slate-500">Currency:</span>
-            <span className="font-semibold text-white">BDT (৳)</span>
-          </div>
-
           <button
             type="button"
             onClick={() => fetchIncomeData(pagination.page)}
@@ -256,7 +234,7 @@ export function OwnerIncomePage() {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs uppercase tracking-wider font-semibold text-slate-400 font-mono flex items-center gap-1 mr-1">
-              <span className="material-symbols-outlined text-base text-amber-400">calendar_month</span>
+              <span className="material-symbols-outlined text-base text-slate-400">calendar_month</span>
               <span>Filter Period:</span>
             </span>
 
@@ -276,7 +254,7 @@ export function OwnerIncomePage() {
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
                   period === p.id
-                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm"
+                    ? "bg-slate-500/20 text-slate-300 border border-slate-500/50 shadow-sm"
                     : "bg-slate-800/60 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent"
                 }`}
               >
@@ -287,8 +265,8 @@ export function OwnerIncomePage() {
 
           {/* Active Property Scope Pill */}
           {selectedListingId && (
-            <div className="flex items-center gap-2 bg-emerald-950/60 border border-emerald-700/50 px-3 py-1.5 rounded-xl text-xs text-emerald-300 font-medium">
-              <span className="material-symbols-outlined text-sm text-emerald-400">filter_alt</span>
+            <div className="flex items-center gap-2 bg-slate-950/60 border border-slate-700/50 px-3 py-1.5 rounded-xl text-xs text-slate-300 font-medium">
+              <span className="material-symbols-outlined text-sm text-slate-400">filter_alt</span>
               <span>Filtered by: <strong>{selectedListingObj?.title || `Listing #${selectedListingId}`}</strong></span>
               <button
                 type="button"
@@ -311,7 +289,7 @@ export function OwnerIncomePage() {
                 type="date"
                 value={customFrom}
                 onChange={(e) => setCustomFrom(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono focus:border-amber-400 focus:outline-none"
+                className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono focus:border-slate-400 focus:outline-none"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -320,13 +298,13 @@ export function OwnerIncomePage() {
                 type="date"
                 value={customTo}
                 onChange={(e) => setCustomTo(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono focus:border-amber-400 focus:outline-none"
+                className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono focus:border-slate-400 focus:outline-none"
               />
             </div>
             <button
               type="button"
               onClick={() => fetchIncomeData(1)}
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-4 py-1.5 rounded-lg transition cursor-pointer"
+              className="bg-slate-500 hover:bg-slate-400 text-slate-950 font-semibold px-4 py-1.5 rounded-lg transition cursor-pointer"
             >
               Apply Filter
             </button>
@@ -354,12 +332,12 @@ export function OwnerIncomePage() {
       {/* Overall Summary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         {/* Metric 1: Total Rent Received */}
-        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-amber-500/40 transition-all">
+        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-slate-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs uppercase tracking-wider font-semibold font-mono">
               Total Rent Received
             </span>
-            <span className="material-symbols-outlined text-xl text-amber-400">payments</span>
+            <span className="material-symbols-outlined text-xl text-slate-400">payments</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold font-mono text-white mb-1">
             {loading ? (
@@ -369,7 +347,6 @@ export function OwnerIncomePage() {
             )}
           </div>
           <div className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span>
               {period === "all" ? "All time confirmed rent" : "Filtered period confirmed"}
             </span>
@@ -377,14 +354,14 @@ export function OwnerIncomePage() {
         </div>
 
         {/* Metric 2: Rent Received This Month */}
-        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-emerald-500/40 transition-all">
+        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-slate-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs uppercase tracking-wider font-semibold font-mono">
               This Month
             </span>
-            <span className="material-symbols-outlined text-xl text-emerald-400">event_available</span>
+            <span className="material-symbols-outlined text-xl text-slate-400">event_available</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-400 mb-1">
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-400 mb-1">
             {loading ? (
               <div className="h-8 w-28 bg-slate-800 rounded animate-pulse" />
             ) : (
@@ -397,12 +374,12 @@ export function OwnerIncomePage() {
         </div>
 
         {/* Metric 3: Income-Generating Listings */}
-        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-cyan-500/40 transition-all">
+        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-slate-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs uppercase tracking-wider font-semibold font-mono">
               Income Listings
             </span>
-            <span className="material-symbols-outlined text-xl text-cyan-400">real_estate_agent</span>
+            <span className="material-symbols-outlined text-xl text-slate-400">real_estate_agent</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold font-mono text-white mb-1">
             {loading ? (
@@ -417,12 +394,12 @@ export function OwnerIncomePage() {
         </div>
 
         {/* Metric 4: Active Income Contracts */}
-        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-purple-500/40 transition-all">
+        <div className="p-5 rounded-2xl bg-[#12151c] border border-white/10 relative overflow-hidden group hover:border-slate-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs uppercase tracking-wider font-semibold font-mono">
               Active Contracts
             </span>
-            <span className="material-symbols-outlined text-xl text-purple-400">description</span>
+            <span className="material-symbols-outlined text-xl text-slate-400">description</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold font-mono text-white mb-1">
             {loading ? (
@@ -444,7 +421,7 @@ export function OwnerIncomePage() {
           onClick={() => setActiveTab("listings")}
           className={`pb-3 px-4 text-xs uppercase tracking-wider font-semibold font-mono transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
             activeTab === "listings"
-              ? "border-amber-400 text-amber-300"
+              ? "border-slate-400 text-slate-300"
               : "border-transparent text-slate-400 hover:text-white hover:border-slate-700"
           }`}
         >
@@ -457,7 +434,7 @@ export function OwnerIncomePage() {
           onClick={() => setActiveTab("contracts")}
           className={`pb-3 px-4 text-xs uppercase tracking-wider font-semibold font-mono transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
             activeTab === "contracts"
-              ? "border-amber-400 text-amber-300"
+              ? "border-slate-400 text-slate-300"
               : "border-transparent text-slate-400 hover:text-white hover:border-slate-700"
           }`}
         >
@@ -470,7 +447,7 @@ export function OwnerIncomePage() {
           onClick={() => setActiveTab("ledger")}
           className={`pb-3 px-4 text-xs uppercase tracking-wider font-semibold font-mono transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
             activeTab === "ledger"
-              ? "border-amber-400 text-amber-300"
+              ? "border-slate-400 text-slate-300"
               : "border-transparent text-slate-400 hover:text-white hover:border-slate-700"
           }`}
         >
@@ -514,7 +491,7 @@ export function OwnerIncomePage() {
                     key={l.listingId}
                     className={`rounded-2xl border p-5 transition-all flex flex-col justify-between ${
                       isSelected
-                        ? "bg-[#14231f] border-emerald-500/70 shadow-lg"
+                        ? "bg-[#14231f] border-slate-500/70 shadow-lg"
                         : "bg-[#12151c] border-white/10 hover:border-slate-700"
                     }`}
                   >
@@ -528,7 +505,7 @@ export function OwnerIncomePage() {
 
                         <span className={`text-[10px] uppercase font-mono font-semibold px-2 py-0.5 rounded border ${
                           l.listingStatus === "occupied"
-                            ? "bg-emerald-950/80 text-emerald-300 border-emerald-600/50"
+                            ? "bg-slate-950/80 text-slate-300 border-slate-600/50"
                             : "bg-slate-800 text-slate-300 border-slate-700"
                         }`}>
                           {l.listingStatus}
@@ -552,7 +529,7 @@ export function OwnerIncomePage() {
                         <div className="flex-1 min-w-0">
                           <Link
                             to={`/listings/${l.listingId}`}
-                            className="text-base font-bold text-white hover:text-amber-400 transition line-clamp-1"
+                            className="text-base font-bold text-white hover:text-slate-400 transition line-clamp-1"
                           >
                             {l.title}
                           </Link>
@@ -562,7 +539,7 @@ export function OwnerIncomePage() {
                           <div className="flex items-center gap-3 text-xs text-slate-400 mt-2">
                             <span>Contracts: <strong className="text-white">{l.contributingContractsCount}</strong></span>
                             <span>•</span>
-                            <span>Active: <strong className="text-emerald-400">{l.activeContractsCount}</strong></span>
+                            <span>Active: <strong className="text-slate-400">{l.activeContractsCount}</strong></span>
                           </div>
                         </div>
                       </div>
@@ -573,7 +550,7 @@ export function OwnerIncomePage() {
                           <span className="text-[10px] uppercase tracking-wider text-slate-400 font-mono block">
                             Total Received
                           </span>
-                          <span className="text-lg font-bold font-mono text-emerald-400">
+                          <span className="text-lg font-bold font-mono text-slate-400">
                             {formatBDT(l.totalRentReceived)}
                           </span>
                         </div>
@@ -602,7 +579,7 @@ export function OwnerIncomePage() {
                         }}
                         className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1 ${
                           isSelected
-                            ? "bg-emerald-800 text-white"
+                            ? "bg-slate-800 text-white"
                             : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700"
                         }`}
                       >
@@ -664,7 +641,7 @@ export function OwnerIncomePage() {
                       </span>
                       <span className={`text-[10px] uppercase font-mono font-semibold px-2 py-0.5 rounded border ${
                         c.contractStatus === "signed" || c.contractStatus === "active"
-                          ? "bg-emerald-950/80 text-emerald-300 border-emerald-600/50"
+                          ? "bg-slate-950/80 text-slate-300 border-slate-600/50"
                           : "bg-slate-800 text-slate-300 border-slate-700"
                       }`}>
                         {c.contractStatus}
@@ -705,7 +682,7 @@ export function OwnerIncomePage() {
                         <span className="text-[10px] uppercase tracking-wider text-slate-400 font-mono block">
                           Total Received
                         </span>
-                        <span className="text-sm font-bold font-mono text-emerald-400">
+                        <span className="text-sm font-bold font-mono text-slate-400">
                           {formatBDT(c.totalRentReceived)}
                         </span>
                       </div>
@@ -720,7 +697,7 @@ export function OwnerIncomePage() {
 
                     <Link
                       to={`/contracts/${c.contractId}`}
-                      className="text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1"
+                      className="text-slate-400 hover:text-slate-300 font-medium flex items-center gap-1"
                     >
                       <span>Contract Details</span>
                       <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -774,13 +751,13 @@ export function OwnerIncomePage() {
                         <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap">
                           {formatDate(p.paidAt)}
                         </td>
-                        <td className="py-3.5 px-4 text-emerald-400 font-bold text-sm whitespace-nowrap">
+                        <td className="py-3.5 px-4 text-slate-400 font-bold text-sm whitespace-nowrap">
                           {formatBDT(p.amount)}
                         </td>
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase font-semibold border ${
                             p.paymentMethod === "Cash"
-                              ? "bg-amber-950/60 text-amber-300 border-amber-600/40"
+                              ? "bg-slate-950/60 text-slate-300 border-slate-600/40"
                               : "bg-cyan-950/60 text-cyan-300 border-cyan-600/40"
                           }`}>
                             <span className="material-symbols-outlined text-xs">
@@ -795,7 +772,7 @@ export function OwnerIncomePage() {
                         <td className="py-3.5 px-4 text-white font-sans font-medium max-w-[200px] truncate">
                           <Link
                             to={`/listings/${p.listingId}`}
-                            className="hover:text-amber-400 transition"
+                            className="hover:text-slate-400 transition"
                             title={p.listingTitle}
                           >
                             {p.listingTitle}
@@ -807,7 +784,7 @@ export function OwnerIncomePage() {
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           <Link
                             to={`/contracts/${p.contractId}`}
-                            className="text-amber-400 hover:underline font-mono"
+                            className="text-slate-400 hover:underline font-mono"
                           >
                             #{p.contractId}
                           </Link>

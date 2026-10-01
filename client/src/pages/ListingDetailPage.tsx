@@ -57,7 +57,8 @@ function formatPhoneForWhatsApp(phone: string): string {
 
   if (!digits) return "";
   if (digits.startsWith("880") && digits.length >= 12) return digits;
-  if (digits.startsWith("0") && digits.length === 11) return `880${digits.slice(1)}`;
+  if (digits.startsWith("0") && digits.length === 11)
+    return `880${digits.slice(1)}`;
   if (digits.length >= 10) return digits;
 
   return "";
@@ -224,10 +225,15 @@ export function ListingDetailPage() {
   const [documentsError, setDocumentsError] = useState<string | null>(null);
 
   // Tenant history state for owner
-  const [tenantHistory, setTenantHistory] = useState<ListingTenantHistoryResponse | null>(null);
+  const [tenantHistory, setTenantHistory] =
+    useState<ListingTenantHistoryResponse | null>(null);
   const [tenantHistoryLoading, setTenantHistoryLoading] = useState(false);
-  const [tenantHistoryError, setTenantHistoryError] = useState<string | null>(null);
-  const [activeTenantTab, setActiveTenantTab] = useState<"current" | "past">("current");
+  const [tenantHistoryError, setTenantHistoryError] = useState<string | null>(
+    null,
+  );
+  const [activeTenantTab, setActiveTenantTab] = useState<"current" | "past">(
+    "current",
+  );
 
   // Verifier actions state
   const [verifyingDocId, setVerifyingDocId] = useState<number | null>(null);
@@ -311,7 +317,7 @@ export function ListingDetailPage() {
                       ? prev.photos.length - 1
                       : prev.selectedIndex - 1,
                 }
-              : null
+              : null,
           );
         }
         if (e.key === "ArrowRight" && reviewLightbox.photos.length > 1) {
@@ -324,7 +330,7 @@ export function ListingDetailPage() {
                       ? 0
                       : prev.selectedIndex + 1,
                 }
-              : null
+              : null,
           );
         }
         if (e.key === "Escape") setReviewLightbox(null);
@@ -350,9 +356,9 @@ export function ListingDetailPage() {
         // If 404 and current user is a verifier, query unverified queue
         if (user?.is_verifier) {
           try {
-            const unverifiedRes = await apiClient.get<{ listings: OwnerPhoneListing[] }>(
-              `/verify/listings`,
-            );
+            const unverifiedRes = await apiClient.get<{
+              listings: OwnerPhoneListing[];
+            }>(`/verify/listings`);
             const found = (unverifiedRes.listings || []).find(
               (l) => String(l.id) === String(id),
             );
@@ -466,7 +472,9 @@ export function ListingDetailPage() {
           );
           setTenantHistory(histRes);
         } catch (histErr: any) {
-          setTenantHistoryError(histErr.message || "Failed to load tenant history.");
+          setTenantHistoryError(
+            histErr.message || "Failed to load tenant history.",
+          );
         } finally {
           setTenantHistoryLoading(false);
         }
@@ -485,7 +493,8 @@ export function ListingDetailPage() {
   // Fetch starred state after listing loads
   useEffect(() => {
     if (!id || !user) return;
-    apiClient.get<{ starred: boolean }>(`/listings/${id}/starred`)
+    apiClient
+      .get<{ starred: boolean }>(`/listings/${id}/starred`)
       .then((res) => setIsStarred(res.starred))
       .catch(() => {});
   }, [id, user]);
@@ -532,7 +541,9 @@ export function ListingDetailPage() {
       );
       setTenantHistory(histRes);
     } catch (histErr: any) {
-      setTenantHistoryError(histErr.message || "Failed to load tenant history.");
+      setTenantHistoryError(
+        histErr.message || "Failed to load tenant history.",
+      );
     } finally {
       setTenantHistoryLoading(false);
     }
@@ -750,14 +761,17 @@ export function ListingDetailPage() {
   };
 
   const handleApproveListing = async () => {
-    if (!id || verifying || listing?.status?.toLowerCase() === "approved") return;
+    if (!id || verifying || listing?.status?.toLowerCase() === "approved")
+      return;
     setVerifying(true);
     setVerifyError(null);
     setVerifySuccessMsg(null);
     try {
       await apiClient.post(`/verify/listings/${id}/verify`);
       setListing((prev) => (prev ? { ...prev, status: "approved" } : null));
-      setVerifySuccessMsg("Listing approved successfully and is now active on Nibash.");
+      setVerifySuccessMsg(
+        "Listing approved successfully and is now active on Nibash.",
+      );
     } catch (err: any) {
       setVerifyError(err.message || "Failed to approve listing.");
     } finally {
@@ -766,7 +780,8 @@ export function ListingDetailPage() {
   };
 
   const handleRejectListing = async () => {
-    if (!id || rejecting || listing?.status?.toLowerCase() === "rejected") return;
+    if (!id || rejecting || listing?.status?.toLowerCase() === "rejected")
+      return;
     setRejecting(true);
     setRejectError(null);
     try {
@@ -815,12 +830,6 @@ export function ListingDetailPage() {
         <div className="p-4 bg-red-950/50 border border-red-800 text-red-300 rounded-lg mb-4 text-sm">
           {error || "Apartment not found."}
         </div>
-        <Link
-          to="/listings"
-          className="inline-block bg-slate-800 text-white px-4 py-2 rounded text-xs hover:bg-slate-700"
-        >
-          ← Back to Listings
-        </Link>
       </div>
     );
   }
@@ -844,29 +853,6 @@ export function ListingDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      {/* Back Link */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <Link
-          to="/listings"
-          className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          <span>Back to Listings</span>
-        </Link>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* MAIN COLUMN: Photo Gallery, Description, Lease Terms & Details, Owner Information, Applications (if owner), Reviews */}
         <div className="contents lg:flex lg:flex-col lg:col-span-7 xl:col-span-8 lg:gap-8">
@@ -1028,7 +1014,7 @@ export function ListingDetailPage() {
                             className="w-full h-full object-cover"
                           />
                           {idx === 0 && (
-                            <span className="absolute bottom-1 left-1 bg-black/80 backdrop-blur-xs text-amber-300 border border-amber-500/30 text-[9px] font-mono px-1 rounded">
+                            <span className="absolute bottom-1 left-1 bg-black/80 backdrop-blur-xs text-slate-300 border border-slate-500/30 text-[9px] font-mono px-1 rounded">
                               Cover
                             </span>
                           )}
@@ -1070,7 +1056,7 @@ export function ListingDetailPage() {
           {/* 2. Description (order-3 on mobile) */}
           <div className="order-3 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg text-[#d4b068]">
+              <span className="material-symbols-outlined text-lg text-slate">
                 description
               </span>
               <span>About this Property</span>
@@ -1083,7 +1069,7 @@ export function ListingDetailPage() {
           {/* 3. Amenities & Facilities (order-4 on mobile) */}
           <div className="order-4 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
             <h2 className="text-base font-bold text-white flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-lg text-[#d4b068]">
+              <span className="material-symbols-outlined text-lg text-slate">
                 hotel_class
               </span>
               <span>Amenities & Facilities</span>
@@ -1094,15 +1080,16 @@ export function ListingDetailPage() {
                 {listing.amenities.map((amenity) => {
                   const iconName = getAmenityIcon(amenity.name);
                   const meta = getAmenityMeta(amenity.name);
-                  const tooltipText = amenity.description || meta.category || amenity.name;
+                  const tooltipText =
+                    amenity.description || meta.category || amenity.name;
 
                   return (
                     <div
                       key={amenity.id || amenity.name}
                       title={tooltipText}
-                      className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border border-slate-800 bg-[#090a0c] text-slate-200 hover:border-[#d4b068]/40 hover:bg-[#151922] transition-all cursor-default select-none shadow-xs"
+                      className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border border-slate-800 bg-[#090a0c] text-slate-200 hover:border-slate/40 hover:bg-[#151922] transition-all cursor-default select-none shadow-xs"
                     >
-                      <span className="material-symbols-outlined text-base text-[#d4b068] group-hover:scale-110 transition-transform">
+                      <span className="material-symbols-outlined text-base text-slate group-hover:scale-110 transition-transform">
                         {iconName}
                       </span>
                       <span>{amenity.name}</span>
@@ -1115,7 +1102,10 @@ export function ListingDetailPage() {
                 <span className="material-symbols-outlined text-slate-500 text-lg">
                   info
                 </span>
-                <span>No specific building amenities or facilities listed for this residence.</span>
+                <span>
+                  No specific building amenities or facilities listed for this
+                  residence.
+                </span>
               </div>
             )}
           </div>
@@ -1143,7 +1133,7 @@ export function ListingDetailPage() {
               listing.pet_allowed !== null)) && (
             <div className="order-5 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
               <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                <span className="material-symbols-outlined text-lg text-slate">
                   receipt_long
                 </span>
                 <span>Lease Terms & Details</span>
@@ -1256,84 +1246,59 @@ export function ListingDetailPage() {
 
           {/* 4. Owner Information Section (order-6 on mobile) */}
           {!isOwner && (
-          <div className="order-6 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
-              <div className="flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-xl text-[#d4b068]">
-                  shield_person
-                </span>
-                <h2 className="text-base font-bold text-white">
-                  Owner Information
-                </h2>
+            <div className="order-6 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
+              <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-xl text-slate">
+                    shield_person
+                  </span>
+                  <h2 className="text-base font-bold text-white">
+                    Owner Information
+                  </h2>
+                </div>
               </div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4b068]/15 text-[#d4b068] border border-[#d4b068]/30">
-                <span className="material-symbols-outlined text-xs">
-                  verified
-                </span>
-                <span>Registered Owner</span>
-              </span>
+
+              {owner ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
+                  {owner.name && (
+                    <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                      <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                        Owner Name
+                      </span>
+                      <span className="font-medium text-white">
+                        {owner.name}
+                      </span>
+                    </div>
+                  )}
+
+                  {owner.email && (
+                    <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                      <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                        Email
+                      </span>
+                      <span className="font-mono text-white text-xs truncate block">
+                        {owner.email}
+                      </span>
+                    </div>
+                  )}
+
+                  {owner.phone && (
+                    <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
+                      <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                        Phone
+                      </span>
+                      <span className="font-mono text-white text-xs">
+                        {owner.phone}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Owner information is currently unavailable.
+                </p>
+              )}
             </div>
-
-            {owner ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
-                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Owner Reference
-                  </span>
-                  <span className="font-mono font-medium text-white">
-                    Owner #{owner.id}
-                  </span>
-                </div>
-
-                {owner.name && (
-                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                      Owner Name
-                    </span>
-                    <span className="font-medium text-white">{owner.name}</span>
-                  </div>
-                )}
-
-                {owner.email && (
-                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                      Email
-                    </span>
-                    <span className="font-mono text-white text-xs truncate block">
-                      {owner.email}
-                    </span>
-                  </div>
-                )}
-
-                {owner.phone && (
-                  <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                    <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                      Phone
-                    </span>
-                    <span className="font-mono text-white text-xs">
-                      {owner.phone}
-                    </span>
-                  </div>
-                )}
-
-                <div className="p-3.5 rounded-xl bg-[#090a0c] border border-slate-800">
-                  <span className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
-                    Verification Status
-                  </span>
-                  <span className="text-emerald-400 flex items-center gap-1 text-xs font-semibold">
-                    <span className="material-symbols-outlined text-sm">
-                      verified_user
-                    </span>
-                    Verified Property Owner
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <p className="text-xs text-slate-400">
-                Owner information is currently unavailable.
-              </p>
-            )}
-          </div>
           )}
 
           {/* 5. If Owner: Applications Received (order-7 on mobile) */}
@@ -1341,7 +1306,7 @@ export function ListingDetailPage() {
             <div className="order-7 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
-                  <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                  <span className="material-symbols-outlined text-lg text-slate">
                     group
                   </span>
                   <span>Applications Received</span>
@@ -1380,7 +1345,7 @@ export function ListingDetailPage() {
                                 ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
                                 : app.status === "rejected"
                                   ? "bg-rose-950 text-rose-300 border border-rose-800"
-                                  : "bg-amber-950 text-amber-300 border border-amber-800"
+                                  : "bg-slate-950 text-slate-300 border border-slate-800"
                             }`}
                           >
                             {app.status}
@@ -1454,7 +1419,7 @@ export function ListingDetailPage() {
                           <>
                             <Link
                               to={`/contracts/new?listingId=${id}&tenantId=${app.tenant_id}`}
-                              className="bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold px-3.5 py-1.5 rounded-lg text-xs transition"
+                              className="bg-slate hover:bg-[#c39f57] text-black font-semibold px-3.5 py-1.5 rounded-lg text-xs transition"
                             >
                               Propose Contract
                             </Link>
@@ -1489,20 +1454,21 @@ export function ListingDetailPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-white/10">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-xl text-sky-400">
+                    <span className="material-symbols-outlined text-xl text-slate-400">
                       history
                     </span>
-                    <h2 className="text-lg font-serif font-bold text-white tracking-wide">
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
                       Tenant History
                     </h2>
-                    <span className="text-xs bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
+                    <span className="text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
                       {(tenantHistory?.currentTenants?.length || 0) +
                         (tenantHistory?.pastTenants?.length || 0)}{" "}
                       Total
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-1">
-                    Public record of current and previous tenants for this apartment.
+                    Public record of current and previous tenants for this
+                    apartment.
                   </p>
                 </div>
 
@@ -1513,11 +1479,10 @@ export function ListingDetailPage() {
                     onClick={() => setActiveTenantTab("current")}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
                       activeTenantTab === "current"
-                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
+                        ? "bg-slate-700/60 text-slate-200 border border-slate-600 shadow-sm"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                     <span>
                       Current ({tenantHistory?.currentTenants?.length || 0})
                     </span>
@@ -1531,8 +1496,9 @@ export function ListingDetailPage() {
                         : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                    <span>Past ({tenantHistory?.pastTenants?.length || 0})</span>
+                    <span>
+                      Past ({tenantHistory?.pastTenants?.length || 0})
+                    </span>
                   </button>
                 </div>
               </div>
@@ -1554,7 +1520,7 @@ export function ListingDetailPage() {
               {/* Loading Spinner */}
               {tenantHistoryLoading ? (
                 <div className="py-12 text-center text-slate-400">
-                  <div className="w-7 h-7 rounded-full border-2 border-sky-400/40 border-t-transparent animate-spin mx-auto mb-2" />
+                  <div className="w-7 h-7 rounded-full border-2 border-slate-400/40 border-t-transparent animate-spin mx-auto mb-2" />
                   <p className="text-xs">Loading tenant history...</p>
                 </div>
               ) : activeTenantTab === "current" ? (
@@ -1580,7 +1546,8 @@ export function ListingDetailPage() {
                         No Current Tenants
                       </h4>
                       <p className="text-xs text-slate-500">
-                        This apartment is not currently occupied by an active tenant.
+                        This apartment is not currently occupied by an active
+                        tenant.
                       </p>
                     </div>
                   )}
@@ -1623,24 +1590,27 @@ export function ListingDetailPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-white/10">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-xl text-amber-400">
+                    <span className="material-symbols-outlined text-xl text-slate-400">
                       folder_shared
                     </span>
-                    <h2 className="text-lg font-serif font-bold text-white tracking-wide">
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
                       Verification Documents
                     </h2>
-                    <span className="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
+                    <span className="text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
                       {documents.length}
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-1">
-                    Official documents uploaded to substantiate ownership, utilities, and property legitimacy.
+                    Official documents uploaded to substantiate ownership,
+                    utilities, and property legitimacy.
                   </p>
                 </div>
 
                 {user?.is_verifier && (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-label-sm uppercase tracking-wider text-amber-300 self-start sm:self-center">
-                    <span className="material-symbols-outlined text-sm text-amber-400">verified_user</span>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/10 border border-slate-500/30 text-[11px] font-label-sm uppercase tracking-wider text-slate-300 self-start sm:self-center">
+                    <span className="material-symbols-outlined text-sm text-slate-400">
+                      verified_user
+                    </span>
                     <span>Review Flow</span>
                   </div>
                 )}
@@ -1661,7 +1631,7 @@ export function ListingDetailPage() {
 
               {documentsLoading ? (
                 <div className="py-12 text-center text-slate-400">
-                  <div className="w-7 h-7 rounded-full border-2 border-amber-400/40 border-t-transparent animate-spin mx-auto mb-2" />
+                  <div className="w-7 h-7 rounded-full border-2 border-slate-400/40 border-t-transparent animate-spin mx-auto mb-2" />
                   <p className="text-xs">Loading verification documents...</p>
                 </div>
               ) : documentsError ? (
@@ -1684,7 +1654,9 @@ export function ListingDetailPage() {
                     No Documents Uploaded
                   </h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                    The owner has not uploaded any verification documents (utility bills, holding tax, or trade license) for this property yet.
+                    The owner has not uploaded any verification documents
+                    (utility bills, holding tax, or trade license) for this
+                    property yet.
                   </p>
                 </div>
               ) : (
@@ -1693,11 +1665,14 @@ export function ListingDetailPage() {
                     const docTitle = formatDocumentType(doc.document_type);
                     const isDocVerified = Boolean(doc.is_verified);
                     const uploadedDate = doc.uploaded_at
-                      ? new Date(doc.uploaded_at).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })
+                      ? new Date(doc.uploaded_at).toLocaleDateString(
+                          undefined,
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          },
+                        )
                       : "Recently";
 
                     return (
@@ -1732,17 +1707,19 @@ export function ListingDetailPage() {
                                   className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] uppercase font-label-sm tracking-wider font-semibold border ${
                                     isDocVerified
                                       ? "text-emerald-300 bg-emerald-950/70 border-emerald-500/40"
-                                      : "text-amber-300 bg-amber-950/70 border-amber-500/40"
+                                      : "text-slate-300 bg-slate-950/70 border-slate-500/40"
                                   }`}
                                 >
                                   <span
                                     className={`w-1.5 h-1.5 rounded-full ${
                                       isDocVerified
                                         ? "bg-emerald-400"
-                                        : "bg-amber-400 animate-pulse"
+                                        : "bg-slate-400 animate-pulse"
                                     }`}
                                   />
-                                  {isDocVerified ? "Verified" : "Pending Review"}
+                                  {isDocVerified
+                                    ? "Verified"
+                                    : "Pending Review"}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
@@ -1794,7 +1771,9 @@ export function ListingDetailPage() {
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                               {doc.media.map((file, idx) => {
-                                const isPdf = file.url.toLowerCase().includes(".pdf");
+                                const isPdf = file.url
+                                  .toLowerCase()
+                                  .includes(".pdf");
                                 return (
                                   <div
                                     key={file.id}
@@ -1808,7 +1787,7 @@ export function ListingDetailPage() {
                                         initialIndex: idx,
                                       })
                                     }
-                                    className="group/file relative rounded-xl overflow-hidden border border-white/10 hover:border-[#d4b068]/50 bg-[#12151c] aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition shadow-sm hover:scale-[1.02]"
+                                    className="group/file relative rounded-xl overflow-hidden border border-white/10 hover:border-slate/50 bg-[#12151c] aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition shadow-sm hover:scale-[1.02]"
                                   >
                                     {isPdf ? (
                                       <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-slate-900/60">
@@ -1864,20 +1843,25 @@ export function ListingDetailPage() {
           <div className="order-8 border border-slate-800 bg-[#12151c] rounded-2xl p-6 sm:p-7 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
               <div className="flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-xl text-amber-400">
+                <span className="material-symbols-outlined text-xl text-slate-400">
                   hotel_class
                 </span>
                 <div>
-                  <h2 className="text-base font-bold text-white">Tenant Reviews</h2>
+                  <h2 className="text-base font-bold text-white">
+                    Tenant Reviews
+                  </h2>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Authentic feedback from verified tenants with confirmed rental payments
+                    Authentic feedback from verified tenants with confirmed
+                    rental payments
                   </p>
                 </div>
               </div>
 
               {reviewSummary.total_reviews > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-600/50 font-mono self-start sm:self-center">
-                  <span className="material-symbols-outlined text-xs">star</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-950/80 text-slate-300 border border-slate-600/50 font-mono self-start sm:self-center">
+                  <span className="material-symbols-outlined text-xs">
+                    star
+                  </span>
                   <span>{reviewSummary.average_rating.toFixed(1)} / 5.0</span>
                 </span>
               )}
@@ -1891,7 +1875,7 @@ export function ListingDetailPage() {
                   <div className="text-4xl sm:text-5xl font-extrabold text-white font-mono tracking-tight mb-1">
                     {reviewSummary.average_rating.toFixed(1)}
                   </div>
-                  <div className="flex items-center text-amber-400 text-lg mb-1.5">
+                  <div className="flex items-center text-slate-400 text-lg mb-1.5">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
@@ -1912,7 +1896,8 @@ export function ListingDetailPage() {
                     ))}
                   </div>
                   <p className="text-xs text-slate-400">
-                    Based on {reviewSummary.total_reviews} verified tenant review{reviewSummary.total_reviews > 1 ? "s" : ""}
+                    Based on {reviewSummary.total_reviews} verified tenant
+                    review{reviewSummary.total_reviews > 1 ? "s" : ""}
                   </p>
                 </div>
 
@@ -1922,17 +1907,24 @@ export function ListingDetailPage() {
                     const count = reviewSummary.rating_counts[star] || 0;
                     const percent =
                       reviewSummary.total_reviews > 0
-                        ? Math.round((count / reviewSummary.total_reviews) * 100)
+                        ? Math.round(
+                            (count / reviewSummary.total_reviews) * 100,
+                          )
                         : 0;
                     return (
-                      <div key={star} className="flex items-center gap-3 text-xs">
+                      <div
+                        key={star}
+                        className="flex items-center gap-3 text-xs"
+                      >
                         <span className="w-12 font-medium text-slate-400 font-mono shrink-0 flex items-center gap-1">
                           <span>{star}</span>
-                          <span className="material-symbols-outlined text-xs text-amber-400">star</span>
+                          <span className="material-symbols-outlined text-xs text-slate-400">
+                            star
+                          </span>
                         </span>
                         <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
                           <div
-                            className="h-full bg-amber-400 rounded-full transition-all duration-500"
+                            className="h-full bg-slate-400 rounded-full transition-all duration-500"
                             style={{ width: `${percent}%` }}
                           />
                         </div>
@@ -1950,20 +1942,28 @@ export function ListingDetailPage() {
             {reviews.length === 0 ? (
               <div className="py-12 px-4 text-center border border-dashed border-slate-800 rounded-xl bg-[#090a0c]/50">
                 <div className="w-12 h-12 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-400 mx-auto mb-3">
-                  <span className="material-symbols-outlined text-2xl text-slate-500">rate_review</span>
+                  <span className="material-symbols-outlined text-2xl text-slate-500">
+                    rate_review
+                  </span>
                 </div>
                 <h3 className="text-sm font-semibold text-slate-200 mb-1">
                   No Reviews Yet
                 </h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Only verified tenants with at least one confirmed rent payment can write a review for this property.
+                  Only verified tenants with at least one confirmed rent payment
+                  can write a review for this property.
                 </p>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 {reviews.map((rev) => {
-                  const initial = (rev.reviewer_name || "T").trim().charAt(0).toUpperCase();
-                  const formattedDate = new Date(rev.created_at).toLocaleDateString(undefined, {
+                  const initial = (rev.reviewer_name || "T")
+                    .trim()
+                    .charAt(0)
+                    .toUpperCase();
+                  const formattedDate = new Date(
+                    rev.created_at,
+                  ).toLocaleDateString(undefined, {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
@@ -1986,7 +1986,9 @@ export function ListingDetailPage() {
                                 {rev.reviewer_name || "Verified Tenant"}
                               </span>
                               <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-700/50">
-                                <span className="material-symbols-outlined text-[11px]">verified</span>
+                                <span className="material-symbols-outlined text-[11px]">
+                                  verified
+                                </span>
                                 <span>Verified Tenant</span>
                               </span>
                             </div>
@@ -1997,15 +1999,18 @@ export function ListingDetailPage() {
                         </div>
 
                         {/* Rating Stars */}
-                        <div className="flex items-center text-amber-400">
+                        <div className="flex items-center text-slate-400">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <span
                               key={star}
                               className={`material-symbols-outlined text-base ${
-                                star <= rev.rating ? "font-variation-fill" : "text-slate-700"
+                                star <= rev.rating
+                                  ? "font-variation-fill"
+                                  : "text-slate-700"
                               }`}
                               style={{
-                                fontVariationSettings: star <= rev.rating ? "'FILL' 1" : "'FILL' 0",
+                                fontVariationSettings:
+                                  star <= rev.rating ? "'FILL' 1" : "'FILL' 0",
                               }}
                             >
                               star
@@ -2044,7 +2049,7 @@ export function ListingDetailPage() {
                                     rating: rev.rating,
                                   })
                                 }
-                                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-slate-700/80 hover:border-amber-400/80 transition-all hover:scale-105 group cursor-pointer shadow-sm"
+                                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-slate-700/80 hover:border-slate-400/80 transition-all hover:scale-105 group cursor-pointer shadow-sm"
                               >
                                 <img
                                   src={img.url}
@@ -2052,7 +2057,9 @@ export function ListingDetailPage() {
                                   className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                                  <span className="material-symbols-outlined text-lg">fullscreen</span>
+                                  <span className="material-symbols-outlined text-lg">
+                                    fullscreen
+                                  </span>
                                 </div>
                               </button>
                             ))}
@@ -2071,52 +2078,39 @@ export function ListingDetailPage() {
         <aside className="contents lg:flex lg:flex-col lg:col-span-5 xl:col-span-4 lg:sticky lg:top-6 lg:gap-6">
           {/* 1. Listing Information Card (order-2 on mobile) */}
           <div className="order-2 border border-slate-800 bg-[#12151c] rounded-2xl p-6 shadow-xl">
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono uppercase bg-slate-800 text-slate-300 px-2.5 py-1 rounded">
-                  {getAreaName(listing.area_id)}
-                </span>
-                {(isOwner || user?.is_verifier || listing.status?.toLowerCase() === "occupied") && (
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded border capitalize ${
-                      listing.status?.toLowerCase() === "occupied"
-                        ? "text-rose-300 bg-rose-950/60 border-rose-800/60"
-                        : listing.status?.toLowerCase() === "waiting" ||
-                          listing.status?.toLowerCase() === "pending"
-                        ? "text-amber-300 bg-amber-950/60 border-amber-800/60"
-                        : "text-emerald-400 bg-emerald-950/60 border-emerald-800/60"
-                    }`}
-                  >
-                    Status: {listing.status}
-                  </span>
-                )}
-              </div>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
               {/* Star button (non-owners only) */}
-              {user && !isOwner ? (
+              {user && (
                 <button
                   type="button"
                   onClick={handleToggleStar}
                   disabled={starLoading}
-                  aria-label={isStarred ? "Remove from starred" : "Add to starred"}
-                  title={isStarred ? "Remove from starred" : "Save to starred listings"}
+                  aria-label={
+                    isStarred ? "Remove from starred" : "Add to starred"
+                  }
+                  title={
+                    isStarred
+                      ? "Remove from starred"
+                      : "Save to starred listings"
+                  }
                   className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border cursor-pointer ${
                     isStarred
                       ? "text-[#d4b068] bg-[#d4b068]/10 border-[#d4b068]/40 shadow-[0_0_12px_rgba(212,175,85,0.25)]"
-                      : "text-slate-400 bg-slate-800/60 border-slate-700 hover:text-[#d4b068] hover:border-[#d4b068]/40"
+                      : "text-slate-400 bg-slate-800/60 border-slate-700 hover:text-slate hover:border-slate/40"
                   } disabled:opacity-50`}
                 >
                   <span
                     className="material-symbols-outlined text-base"
-                    style={{ fontVariationSettings: isStarred ? "'FILL' 1" : "'FILL' 0" }}
+                    style={{
+                      fontVariationSettings: isStarred
+                        ? "'FILL' 1"
+                        : "'FILL' 0",
+                    }}
                   >
                     grade
                   </span>
                   <span>{isStarred ? "Starred" : "Star"}</span>
                 </button>
-              ) : (
-                <span className="text-xs font-mono text-slate-500">
-                  Ref #{listing.id}
-                </span>
               )}
             </div>
 
@@ -2163,7 +2157,7 @@ export function ListingDetailPage() {
                   {listing.bathroom_count}
                 </span>
               </div>
-              <div className="p-2 border-t border-slate-800/80">
+              <div className="p-2">
                 <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">
                   Floor
                 </span>
@@ -2171,13 +2165,12 @@ export function ListingDetailPage() {
                   {listing.on_which_floor}
                 </span>
               </div>
-              <div className="p-2 border-t border-slate-800/80">
+              <div className="p-2">
                 <span className="block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5 font-medium">
-                  Coordinates
+                  Location
                 </span>
-                <span className="text-xs font-mono text-slate-300 block truncate">
-                  {Number(listing.latitude).toFixed(2)},{" "}
-                  {Number(listing.longitude).toFixed(2)}
+                <span className="text-base font-bold text-white">
+                  {getAreaName(listing.area_id)}
                 </span>
               </div>
             </div>
@@ -2188,16 +2181,12 @@ export function ListingDetailPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
-                  <span className="material-symbols-outlined text-lg text-[#d4b068]">
+                  <span className="material-symbols-outlined text-lg text-slate">
                     location_on
                   </span>
                   <span>Property Location</span>
                 </h2>
               </div>
-
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 bg-slate-800 px-2.5 py-1 rounded">
-                {getAreaName(listing.area_id)}
-              </span>
             </div>
 
             <ListingMapPreview
@@ -2223,7 +2212,7 @@ export function ListingDetailPage() {
               onClick={getDirections}
             >
               <span className="material-symbols-outlined text-sm">
-              directions
+                directions
               </span>
               <span>Get Directions</span>
             </button>
@@ -2238,7 +2227,9 @@ export function ListingDetailPage() {
                 rel="noopener noreferrer"
                 className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-xs font-semibold text-slate-950 shadow-sm transition hover:bg-[#1ebe5d]"
               >
-                <span className="material-symbols-outlined text-base">chat</span>
+                <span className="material-symbols-outlined text-base">
+                  chat
+                </span>
                 <span>Contact Owner via WhatsApp</span>
               </a>
             )}
@@ -2250,19 +2241,25 @@ export function ListingDetailPage() {
                     <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
                       Verification Status
                     </span>
-                    <span className="text-xs font-semibold text-white">Listing Review</span>
+                    <span className="text-xs font-semibold text-white">
+                      Listing Review
+                    </span>
                   </div>
                   <span
                     className={`text-xs px-2.5 py-1 rounded-full font-medium border flex items-center gap-1.5 ${
                       listing.status?.toLowerCase() === "approved"
                         ? "bg-emerald-950/60 text-emerald-300 border-emerald-800/60"
-                        : "bg-amber-950/60 text-amber-300 border-amber-800/60"
+                        : "bg-slate-950/60 text-slate-300 border-slate-800/60"
                     }`}
                   >
                     <span className="material-symbols-outlined text-sm">
-                      {listing.status?.toLowerCase() === "approved" ? "verified" : "pending"}
+                      {listing.status?.toLowerCase() === "approved"
+                        ? "verified"
+                        : "pending"}
                     </span>
-                    {listing.status?.toLowerCase() === "approved" ? "Approved" : "Pending Verification"}
+                    {listing.status?.toLowerCase() === "approved"
+                      ? "Approved"
+                      : "Pending Verification"}
                   </span>
                 </div>
 
@@ -2271,7 +2268,8 @@ export function ListingDetailPage() {
                   <div className="text-[11px] text-slate-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
                     <span>Documents Verified</span>
                     <span className="text-white font-bold">
-                      {documents.filter((d) => d.is_verified).length} / {documents.length}
+                      {documents.filter((d) => d.is_verified).length} /{" "}
+                      {documents.length}
                     </span>
                   </div>
                   <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
@@ -2280,7 +2278,9 @@ export function ListingDetailPage() {
                       style={{
                         width: `${
                           documents.length > 0
-                            ? (documents.filter((d) => d.is_verified).length / documents.length) * 100
+                            ? (documents.filter((d) => d.is_verified).length /
+                                documents.length) *
+                              100
                             : 0
                         }%`,
                       }}
@@ -2290,14 +2290,18 @@ export function ListingDetailPage() {
 
                 {verifySuccessMsg && (
                   <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">check_circle</span>
+                    <span className="material-symbols-outlined text-base">
+                      check_circle
+                    </span>
                     <span>{verifySuccessMsg}</span>
                   </div>
                 )}
 
                 {verifyError && (
                   <div className="p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">error</span>
+                    <span className="material-symbols-outlined text-base">
+                      error
+                    </span>
                     <span>{verifyError}</span>
                   </div>
                 )}
@@ -2307,29 +2311,45 @@ export function ListingDetailPage() {
                   <button
                     type="button"
                     onClick={handleApproveListing}
-                    disabled={verifying || listing.status?.toLowerCase() === "approved" || listing.status?.toLowerCase() === "rejected"}
+                    disabled={
+                      verifying ||
+                      listing.status?.toLowerCase() === "approved" ||
+                      listing.status?.toLowerCase() === "rejected"
+                    }
                     className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-semibold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-base">
-                      {listing.status?.toLowerCase() === "approved" ? "check_circle" : "verified"}
+                      {listing.status?.toLowerCase() === "approved"
+                        ? "check_circle"
+                        : "verified"}
                     </span>
                     <span>
                       {verifying
                         ? "Approving Listing..."
                         : listing.status?.toLowerCase() === "approved"
-                        ? "Listing Approved"
-                        : "Approve Listing"}
+                          ? "Listing Approved"
+                          : "Approve Listing"}
                     </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setShowRejectModal(true)}
-                    disabled={verifying || rejecting || listing.status?.toLowerCase() === "rejected"}
+                    disabled={
+                      verifying ||
+                      rejecting ||
+                      listing.status?.toLowerCase() === "rejected"
+                    }
                     className="w-full bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-medium py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    <span className="material-symbols-outlined text-base">cancel</span>
-                    <span>{listing.status?.toLowerCase() === "rejected" ? "Listing Rejected" : "Reject Listing"}</span>
+                    <span className="material-symbols-outlined text-base">
+                      cancel
+                    </span>
+                    <span>
+                      {listing.status?.toLowerCase() === "rejected"
+                        ? "Listing Rejected"
+                        : "Reject Listing"}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -2344,9 +2364,11 @@ export function ListingDetailPage() {
                 <div className="flex flex-col gap-2.5">
                   <a
                     href="#tenant-history"
-                    className="w-full bg-sky-950/40 hover:bg-sky-900/50 text-sky-300 border border-sky-800/60 font-medium py-2.5 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-1.5"
+                    className="w-full bg-slate-950/40 hover:bg-slate-900/50 text-slate-300 border border-slate-800/60 font-medium py-2.5 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-1.5"
                   >
-                    <span className="material-symbols-outlined text-sm">history</span>
+                    <span className="material-symbols-outlined text-sm">
+                      history
+                    </span>
                     <span>View Tenant History</span>
                   </a>
                   <Link
@@ -2394,13 +2416,16 @@ export function ListingDetailPage() {
                 {listing.status === "occupied" && !isApplied ? (
                   <div className="p-5 text-center border border-rose-900/40 rounded-xl bg-[#090a0c]">
                     <div className="w-10 h-10 rounded-full bg-rose-950/80 border border-rose-800/60 text-rose-400 flex items-center justify-center mx-auto mb-2.5">
-                      <span className="material-symbols-outlined text-xl">home_work</span>
+                      <span className="material-symbols-outlined text-xl">
+                        home_work
+                      </span>
                     </div>
                     <p className="text-xs font-semibold text-rose-200 mb-1">
                       Applications Closed
                     </p>
                     <p className="text-[11px] text-slate-400">
-                      An active lease contract is currently signed for this property.
+                      An active lease contract is currently signed for this
+                      property.
                     </p>
                   </div>
                 ) : !user ? (
@@ -2420,7 +2445,7 @@ export function ListingDetailPage() {
                   <div
                     className={`p-4 rounded-xl bg-[#090a0c] border shadow-lg ${
                       effectiveApp?.contractStatus === "proposed"
-                        ? "border-[#d4b068]/70"
+                        ? "border-slate/70"
                         : effectiveApp?.contractStatus === "signed" ||
                             effectiveApp?.status === "approved"
                           ? "border-emerald-800/60"
@@ -2434,13 +2459,13 @@ export function ListingDetailPage() {
                         <span
                           className={`material-symbols-outlined text-xl ${
                             effectiveApp?.contractStatus === "proposed"
-                              ? "text-[#d4b068]"
+                              ? "text-slate"
                               : effectiveApp?.contractStatus === "signed" ||
                                   effectiveApp?.status === "approved"
                                 ? "text-emerald-400"
                                 : effectiveApp?.status === "rejected"
                                   ? "text-rose-400"
-                                  : "text-amber-400"
+                                  : "text-slate-400"
                           }`}
                         >
                           {effectiveApp?.contractStatus === "proposed"
@@ -2467,7 +2492,7 @@ export function ListingDetailPage() {
                       <span
                         className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded ${
                           effectiveApp?.contractStatus === "proposed"
-                            ? "bg-amber-950 text-amber-300 border border-amber-800"
+                            ? "bg-slate-950 text-slate-300 border border-slate-800"
                             : effectiveApp?.contractStatus === "signed" ||
                                 effectiveApp?.status === "approved"
                               ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
@@ -2501,7 +2526,7 @@ export function ListingDetailPage() {
                       effectiveApp?.contractStatus === "proposed" && (
                         <Link
                           to={`/contracts/${effectiveApp.contractId}`}
-                          className="mb-4 w-full bg-[#d4b068] hover:bg-[#c39f57] text-black font-semibold py-2.5 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-2 shadow-sm"
+                          className="mb-4 w-full bg-slate hover:bg-[#c39f57] text-black font-semibold py-2.5 px-4 rounded-xl text-xs transition text-center flex items-center justify-center gap-2 shadow-sm"
                         >
                           <span className="material-symbols-outlined text-sm">
                             draw
@@ -2537,7 +2562,7 @@ export function ListingDetailPage() {
                             className={`font-semibold uppercase font-mono text-[11px] ${
                               effectiveApp.contractStatus === "signed"
                                 ? "text-emerald-400"
-                                : "text-[#d4b068]"
+                                : "text-slate"
                             }`}
                           >
                             {effectiveApp.contractStatus === "signed"
@@ -2583,8 +2608,8 @@ export function ListingDetailPage() {
                     onSubmit={handleSubmitTenantForm}
                     className="flex flex-col gap-4"
                   >
-                    <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-200 text-xs flex items-start gap-2">
-                      <span className="material-symbols-outlined text-amber-400 text-base shrink-0 mt-0.5">
+                    <div className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-800/50 text-slate-200 text-xs flex items-start gap-2">
+                      <span className="material-symbols-outlined text-slate-400 text-base shrink-0 mt-0.5">
                         info
                       </span>
                       <span>
@@ -2901,14 +2926,16 @@ export function ListingDetailPage() {
             <div>
               <div className="flex items-center gap-2 mb-0.5">
                 <h3 className="text-sm font-semibold truncate max-w-xs sm:max-w-md text-white">
-                  {reviewLightbox.reviewerName || "Verified Tenant"}'s Review Photo
+                  {reviewLightbox.reviewerName || "Verified Tenant"}'s Review
+                  Photo
                 </h3>
-                <span className="text-xs text-amber-400 font-mono">
+                <span className="text-xs text-slate-400 font-mono">
                   ★ {reviewLightbox.rating}/5
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono">
-                Photo {reviewLightbox.selectedIndex + 1} of {reviewLightbox.photos.length}
+                Photo {reviewLightbox.selectedIndex + 1} of{" "}
+                {reviewLightbox.photos.length}
               </p>
             </div>
 
@@ -2918,8 +2945,18 @@ export function ListingDetailPage() {
               className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
               aria-label="Close fullscreen gallery"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -2949,14 +2986,24 @@ export function ListingDetailPage() {
                                 ? prev.photos.length - 1
                                 : prev.selectedIndex - 1,
                           }
-                        : null
+                        : null,
                     )
                   }
                   className="absolute left-2 sm:left-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
                   aria-label="Previous photo"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
                 </button>
 
@@ -2972,14 +3019,24 @@ export function ListingDetailPage() {
                                 ? 0
                                 : prev.selectedIndex + 1,
                           }
-                        : null
+                        : null,
                     )
                   }
                   className="absolute right-2 sm:right-6 w-12 h-12 rounded-full bg-black/70 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center transition cursor-pointer shadow-xl"
                   aria-label="Next photo"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
               </>
@@ -2997,7 +3054,9 @@ export function ListingDetailPage() {
                   key={photo.id || idx}
                   type="button"
                   onClick={() =>
-                    setReviewLightbox((prev) => (prev ? { ...prev, selectedIndex: idx } : null))
+                    setReviewLightbox((prev) =>
+                      prev ? { ...prev, selectedIndex: idx } : null,
+                    )
                   }
                   className={`w-14 sm:w-16 aspect-square rounded-md overflow-hidden border transition cursor-pointer flex-shrink-0 ${
                     idx === reviewLightbox.selectedIndex
@@ -3005,7 +3064,11 @@ export function ListingDetailPage() {
                       : "border-white/20 opacity-50 hover:opacity-100"
                   }`}
                 >
-                  <img src={photo.url} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={photo.url}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -3039,22 +3102,32 @@ export function ListingDetailPage() {
           >
             <div className="flex items-start gap-3">
               <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-400">
-                <span className="material-symbols-outlined text-2xl">cancel</span>
+                <span className="material-symbols-outlined text-2xl">
+                  cancel
+                </span>
               </div>
               <div className="flex-1">
-                <h3 className="text-base font-bold text-white">Reject this listing?</h3>
-                <p className="text-xs text-slate-400 mt-1">This action cannot be undone.</p>
+                <h3 className="text-base font-bold text-white">
+                  Reject this listing?
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  This action cannot be undone.
+                </p>
               </div>
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed bg-[#090a0c] p-3.5 rounded-xl border border-white/5">
-              The listing will be marked as <span className="text-rose-400 font-semibold">rejected</span> and
-              immediately removed from all public listings. Tenants will no longer be able to find or apply to it.
+              The listing will be marked as{" "}
+              <span className="text-rose-400 font-semibold">rejected</span> and
+              immediately removed from all public listings. Tenants will no
+              longer be able to find or apply to it.
             </p>
 
             {rejectError && (
               <div className="p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center gap-2">
-                <span className="material-symbols-outlined text-base">error</span>
+                <span className="material-symbols-outlined text-base">
+                  error
+                </span>
                 <span>{rejectError}</span>
               </div>
             )}
@@ -3074,7 +3147,11 @@ export function ListingDetailPage() {
                 disabled={rejecting}
                 className="px-4 py-2 bg-rose-700 hover:bg-rose-600 text-white rounded-xl text-xs font-semibold transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               >
-                {rejecting && <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>}
+                {rejecting && (
+                  <span className="material-symbols-outlined text-base animate-spin">
+                    progress_activity
+                  </span>
+                )}
                 {rejecting ? "Rejecting..." : "Confirm Rejection"}
               </button>
             </div>
@@ -3173,7 +3250,9 @@ function TenantHistoryCard({
         {/* Tenancy Duration / Dates */}
         <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1 border-t border-slate-800/80">
           <div className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">calendar_today</span>
+            <span className="material-symbols-outlined text-xs">
+              calendar_today
+            </span>
             <span>
               {isCurrent
                 ? `Started: ${tenant.startDate}`
@@ -3195,7 +3274,9 @@ function TenantHistoryCard({
           className="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-700 transition flex items-center gap-1 font-mono"
         >
           <span>Contract #{tenant.contractId}</span>
-          <span className="material-symbols-outlined text-xs">arrow_forward</span>
+          <span className="material-symbols-outlined text-xs">
+            arrow_forward
+          </span>
         </Link>
       </div>
     </div>
