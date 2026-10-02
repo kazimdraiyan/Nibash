@@ -27,5 +27,12 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Database
+*.dump
+
 # Graphify
-graphify-out/cache/
+graphify-out/
+
+# Agent
+.agents/
+skills-lock.json
