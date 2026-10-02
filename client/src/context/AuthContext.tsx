@@ -5,7 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { apiClient } from "../api/client";
+import { apiClient, API_BASE_URL } from "../api/client";
 
 export interface User {
   email: string;
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function fetchUserInfo(authToken: string): Promise<User | null> {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
+      const res = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       if (!res.ok) return null;
