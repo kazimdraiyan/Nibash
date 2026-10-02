@@ -406,9 +406,6 @@ export function ListingsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-3xl font-bold text-white mb-1">Browse Apartments</h1>
-          <p className="text-sm text-slate-400">
-            Real approved properties stored in PostgreSQL database.
-          </p>
         </div>
       </div>
 

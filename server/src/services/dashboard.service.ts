@@ -266,8 +266,8 @@ export async function getDuplicateLocations(): Promise<DuplicateLocation[]> {
     FROM listings l1
     JOIN listings l2 ON l1.id < l2.id
                     AND l1.owner_id != l2.owner_id
-                    AND ABS(l1.latitude  - l2.latitude)  < 0.0005
-                    AND ABS(l1.longitude - l2.longitude) < 0.0005
+                    AND ABS(l1.latitude  - l2.latitude)  < 0.0002
+                    AND ABS(l1.longitude - l2.longitude) < 0.0002
     JOIN users u1 ON u1.id = l1.owner_id
     JOIN users u2 ON u2.id = l2.owner_id
     JOIN areas a  ON a.id  = l1.area_id
