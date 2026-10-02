@@ -4,7 +4,7 @@
 
 Course project for **CSE216: Database Systems** - a PERN-stack platform where owners list verified apartments, tenants search and apply with multi-filter queries, and the system tracks leases, rent payments, reviews, and fraud signals through explicit SQL.
 
-[Watch Demo on YouTube](https://example.com/nibash-demo)
+[Watch Demo on YouTube](https://youtu.be/Q9piKY3quFo)
 
 [Entity Relationship Diagram (ERD)](db/ERD.pdf)
 
@@ -234,6 +234,8 @@ nibash/
 - bKash/SSLCommerz sandbox integration for wallet-based identity verification
 - Computed owner trust score from reviews, payment history, and verification status
 - Email/SMS notifications for applications, contract milestones, and overdue rent
+- Rate limiting: prevent brute-force login attempts and API abuse
+- Monetization: listing promotion for owners
 
 ---
 
